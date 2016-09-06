@@ -10,10 +10,10 @@
 监听剪贴板，复制链接通知栏提示离线，方便快捷！<br/>
 Offline Saver，Web Saver，Video Saver，HTML Saver。
 
-豌豆荚：http://www.wandoujia.com/apps/com.liuyx.myreader
-应用宝：http://android.myapp.com/myapp/detail.htm?apkName=com.liuyx.myreader
-360手机：http://zhushou.360.cn/detail/index/soft_id/3381439?recrefer=SE_D_%E8%AF%BB%E4%B9%90%E4%B9%90
-百度手机助手：http://shouji.baidu.com/software/9855849.html
+豌豆荚：http://www.wandoujia.com/apps/com.liuyx.myreader<br/>
+应用宝：http://android.myapp.com/myapp/detail.htm?apkName=com.liuyx.myreader<br/>
+360手机：http://zhushou.360.cn/detail/index/soft_id/3381439?recrefer=SE_D_%E8%AF%BB%E4%B9%90%E4%B9%90<br/>
+百度手机助手：http://shouji.baidu.com/software/9855849.html<br/>
 
 ![Alt text](/Screenshots/Screenshot1_960.png "读乐乐截屏")<br/>
 ![Alt text](/Screenshots/Screenshot2_960.png "读乐乐截屏")<br/>
