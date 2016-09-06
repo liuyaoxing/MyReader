@@ -9,3 +9,8 @@
 长按链接直接离线，也可以长按图片屏蔽图片，不受骚乱。<br/>
 监听剪贴板，复制链接通知栏提示离线，方便快捷！<br/>
 Offline Saver，Web Saver，Video Saver，HTML Saver。
+
+![Alt text](/Screenshots/Screenshot1_960.png "读乐乐截屏")<br/>
+![Alt text](/Screenshots/Screenshot2_960.png "读乐乐截屏")<br/>
+![Alt text](/Screenshots/Screenshot3_960.png "读乐乐截屏")<br/>
+![Alt text](/Screenshots/Screenshot4_960.png "读乐乐截屏")<br/>
