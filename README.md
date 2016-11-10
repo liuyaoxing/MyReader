@@ -18,7 +18,8 @@ Offline Saver，Web Saver，Video Saver，HTML Saver。
 Vivo应用：http://info.appstore.vivo.com.cn/detail/1529876?source=7<br/>
 安卓市场：http://apk.hiapk.com/appinfo/com.liuyx.myreader<br/>
 
-![Alt text](/Screenshots/Screenshot1_960.png "读乐乐截屏")<br/>
-![Alt text](/Screenshots/Screenshot2_960.png "读乐乐截屏")<br/>
-![Alt text](/Screenshots/Screenshot3_960.png "读乐乐截屏")<br/>
-![Alt text](/Screenshots/Screenshot4_960.png "读乐乐截屏")<br/>
+![Alt text](/Screenshots/Screenshot_2016-320-1.png "读乐乐截屏")
+![Alt text](/Screenshots/Screenshot_2016-320-2.png "读乐乐截屏")
+![Alt text](/Screenshots/Screenshot_2016-320-3.png "读乐乐截屏")<br/>
+![Alt text](/Screenshots/Screenshot_2016-320-4.png "读乐乐截屏")
+![Alt text](/Screenshots/Screenshot_2016-320-5.png "读乐乐截屏")
