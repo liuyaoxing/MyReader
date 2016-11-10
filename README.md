@@ -12,8 +12,11 @@ Offline Saver，Web Saver，Video Saver，HTML Saver。
 
 豌豆荚：http://www.wandoujia.com/apps/com.liuyx.myreader<br/>
 应用宝：http://android.myapp.com/myapp/detail.htm?apkName=com.liuyx.myreader<br/>
-360手机：http://zhushou.360.cn/detail/index/soft_id/3381439?recrefer=SE_D_%E8%AF%BB%E4%B9%90%E4%B9%90<br/>
+360手机：http://zhushou.360.cn/detail/index/soft_id/3381439<br/>
 百度手机助手：http://shouji.baidu.com/software/9855849.html<br/>
+91手机助手：http://d.91.com/Soft/Android/com.liuyx.myreader-15.html<br/>
+Vivo应用：http://info.appstore.vivo.com.cn/detail/1529876?source=7<br/>
+安卓市场：http://apk.hiapk.com/appinfo/com.liuyx.myreader<br/>
 
 ![Alt text](/Screenshots/Screenshot1_960.png "读乐乐截屏")<br/>
 ![Alt text](/Screenshots/Screenshot2_960.png "读乐乐截屏")<br/>
