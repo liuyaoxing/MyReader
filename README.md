@@ -20,6 +20,6 @@ Vivo应用：http://info.appstore.vivo.com.cn/detail/1529876?source=7<br/>
 
 ![Alt text](/Screenshots/Screenshot_2016-320-1.png "读乐乐截屏")
 ![Alt text](/Screenshots/Screenshot_2016-320-2.png "读乐乐截屏")
-![Alt text](/Screenshots/Screenshot_2016-320-3.png "读乐乐截屏")<br/>
+![Alt text](/Screenshots/Screenshot_2016-320-3.png "读乐乐截屏")
 ![Alt text](/Screenshots/Screenshot_2016-320-4.png "读乐乐截屏")
 ![Alt text](/Screenshots/Screenshot_2016-320-5.png "读乐乐截屏")
