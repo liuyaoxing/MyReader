@@ -28,10 +28,10 @@ VIVO市场| http://info.appstore.vivo.com.cn/detail/1529876?source=7
 ---
 
 ## 应用截图
-![image](K:\AppStore\Github\liuyaoxing\MyReader\images/readme/Screenshot_2017_main.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_main.png)
 
-![image](K:\AppStore\Github\liuyaoxing\MyReader\images/readme/Screenshot_2017_acct_nzzd.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_nzzd.png)
 
-![image](K:\AppStore\Github\liuyaoxing\MyReader\images/readme/Screenshot_2016_offlinedetail.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinedetail.png)
 
-![image](K:\AppStore\Github\liuyaoxing\MyReader\images/readme/Screenshot_2017_acct_tcxxm.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_tcxxm.png)
