@@ -1,25 +1,37 @@
-# MyReader
+# 读乐乐
+## 没有4G、3G或Wi-Fi？随时查看网页图片和视频，不受网络限制！
 
-没有4G、3G或Wi-Fi？随时查看网页，不受网络限制！<br/>
-提供离线保存网页，并以最适合手机屏幕尺寸展示，支持原生阅读格式体验，享受阅读乐趣。<br/>
-提供整站下载汤不热tumblr的博客，并用网页输出格式查看，请科学上网，享受摄影的乐趣。<br/>
-支持微信公众号文章离线保存，对图片查看良好支持。<br/>
-还能一次性将网页中视频全部保存到本地，离线查看。<br/>
-内置传送门微信公众号文章精选，方便快捷查看资讯。<br/>
-长按链接直接离线，也可以长按图片屏蔽图片，不受骚乱。<br/>
-监听剪贴板，复制链接通知栏提示离线，方便快捷！<br/>
-Offline Saver，Web Saver，Video Saver，HTML Saver。
+#### 1、轻松保存网页文件(图片和视频)到手机和平板，稍后阅读。
+#### 2、提供知乎日报订阅和阅读，随时涨姿势。
+#### 3、支持订阅微信公众号帐号，可以查看历史文章。
+#### 4、好喜欢某个Tumblr帐号，一键图文和视频全部下载到手机。
+#### 5、提供热门微信公众号文章实时排行榜，不错过热点。
+#### 6、支持快捷分享到微信和朋友圈等，独乐乐不如众乐乐。
+#### Offline Save,Video Saver,Web Saver,Html Saver,Rss Reader。
 
-豌豆荚：http://www.wandoujia.com/apps/com.liuyx.myreader<br/>
-应用宝：http://android.myapp.com/myapp/detail.htm?apkName=com.liuyx.myreader<br/>
-360手机：http://zhushou.360.cn/detail/index/soft_id/3381439<br/>
-百度手机助手：http://shouji.baidu.com/software/10290658.html<br/>
-91手机助手：http://d.91.com/Soft/Android/com.liuyx.myreader-15.html<br/>
-Vivo应用：http://info.appstore.vivo.com.cn/detail/1529876?source=7<br/>
-安卓市场：http://apk.hiapk.com/appinfo/com.liuyx.myreader<br/>
 
-![Alt text](/Screenshots/Screenshot_2016-320-1.png "读乐乐截屏")
-![Alt text](/Screenshots/Screenshot_2016-320-2.png "读乐乐截屏")
-![Alt text](/Screenshots/Screenshot_2016-320-3.png "读乐乐截屏")
-![Alt text](/Screenshots/Screenshot_2016-320-4.png "读乐乐截屏")
-![Alt text](/Screenshots/Screenshot_2016-320-5.png "读乐乐截屏")
+---
+
+## 应用商店下载
+
+商店名称 | 下载链接
+---|---
+豌豆荚  | http://www.wandoujia.com/apps/com.liuyx.myreader
+应用宝  | http://android.myapp.com/myapp/detail.htm?apkName=com.liuyx.myreader
+百度手机| https://mobile.baidu.com/item?docid=11122281
+91助手  | http://d.91.com/Soft/Android/com.liuyx.myreader-24.html
+VIVO市场| http://info.appstore.vivo.com.cn/detail/1529876?source=7
+安卓市场| http://apk.hiapk.com/appinfo/com.liuyx.myreader
+酷安市场| http://www.coolapk.com/apk/com.liuyx.myreader
+
+
+---
+
+## 应用截图
+![image](K:\AppStore\Github\liuyaoxing\MyReader\images/readme/Screenshot_2017_main.png)
+
+![image](K:\AppStore\Github\liuyaoxing\MyReader\images/readme/Screenshot_2017_acct_nzzd.png)
+
+![image](K:\AppStore\Github\liuyaoxing\MyReader\images/readme/Screenshot_2016_offlinedetail.png)
+
+![image](K:\AppStore\Github\liuyaoxing\MyReader\images/readme/Screenshot_2017_acct_tcxxm.png)
