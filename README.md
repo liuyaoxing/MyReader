@@ -24,6 +24,8 @@ VIVO市场| http://info.appstore.vivo.com.cn/detail/1529876?source=7
 安卓市场| http://apk.hiapk.com/appinfo/com.liuyx.myreader
 酷安市场| http://www.coolapk.com/apk/com.liuyx.myreader
 PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
+神马应用|http://a.sm.cn/details/info?pkg=com.liuyx.myreader
+
 ---
 
 ## 应用截图
