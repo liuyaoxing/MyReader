@@ -27,7 +27,8 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
 神马应用|http://a.sm.cn/details/info?pkg=com.liuyx.myreader
 
 ---
- ## 使用指南
+## 使用指南
+
 使用指南：https://github.com/liuyaoxing/MyReader/blob/master/使用指南.HowToUse.md
  
  
