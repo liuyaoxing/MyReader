@@ -19,8 +19,8 @@
 ---|---
 豌豆荚  | http://www.wandoujia.com/apps/com.liuyx.myreader
 应用宝  | http://android.myapp.com/myapp/detail.htm?apkName=com.liuyx.myreader
-百度手机| https://mobile.baidu.com/item?docid=11122281
-91助手  | http://d.91.com/Soft/Android/com.liuyx.myreader-25.html
+百度手机| https://mobile.baidu.com/item?docid=11243961
+91助手  | http://d.91.com/Soft/Android/com.liuyx.myreader-26.html
 VIVO市场| http://info.appstore.vivo.com.cn/detail/1529876?source=7
 安卓市场| http://apk.hiapk.com/appinfo/com.liuyx.myreader
 酷安市场| http://www.coolapk.com/apk/com.liuyx.myreader
