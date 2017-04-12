@@ -7,6 +7,7 @@
 #### 4、好喜欢某个Tumblr帐号，一键图文和视频全部下载到手机。
 #### 5、提供热门微信公众号文章实时排行榜，不错过热点。
 #### 6、支持快捷分享到微信和朋友圈等，独乐乐不如众乐乐。
+#### 7、增加蓝牙聊天、图片和文件传送功能。男人喜欢蓝牙，任何东西加上了蓝牙都会好很多！
 #### Offline Save,Video Saver,Web Saver,Html Saver,Rss Reader。
 
 
@@ -18,20 +19,27 @@
 ---|---
 豌豆荚  | http://www.wandoujia.com/apps/com.liuyx.myreader
 应用宝  | http://android.myapp.com/myapp/detail.htm?apkName=com.liuyx.myreader
-百度手机| https://mobile.baidu.com/item?docid=11122281
-91助手  | http://d.91.com/Soft/Android/com.liuyx.myreader-24.html
+百度手机| https://mobile.baidu.com/item?docid=11243961
+91助手  | http://d.91.com/Soft/Android/com.liuyx.myreader-26.html
 VIVO市场| http://info.appstore.vivo.com.cn/detail/1529876?source=7
 安卓市场| http://apk.hiapk.com/appinfo/com.liuyx.myreader
 酷安市场| http://www.coolapk.com/apk/com.liuyx.myreader
-
+PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
+神马应用|http://a.sm.cn/details/info?pkg=com.liuyx.myreader
 
 ---
+## 使用指南
 
+使用指南：https://github.com/liuyaoxing/MyReader/blob/master/使用指南.HowToUse.md
+ 
+ 
+ ---
+ 
 ## 应用截图
-![image](K:\AppStore\Github\liuyaoxing\MyReader\images/readme/Screenshot_2017_main.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_main.png)
 
-![image](K:\AppStore\Github\liuyaoxing\MyReader\images/readme/Screenshot_2017_acct_nzzd.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_nzzd.png)
 
-![image](K:\AppStore\Github\liuyaoxing\MyReader\images/readme/Screenshot_2016_offlinedetail.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinedetail.png)
 
-![image](K:\AppStore\Github\liuyaoxing\MyReader\images/readme/Screenshot_2017_acct_tcxxm.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_tcxxm.png)
