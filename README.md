@@ -21,7 +21,6 @@
 应用宝  | http://android.myapp.com/myapp/detail.htm?apkName=com.liuyx.myreader
 百度手机| https://mobile.baidu.com/item?docid=11354962&from=1015530l
 91助手  | http://d.91.com/Soft/Android/com.liuyx.myreader-27.html
-VIVO市场| http://info.appstore.vivo.com.cn/detail/1529876?source=7
 安卓市场| http://apk.hiapk.com/appinfo/com.liuyx.myreader
 酷安市场| http://www.coolapk.com/apk/com.liuyx.myreader
 PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
