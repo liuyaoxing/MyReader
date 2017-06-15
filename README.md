@@ -36,14 +36,12 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
  ---
  
 ## 应用截图
-![image](https://github.com/liuyaoxing/MyBLEChat/raw/master/images/readme/Screenshot_2017-message1.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_main.png)
 
-![image](https://github.com/liuyaoxing/MyBLEChat/raw/master/images/readme/Screenshot_2017-message2.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinefilter.png)
 
-![image](https://github.com/liuyaoxing/MyBLEChat/raw/master/images/readme/Screenshot_2017-bt-sender.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinedetail.png)
 
-![image](https://github.com/liuyaoxing/MyBLEChat/raw/master/images/readme/Screenshot_2017-wifi-sender.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_nzzd.png)
 
-![image](https://github.com/liuyaoxing/MyBLEChat/raw/master/images/readme/Screenshot_2017-bluetoothlist.png)
-
-![image](https://github.com/liuyaoxing/MyBLEChat/raw/master/images/readme/Screenshot_2017-wifilist.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_tcxxm.png)
