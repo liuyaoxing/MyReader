@@ -26,6 +26,7 @@
 PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
 神马应用|http://a.sm.cn/details/info?pkg=com.liuyx.myreader
 锤子应用|http://s.t.tt/LVYy4w?&source=share&version=2
+华为应用|http://appstore.huawei.com/app/C100037721
 
 ---
 ## 使用指南
