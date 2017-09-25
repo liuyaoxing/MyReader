@@ -19,7 +19,7 @@
 ---|---
 酷安市场| http://www.coolapk.com/apk/com.liuyx.myreader
 应用宝  | http://android.myapp.com/myapp/detail.htm?apkName=com.liuyx.myreader
-百度手机| https://mobile.baidu.com/item?type=soft&docid=22191444
+百度手机| https://mobile.baidu.com/item?type=soft&docid=22371314
 91助手  | http://d.91.com/Soft/Android/com.liuyx.myreader-40.html
 华为应用|http://appstore.huawei.com/app/C100037721
 PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
