@@ -21,7 +21,6 @@
 应用宝  | http://android.myapp.com/myapp/detail.htm?apkName=com.liuyx.myreader
 百度手机| https://mobile.baidu.com/item?type=soft&docid=22371314
 360手机 | http://zhushou.360.cn/detail/index/soft_id/3381439
-91助手  | http://d.91.com/Soft/Android/com.liuyx.myreader-41.html
 华为应用|http://appstore.huawei.com/app/C100037721
 PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
 神马应用|http://a.sm.cn/details/info?pkg=com.liuyx.myreader
