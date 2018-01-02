@@ -28,6 +28,10 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
 豌豆荚  | http://www.wandoujia.com/apps/com.liuyx.myreader
 
 ---
+## 下载最新版
+
+下载读乐乐：https://github.com/liuyaoxing/MyReader/raw/master/releases/MyReader_v3.3_sign_legu_signed_zipalign.apk
+---
 ## 使用指南
 
 使用指南：https://github.com/liuyaoxing/MyReader/blob/master/使用指南.HowToUse.md
