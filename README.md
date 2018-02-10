@@ -27,11 +27,12 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
 神马应用|http://a.sm.cn/details/info?pkg=com.liuyx.myreader
 锤子应用|http://s.t.tt/LVYy4w?&source=share&version=2
 豌豆荚  | http://www.wandoujia.com/apps/com.liuyx.myreader
+魅族应用|http://app.flyme.cn/apps/public/detail?package_name=com.liuyx.myreader
 
 ---
 ## 下载最新版
 
-下载读乐乐：https://github.com/liuyaoxing/MyReader/raw/master/releases/MyReader_v3.6_sign_legu_signed_zipalign.apk
+下载读乐乐：https://github.com/liuyaoxing/MyReader/raw/master/releases/MyReader_v3.7_sign_legu_signed_zipalign.apk
 
 ---
 ## 使用指南
