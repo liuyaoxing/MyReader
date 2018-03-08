@@ -45,10 +45,14 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
 ## 应用截图
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_main.png)
 
-![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinefilter.png)
 
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinedetail.png)
 
+
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_nzzd.png)
 
-![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_tcxxm.png)
+
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_tcxxm.png
+
+
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinefilter.png)
