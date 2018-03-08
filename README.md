@@ -43,16 +43,17 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
  ---
  
 ## 应用截图
+首页应用
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_main.png)
 
-
+查看文章
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinedetail.png)
 
-
+最新500条
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_nzzd.png)
 
 
-![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_tcxxm.png
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_tcxxm.png)
 
-
+搜索过滤
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinefilter.png)
