@@ -19,7 +19,7 @@
 ---|---
 酷安市场| http://www.coolapk.com/apk/com.liuyx.myreader
 应用宝  | http://android.myapp.com/myapp/detail.htm?apkName=com.liuyx.myreader
-百度手机| https://mobile.baidu.com/item?type=soft&docid=23310856
+百度手机| https://mobile.baidu.com/item?type=soft&docid=23531748
 小米应用|http://app.mi.com/details?id=com.liuyx.myreader
 360手机 | http://zhushou.360.cn/detail/index/soft_id/3381439
 华为应用|http://appstore.huawei.com/app/C100037721
@@ -43,12 +43,18 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
  ---
  
 ## 应用截图
+#### 首页应用
+
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_main.png)
 
-![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinefilter.png)
-
+#### 查看文章
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinedetail.png)
 
+#### 最新500条
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_nzzd.png)
 
+#### 看一看
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2017_acct_tcxxm.png)
+
+#### 搜索过滤
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinefilter.png)
