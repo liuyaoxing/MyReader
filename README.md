@@ -21,7 +21,7 @@
 ---|---
 酷安市场| http://www.coolapk.com/apk/com.liuyx.myreader
 应用宝  | http://android.myapp.com/myapp/detail.htm?apkName=com.liuyx.myreader
-百度手机| https://mobile.baidu.com/item?type=soft&docid=23724514
+百度手机| https://mobile.baidu.com/item?type=soft&docid=23825499
 小米应用|http://app.mi.com/details?id=com.liuyx.myreader
 360手机 | http://zhushou.360.cn/detail/index/soft_id/3381439
 华为应用|http://appstore.huawei.com/app/C100037721
