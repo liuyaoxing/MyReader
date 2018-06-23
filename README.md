@@ -53,7 +53,7 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinedetail.png)
 
 #### 最新500条
-![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2018_newslist.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2018_news500.png)
 
 #### 看一看
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2018_offlinelist.png)
