@@ -60,3 +60,9 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
 
 #### 搜索过滤
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinefilter.png)
+
+---
+## 联系方式
+
+微博主页：https://m.weibo.cn/u/2845728832
+
