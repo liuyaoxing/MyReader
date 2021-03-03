@@ -1,0 +1,58 @@
+package gson.formatterentry;
+
+import java.io.Serializable;
+
+public class FormatterEntry implements Serializable {
+
+	/** –Ú¡–∫≈ */
+	private static final long serialVersionUID = 5587900874851982631L;
+
+	private String[] title_select;
+	private String[] date_select;
+	private String[] author_select;
+	private String[] body_select;
+	private boolean script_remove = true;
+
+	
+
+	public String[] getTitle_select() {
+		return title_select;
+	}
+
+	public void setTitle_select(String[] title_select) {
+		this.title_select = title_select;
+	}
+
+	public String[] getDate_select() {
+		return date_select;
+	}
+
+	public void setDate_select(String[] date_select) {
+		this.date_select = date_select;
+	}
+
+	public String[] getAuthor_select() {
+		return author_select;
+	}
+
+	public void setAuthor_select(String[] author_select) {
+		this.author_select = author_select;
+	}
+
+	public String[] getBody_select() {
+		return body_select;
+	}
+
+	public void setBody_select(String[] body_select) {
+		this.body_select = body_select;
+	}
+
+	public boolean isScript_remove() {
+		return script_remove;
+	}
+
+	public void setScript_remove(boolean script_remove) {
+		this.script_remove = script_remove;
+	}
+
+}

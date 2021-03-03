@@ -1,0 +1,41 @@
+package gson.preferencehost;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gson.Gson;
+
+import gson.formatterentry.FormatterEntry;
+
+public class PreferenceHostFactory {
+
+	public static void main(String[] args) {
+		List<PreferenceHost> hostList = new ArrayList<>();
+		{
+			PreferenceHost host1 = new PreferenceHost();
+			host1.setUrl("cnbeta.com");
+			host1.setSaveImages(new String[] { "ess-data" });
+			FormatterEntry cnBeta = new FormatterEntry();
+			cnBeta.setDate_select(new String[] { "div.meta > span", "span.pt_info" });
+			cnBeta.setAuthor_select(new String[] { "span.source" });
+			cnBeta.setContent_select(new String[] { "div.post_content", "div.article-content" });
+			host1.setFormatterEntry(cnBeta);
+			hostList.add(host1);
+		}
+		{
+			PreferenceHost host2 = new PreferenceHost();
+			host2.setUrl("ithome.com");
+			host2.setSaveImages(new String[] { "ess-data" });
+			FormatterEntry ithome = new FormatterEntry();
+			ithome.setRemove_tags(new String[] { "div.user-hd" });
+			ithome.setAuthor_select(new String[] { "span.news-author", "span.source_baidu", "span#source_baidu" });
+			ithome.setDate_select(new String[] { "span.news-time", "span.pubtime_baidu", "span#pubtime_baidu" });
+			ithome.setContent_select(new String[] { "div.news-content", "div.post_content", "div#paragraph" });
+			ithome.setComments_select(new String[] { "div.comment" });
+			host2.setFormatterEntry(ithome);
+			hostList.add(host2);
+		}
+
+		System.out.println(new Gson().toJson(hostList.toArray(new PreferenceHost[0])));
+	}
+}
