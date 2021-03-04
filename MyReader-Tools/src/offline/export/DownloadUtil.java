@@ -172,7 +172,7 @@ public class DownloadUtil {
 			if (strings.length > 1) {
 				dispositionHeader = strings[1].replace("filename=", "");
 				dispositionHeader = dispositionHeader.replace("\"", "");
-				return dispositionHeader;
+				return dispositionHeader.trim();
 			}
 			return "";
 		}
