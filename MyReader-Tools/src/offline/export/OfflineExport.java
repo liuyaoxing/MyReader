@@ -3,11 +3,14 @@ package offline.export;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -25,6 +28,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import offline.export.DownloadUtil.OnDownloadListener;
+import offline.export.db.BackupTask;
+import offline.export.db.DataBaseProxy;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -115,7 +120,7 @@ public class OfflineExport {
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 	}
 
-	protected boolean doBackFiles(int page) throws IOException {
+	protected boolean doBackFiles(int page) throws IOException, SQLException {
 		String backupListUrl = String.format("%s/dll/export/list", urlTxt.getText());
 		Request request = new Request.Builder().addHeader("x-header", "dll")//
 				.header("page", String.valueOf(page))//
@@ -128,12 +133,26 @@ public class OfflineExport {
 		}
 		String body = response.body().string();
 		JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
+
+		final BackupTask backupTask = new BackupTask();
+		final DataBaseProxy database = new DataBaseProxy();
+		database.dbCreate(backupTask);
+
+		Map<String, String> whereMap = new HashMap<String, String>();
+
 		for (int i = 0; i < jsonArray.size(); i++) {
 			JsonObject element = jsonArray.get(i).getAsJsonObject();
 			System.out.println("¿ªÊ¼Ö´ÐÐ:" + element);
 			final String id = element.get("_id").getAsString();
-			String title = element.get("title").getAsString();
-			long length = element.get("foldersize").getAsLong();
+			final String title = element.get("title").getAsString();
+			final long length = element.get("foldersize").getAsLong();
+
+			whereMap.put(BackupTask.KEY_ID, id);
+
+			List<Map<String, Object>> resList = database.dbQuery(backupTask.getTableName(), whereMap);
+			if (resList != null && resList.size() > 0)
+				continue;
+
 			tableModel.addRow(new Object[] { id, title, FileUtils.getFileSize(length), "0%" });
 			final int row = tableModel.getRowCount() - 1, col = tableModel.getColumnCount() - 1;
 			final String getUrl = String.format("%s/dll/export/%s", urlTxt.getText(), id);
@@ -144,6 +163,10 @@ public class OfflineExport {
 					try {
 						tableModel.setValueAt("100%", row, col - 1);
 						tableModel.setValueAt(file.getCanonicalFile(), row, col);
+						backupTask.setId(id);
+						backupTask.setTitle(title);
+						backupTask.setLength(String.valueOf(length));
+						database.dbInsert(backupTask);
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
