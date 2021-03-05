@@ -1,0 +1,6 @@
+/bigcache/
+/bin/
+/db_file.lck
+/db_file.log
+/db_file.properties
+/db_file.script
