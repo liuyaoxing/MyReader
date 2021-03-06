@@ -30,6 +30,7 @@ import com.google.gson.JsonObject;
 import offline.export.DownloadUtil.OnDownloadListener;
 import offline.export.db.BackupTask;
 import offline.export.db.DataBaseProxy;
+import offline.export.log.LogHandler;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -93,6 +94,7 @@ public class OfflineExport {
 		JButton backupBtn = new JButton("开始备份");
 		backupBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				LogHandler.debug("开始备份...");
 				backupTask = new BackupTask();
 				database = new DataBaseProxy();
 				try {
