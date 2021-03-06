@@ -161,7 +161,7 @@ public class OfflineExport {
 			if (resList != null && resList.size() > 0)
 				continue;
 
-			tableModel.insertRow(0, new Object[] { id, title, FileUtils.getFileSize(length), "0%" });
+			tableModel.insertRow(0, new Object[] { id, title, url, FileUtils.getFileSize(length), "0%" });
 			final int row = 0, col = tableModel.getColumnCount() - 1;
 			final String getUrl = String.format("%s/dll/export/%s", urlTxt.getText(), id);
 

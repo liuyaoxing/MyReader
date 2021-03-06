@@ -78,7 +78,7 @@ public class DataBaseProxy {
 			columns.append(entry.getKey());
 			if (values.length() > 0)
 				values.append(",");
-			values.append(entry.getValue());
+			values.append("'").append(entry.getValue()).append("'");
 		}
 		return dbUpdate(String.format(insertTemplate, baseDo.getTableName(), columns.toString(), values.toString()));
 	}
