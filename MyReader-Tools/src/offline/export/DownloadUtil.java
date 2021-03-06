@@ -1,6 +1,7 @@
 package offline.export;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -92,6 +93,10 @@ public class DownloadUtil {
 
 	protected void processResponse(final String destFileDir, final String destFileName,
 			final OnDownloadListener listener, Response response) {
+		if (response.code() == 404) {
+			listener.onDownloadFailed(new FileNotFoundException("文件不存在!"));
+			return;
+		}
 		InputStream is = null;
 		byte[] buf = new byte[2048];
 		int len = 0;
@@ -103,7 +108,7 @@ public class DownloadUtil {
 			dir.mkdirs();
 		}
 		File file = null;
-		if (destFileName == null || destFileName.isEmpty()) {
+		if ((destFileName == null || destFileName.isEmpty()) && !getHeaderFileName(response).isEmpty()) {
 			file = new File(dir, getHeaderFileName(response));
 		} else {
 			file = new File(dir, destFileName);
@@ -132,6 +137,9 @@ public class DownloadUtil {
 				}
 				if (fos != null) {
 					fos.close();
+				}
+				if (response != null && response.body() != null) {
+					response.body().close();
 				}
 			} catch (IOException e) {
 

@@ -45,6 +45,8 @@ public class OfflineExport {
 	protected BackupTask backupTask;
 	protected DataBaseProxy database;
 
+	protected Thread startThread;
+
 	/**
 	 * Launch the application.
 	 */
@@ -99,11 +101,18 @@ public class OfflineExport {
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
-				new Thread(new Runnable() {
+				if (startThread != null) {
+					startThread.interrupt();
+					startThread = null;
+					return;
+				}
+				startThread = new Thread(new Runnable() {
 					@Override
 					public void run() {
 						for (int i = 0; i < Integer.MAX_VALUE; i++) {
 							try {
+								if (startThread == null || startThread.isInterrupted())
+									break;
 								if (!doBackFiles(i))
 									break;
 							} catch (Exception ex) {
@@ -111,7 +120,8 @@ public class OfflineExport {
 							}
 						}
 					}
-				}).start();
+				});
+				startThread.start();
 			}
 		});
 		backupBtn.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -162,6 +172,10 @@ public class OfflineExport {
 				continue;
 
 			tableModel.insertRow(0, new Object[] { id, title, url, FileUtils.getFileSize(length), "0%" });
+			table.scrollRectToVisible(table.getCellRect(0, 0, true));
+			table.setRowSelectionInterval(0, 0);
+			table.setSelectionBackground(Color.LIGHT_GRAY);// 选中行设置背景色
+
 			final int row = 0, col = tableModel.getColumnCount() - 1;
 			final String getUrl = String.format("%s/dll/export/%s", urlTxt.getText(), id);
 
@@ -189,15 +203,10 @@ public class OfflineExport {
 				@Override
 				public void onDownloadFailed(Exception e) {
 					tableModel.setValueAt("0%", row, col - 1);
-					tableModel.setValueAt("下载失败", row, col);
+					tableModel.setValueAt("下载失败" + e.getMessage(), row, col);
 				}
 			});
 
-			table.setRowSelectionInterval(row, row);
-
-			table.scrollRectToVisible(table.getCellRect(row, 0, true));
-
-			table.setSelectionBackground(Color.LIGHT_GRAY);// 选中行设置背景色
 		}
 		return jsonArray.size() > 0;
 	}

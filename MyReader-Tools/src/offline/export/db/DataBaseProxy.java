@@ -28,7 +28,9 @@ public class DataBaseProxy {
 	public Connection getConnection(String dbName, String userName, String password) {
 		try {
 			Class.forName("org.hsqldb.jdbc.JDBCDriver");
-			return DriverManager.getConnection("jdbc:hsqldb:" + dbName, "SA", "");
+			return DriverManager.getConnection(
+					"jdbc:hsqldb:" + dbName + ";crypt_key=604a6105889da65326bf35790a923932;crypt_type=blowfish", "SA",
+					"");
 		} catch (Exception e) {
 			return null;
 		}
