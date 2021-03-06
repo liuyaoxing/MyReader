@@ -22,25 +22,26 @@ public class DataBaseProxy {
 	}
 
 	public DataBaseProxy(String dbName) {
-		conn = getConnection("jdbc:hsqldb:" + dbName, "SA", "");
+		conn = getConnection(dbName, "SA", "");
 	}
 
 	public Connection getConnection(String dbName, String userName, String password) {
 		try {
+			Class.forName("org.hsqldb.jdbc.JDBCDriver");
 			return DriverManager.getConnection("jdbc:hsqldb:" + dbName, "SA", "");
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			return null;
 		}
 	}
 
-	public int dbCreate(BaseDo baseDo) throws SQLException {
+	public int dbCreate(BaseDo baseDo) throws SQLException, IllegalArgumentException, IllegalAccessException {
 		String createSql = "CREATE TABLE IF NOT EXISTS %s (%s)";
 		StringBuffer statement = new StringBuffer();
 		Field[] fields = baseDo.getClass().getFields();
 		for (Field field : fields) {
 			if (statement.length() > 0)
 				statement.append(", ");
-			statement.append(field.getName()).append(" VARCHAR(256)");
+			statement.append(field.get(baseDo)).append(" VARCHAR(256)");
 		}
 		return dbUpdate(String.format(createSql, baseDo.getTableName(), statement.toString()));
 	}
@@ -55,7 +56,7 @@ public class DataBaseProxy {
 		Iterator<Entry<String, String>> iter = whereMap.entrySet().iterator();
 		while (iter.hasNext()) {
 			Entry<String, String> entry = iter.next();
-			where.append(entry.getKey()).append(" = ").append(entry.getValue());
+			where.append(entry.getKey()).append(" = '").append(entry.getValue()).append("'");
 		}
 		return dbQuery(String.format(selectTemplate, tableName, where.toString()));
 	}

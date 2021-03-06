@@ -159,7 +159,7 @@ public class Testdb {
 		Testdb db = null;
 
 		try {
-			db = new Testdb("db_file");
+			db = new Testdb("dulele");
 		} catch (Exception ex1) {
 			ex1.printStackTrace(); // could not start db
 

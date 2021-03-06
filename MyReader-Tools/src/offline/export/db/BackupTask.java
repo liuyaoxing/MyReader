@@ -9,6 +9,7 @@ public class BackupTask extends BaseDo {
 
 	public static final String KEY_ID = "id";
 	public static final String KEY_TITLE = "title";
+	public static final String KEY_URL = "url";
 	public static final String KEY_LENGTH = "length";
 
 	@Override
@@ -18,7 +19,7 @@ public class BackupTask extends BaseDo {
 
 	@Override
 	public String getCreateSql() {
-		return "CREATE TABLE BackupTask (id VARCHAR(16), title VARCHAR(256), length VARCHAR(16))";
+		return "CREATE TABLE BackupTask (id VARCHAR(16), title VARCHAR(256), url VARCHAR(256),  length VARCHAR(16))";
 	}
 
 	@Override
@@ -40,6 +41,14 @@ public class BackupTask extends BaseDo {
 
 	public void setTitle(String title) {
 		attributeMap.put(KEY_TITLE, title);
+	}
+
+	public String getUrl() {
+		return attributeMap.get(KEY_URL);
+	}
+
+	public void setUrl(String url) {
+		attributeMap.put(KEY_URL, url);
 	}
 
 	public long getLength() {
