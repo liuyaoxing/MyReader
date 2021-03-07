@@ -93,6 +93,7 @@ public class OfflineExport {
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
 		urlTxt = new JTextField();
+		urlTxt.setText("http://192.168.43.1:61666");
 		urlTxt.setToolTipText("«Î ‰»Î∂¡¿÷¿÷∑˛ŒÒURL");
 		panel.add(urlTxt);
 		urlTxt.setColumns(10);
