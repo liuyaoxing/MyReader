@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -42,11 +43,15 @@ public class OfflineExport {
 	private DefaultTableModel tableModel;
 
 	private String[] columnNames = new String[] { "ID", "标题", "URL", "大小", "状态", "保存路径" };
-	private int[] columnWidths = new int[] { 50, 250, 50, 50, 50, 250 };
+	private int[] columnWidths = new int[] { 50, 250, 50, 50, 40, 250 };
 	protected BackupTask backupTask;
 	protected DataBaseProxy database;
 
 	protected Thread startThread;
+
+	private String frameTitle;
+
+	private AtomicLong counter = new AtomicLong(0);
 
 	/**
 	 * Launch the application.
@@ -58,8 +63,9 @@ public class OfflineExport {
 					UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 					OfflineExport window = new OfflineExport();
 					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
+				} catch (Exception ex) {
+					LogHandler.error(ex);
+					ex.printStackTrace();
 				}
 			}
 		});
@@ -91,39 +97,10 @@ public class OfflineExport {
 		panel.add(urlTxt);
 		urlTxt.setColumns(10);
 
-		JButton backupBtn = new JButton("开始备份");
+		final JButton backupBtn = new JButton("开始备份");
 		backupBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				LogHandler.debug("开始备份...");
-				backupTask = new BackupTask();
-				database = new DataBaseProxy();
-				try {
-					int res = database.dbCreate(backupTask);
-					System.out.println(res);
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-				if (startThread != null) {
-					startThread.interrupt();
-					startThread = null;
-					return;
-				}
-				startThread = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						for (int i = 0; i < Integer.MAX_VALUE; i++) {
-							try {
-								if (startThread == null || startThread.isInterrupted())
-									break;
-								if (!doBackFiles(i))
-									break;
-							} catch (Exception ex) {
-								ex.printStackTrace();
-							}
-						}
-					}
-				});
-				startThread.start();
+				doStartBackup(backupBtn);
 			}
 		});
 		backupBtn.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -147,7 +124,7 @@ public class OfflineExport {
 		String backupListUrl = String.format("%s/dll/export/list", urlTxt.getText());
 		Request request = new Request.Builder().addHeader("x-header", "dll")//
 				.header("page", String.valueOf(page))//
-				.header("size", String.valueOf(5))//
+				.header("size", String.valueOf(100))//
 				.header("sort", "_id")//
 				.url(backupListUrl).build();
 		Response response = DownloadUtil.get().newCall(request);
@@ -158,8 +135,8 @@ public class OfflineExport {
 		JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
 
 		Map<String, String> whereMap = new HashMap<String, String>();
-
 		for (int i = 0; i < jsonArray.size(); i++) {
+			frame.setTitle(String.format("%s (已处理: %s项)", frameTitle, counter.incrementAndGet()));
 			JsonObject element = jsonArray.get(i).getAsJsonObject();
 			System.out.println("开始执行:" + element);
 			final String id = element.get("_id").getAsString();
@@ -170,10 +147,12 @@ public class OfflineExport {
 			whereMap.put(BackupTask.KEY_ID, id);
 
 			List<Map<String, Object>> resList = database.dbQuery(backupTask.getTableName(), whereMap);
-			if (resList != null && resList.size() > 0)
+			if (resList != null && resList.size() > 0) {
+				tableModel.insertRow(0, new Object[] { id, title, url, FileUtils.getFileSize(length), "文件已存在！" });
 				continue;
-
+			}
 			tableModel.insertRow(0, new Object[] { id, title, url, FileUtils.getFileSize(length), "0%" });
+			
 			table.scrollRectToVisible(table.getCellRect(0, 0, true));
 			table.setRowSelectionInterval(0, 0);
 			table.setSelectionBackground(Color.LIGHT_GRAY);// 选中行设置背景色
@@ -193,6 +172,7 @@ public class OfflineExport {
 						backupTask.setLength(String.valueOf(length));
 						database.dbInsert(backupTask);
 					} catch (Exception ex) {
+						LogHandler.error(ex);
 						ex.printStackTrace();
 					}
 				}
@@ -209,7 +189,50 @@ public class OfflineExport {
 				}
 			});
 
+			if (tableModel.getDataVector().size() > 5000) {
+				tableModel.getDataVector().clear();
+			}
+
 		}
 		return jsonArray.size() > 0;
+	}
+
+	protected void doStartBackup(final JButton backupBtn) {
+		LogHandler.debug("开始备份...");
+		backupTask = new BackupTask();
+		try {
+			database = new DataBaseProxy();
+			frameTitle = frame.getTitle();
+			int res = database.dbCreate(backupTask);
+			System.out.println(res);
+
+			if (startThread != null) {
+				startThread.interrupt();
+				startThread = null;
+			} else {
+				startThread = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						for (int i = 0; i < Integer.MAX_VALUE; i++) {
+							try {
+								if (startThread == null || startThread.isInterrupted())
+									break;
+								if (!doBackFiles(i))
+									break;
+							} catch (Exception ex) {
+								LogHandler.error(ex);
+								ex.printStackTrace();
+							}
+						}
+					}
+				});
+			}
+			startThread.start();
+
+			backupBtn.setText(startThread == null ? "开始备份" : "停止备份");
+		} catch (Exception ex) {
+			LogHandler.error(ex);
+			ex.printStackTrace();
+		}
 	}
 }

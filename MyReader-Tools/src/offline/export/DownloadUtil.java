@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
+import offline.export.log.LogHandler;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Dispatcher;
@@ -128,8 +129,9 @@ public class DownloadUtil {
 			fos.flush();
 			// ÏÂÔØÍê³É
 			listener.onDownloadSuccess(file);
-		} catch (Exception e) {
-			listener.onDownloadFailed(e);
+		} catch (Exception ex) {
+			LogHandler.error(ex);
+			listener.onDownloadFailed(ex);
 		} finally {
 			try {
 				if (is != null) {
@@ -180,6 +182,8 @@ public class DownloadUtil {
 			if (strings.length > 1) {
 				dispositionHeader = strings[1].replace("filename=", "");
 				dispositionHeader = dispositionHeader.replace("\"", "");
+				if (dispositionHeader.length() > 50)
+					return dispositionHeader.trim().substring(0, 50);
 				return dispositionHeader.trim();
 			}
 			return "";
