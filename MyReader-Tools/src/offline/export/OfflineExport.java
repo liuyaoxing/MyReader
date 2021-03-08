@@ -3,8 +3,14 @@ package offline.export;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -25,10 +31,15 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -74,6 +85,8 @@ public class OfflineExport {
 	private String frameTitle;
 
 	private AtomicLong counter = new AtomicLong(0);
+
+	private File currentDirectory;
 
 	/**
 	 * Launch the application.
@@ -171,11 +184,12 @@ public class OfflineExport {
 						while (iter.hasNext()) {
 							Entry<String, JsonObject> entry = iter.next();
 							JsonObject element = entry.getValue();
-							final String id = element.get(FILESERVER_MD5).getAsString();
-							final String title = element.get(FILESERVER_NAME).getAsString();
-							final String url = element.get(FILESERVER_PATH).getAsString();
-							final String size = element.get(FILESERVER_SIZE).getAsString();
-							tableModel.insertRow(-1, new Object[] { id, title, url, size, "" });
+							JsonObject jsonObject = element.get("nameValuePairs").getAsJsonObject();
+							final String id = jsonObject.get(FILESERVER_MD5).getAsString();
+							final String title = jsonObject.get(FILESERVER_NAME).getAsString();
+							final String url = jsonObject.get(FILESERVER_PATH).getAsString();
+							final String size = jsonObject.get(FILESERVER_SIZE).getAsString();
+							tableModel.insertRow(0, new Object[] { id, title, url, size, "", "" });
 						}
 					} catch (IOException e1) {
 						e1.printStackTrace();
@@ -192,6 +206,8 @@ public class OfflineExport {
 						String body = response.body().string();
 						JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
 						JFileChooser fileChooser = new JFileChooser();// 文件选择器
+						if (currentDirectory != null)
+							fileChooser.setCurrentDirectory(currentDirectory);
 						fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);// 设定只能选择到文件夹
 						int state = fileChooser.showOpenDialog(null);// 此句是打开文件选择器界面的触发语句
 						if (state == JFileChooser.APPROVE_OPTION) {
@@ -217,17 +233,96 @@ public class OfflineExport {
 		}
 		table.getTableHeader().setVisible(true);
 		table.setShowGrid(true);
+		table.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent me) {
+				if (SwingUtilities.isRightMouseButton(me)) {
+					final int row = table.rowAtPoint(me.getPoint());
+					table.setRowSelectionInterval(row, row);
+					System.out.println("row:" + row);
+					if (row != -1) {
+						final int column = table.columnAtPoint(me.getPoint());
+
+						final JPopupMenu popup = new JPopupMenu();
+						JMenuItem copyItem = new JMenuItem("复制");
+						popup.add(copyItem);
+						copyItem.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								Object value = table.getValueAt(row, column);
+								if (value != null)
+									setSysClipboardText(String.valueOf(value));
+							}
+						});
+
+						if (getComboText(urlCombo).contains(FOLDER_LIST)) {
+							JMenuItem syncFolderItem = new JMenuItem("下载文件夹");
+							popup.add(syncFolderItem);
+							syncFolderItem.addActionListener(new ActionListener() {
+								public void actionPerformed(ActionEvent e) {
+									Object title = table.getValueAt(row, 1);
+									if (title != null) {
+										try {
+											currentDirectory = new File(title.toString().replace("[文件夹]", "")).getCanonicalFile();
+										} catch (IOException e1) {
+											e1.printStackTrace();
+										}
+									}
+
+									Object value = table.getValueAt(row, 0);
+									if (value != null) {
+										String newUrl = getInputHostUrl() + FOLDER_LIST_MD5 + value;
+										setComboBox(urlCombo, newUrl);
+										backupBtn.doClick();
+									}
+									setSysClipboardText(String.valueOf(value));
+								}
+							});
+						}
+
+						JMenuItem calcel = new JMenuItem("取消");
+						calcel.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								popup.setVisible(false);
+							}
+						});
+
+						popup.add(new JSeparator());
+						popup.add(calcel);
+						popup.show(me.getComponent(), me.getX(), me.getY());
+					}
+				}
+			}
+		});
 
 		JScrollPane scrollPane = new JScrollPane(table); // 支持滚动
 
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 	}
 
+	/**
+	 * 将字符串复制到剪切板。
+	 */
+	public static void setSysClipboardText(String writeMe) {
+		Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+		Transferable tText = new StringSelection(writeMe);
+		clip.setContents(tText, null);
+	}
+
 	private String getInputHostUrl() {
-		return null;
+		try {
+			String newItem = String.valueOf(urlCombo.getEditor().getItem());
+			URL url = new URL(newItem);
+			return "http://" + String.format("%s:%s", url.getHost(), url.getPort());
+		} catch (Exception ex) {
+			return null;
+		}
 	}
 
 	protected void doSyncFolder(JsonArray jsonArray, File toFile) throws IOException {
+		String inputHostUrl = getInputHostUrl();
+		if (inputHostUrl == null || inputHostUrl.isEmpty()) {
+			JOptionPane.showMessageDialog(null, "请输入正确的服务器地址！");
+			return;
+		}
 		tableModel.getDataVector().clear();
 		for (int i = 0; i < jsonArray.size(); i++) {
 			JsonObject element = jsonArray.get(i).getAsJsonObject();
@@ -235,13 +330,14 @@ public class OfflineExport {
 			final String title = element.get(FILESERVER_NAME).getAsString();
 			final String url = element.get(FILESERVER_PATH).getAsString();
 			final String size = element.get(FILESERVER_SIZE).getAsString();
-			tableModel.insertRow(-1, new Object[] { id, title, url, size, "" });
+			tableModel.insertRow(0, new Object[] { id, title, url, size, "", "" });
 
 			final int row = 0, col = tableModel.getColumnCount() - 1;
 
 			File destFile = new File(toFile, title);
 			if (destFile.exists() && id.equals(MD5Utils.encryptFileFast(destFile))) {
-				tableModel.setValueAt("100%", row, col - 1);
+				tableModel.setValueAt("文件已存在!", row, col - 1);
+				tableModel.setValueAt(destFile.getCanonicalFile(), row, col);
 				continue;
 			}
 
@@ -274,6 +370,12 @@ public class OfflineExport {
 
 	private String getComboText(JComboBox<String> comboBox) {
 		return String.valueOf(comboBox.getEditor().getItem());
+	}
+
+	private void setComboBox(JComboBox<String> comboBox, String newItem) {
+		DefaultComboBoxModel<String> d = (DefaultComboBoxModel<String>) urlCombo.getModel();
+		d.addElement(newItem);
+		d.setSelectedItem(newItem);
 	}
 
 	protected boolean doBackFiles(int page) throws IOException, SQLException {
