@@ -62,9 +62,22 @@ public class DownloadUtil {
 
 	public void download(final String url, String id, final String destFileDir, final OnDownloadListener listener)
 			throws IOException {
+		download(url, id, new File(destFileDir), listener);
+	}
+
+	/**
+	 * @param url          下载连接
+	 * @param destFileDir  下载的文件储存目录
+	 * @param destFileName 下载文件名称，后面记得拼接后缀，否则手机没法识别文件类型
+	 * @param listener     下载监听
+	 * @throws IOException
+	 */
+
+	public void download(final String url, String id, final File toFile, final OnDownloadListener listener)
+			throws IOException {
 		Request request = new Request.Builder().url(url).build();
 		Response response = okHttpClient.newCall(request).execute();
-		processResponse(destFileDir, null, listener, response);
+		processResponse(toFile, listener, response);
 	}
 
 	/**
@@ -87,13 +100,12 @@ public class DownloadUtil {
 
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
-				processResponse(destFileDir, destFileName, listener, response);
+				processResponse(new File(destFileDir, destFileName), listener, response);
 			}
 		});
 	}
 
-	protected void processResponse(final String destFileDir, final String destFileName,
-			final OnDownloadListener listener, Response response) {
+	protected void processResponse(File toFile, final OnDownloadListener listener, Response response) {
 		if (response.code() == 404) {
 			listener.onDownloadFailed(new FileNotFoundException("文件不存在!"));
 			return;
@@ -104,20 +116,21 @@ public class DownloadUtil {
 		FileOutputStream fos = null;
 
 		// 储存下载文件的目录
-		File dir = new File(destFileDir);
-		if (!dir.exists()) {
-			dir.mkdirs();
+		String destFileName = null;
+		if (toFile.isDirectory()) {
+			if (!toFile.exists()) {
+				toFile.mkdirs();
+			}
+			toFile = new File(toFile, destFileName);
 		}
-		File file = null;
-		if ((destFileName == null || destFileName.isEmpty()) && !getHeaderFileName(response).isEmpty()) {
-			file = new File(dir, getHeaderFileName(response));
-		} else {
-			file = new File(dir, destFileName);
+		if (toFile.getParentFile() != null && !toFile.getParentFile().exists()) {
+			toFile.getParentFile().mkdirs();
 		}
+
 		try {
 			is = response.body().byteStream();
 			long total = response.body().contentLength();
-			fos = new FileOutputStream(file);
+			fos = new FileOutputStream(toFile);
 			long sum = 0;
 			while ((len = is.read(buf)) != -1) {
 				fos.write(buf, 0, len);
@@ -128,7 +141,7 @@ public class DownloadUtil {
 			}
 			fos.flush();
 			// 下载完成
-			listener.onDownloadSuccess(file);
+			listener.onDownloadSuccess(toFile);
 		} catch (Exception ex) {
 			LogHandler.error(ex);
 			listener.onDownloadFailed(ex);

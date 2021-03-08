@@ -7,43 +7,65 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.DefaultTableModel;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 import offline.export.DownloadUtil.OnDownloadListener;
 import offline.export.db.BackupTask;
 import offline.export.db.DataBaseProxy;
 import offline.export.log.LogHandler;
+import offline.export.utils.MD5Utils;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class OfflineExport {
 
+	public static final String FILESERVER_NAME = "name";
+	public static final String FILESERVER_SIZE = "size";
+	public static final String FILESERVER_PATH = "path";
+	public static final String FILESERVER_LENGTH = "length";
+	public static final String FILESERVER_MD5 = "md5";
+
+	private static final String FOLDER_LIST = "/folder/list";
+	private static final String FOLDER_LIST_MD5 = "/folder/list/md5/";
+	private static final String FOLDER_DOWNLOAD_MD5 = "/folder/download/md5/";
+
 	private JFrame frame;
-	private JTextField urlTxt;
+	private JComboBox<String> urlCombo;
 	private JTable table;
 	private DefaultTableModel tableModel;
 
-	private String[] columnNames = new String[] { "ID", "±ÍÃ‚", "URL", "¥Û–°", "◊¥Ã¨", "±£¥Ê¬∑æ∂" };
-	private int[] columnWidths = new int[] { 50, 250, 50, 50, 40, 250 };
+	private String[] columnNames = new String[] { "ID", "Ê†áÈ¢ò", "URL", "Â§ßÂ∞è", "Áä∂ÊÄÅ", "‰øùÂ≠òË∑ØÂæÑ" };
+	private int[] columnWidths = new int[] { 50, 250, 50, 50, 50, 250 };
 	protected BackupTask backupTask;
 	protected DataBaseProxy database;
 
@@ -83,7 +105,7 @@ public class OfflineExport {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setTitle("∂¡¿÷¿÷±∏∑›π§æﬂ v3.24");
+		frame.setTitle("ËØª‰πê‰πêÂ§á‰ªΩÂ∑•ÂÖ∑ v3.24");
 		frame.setSize(888, 666);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -92,16 +114,97 @@ public class OfflineExport {
 		frame.getContentPane().add(panel, BorderLayout.NORTH);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-		urlTxt = new JTextField();
-		urlTxt.setText("http://192.168.43.1:61666");
-		urlTxt.setToolTipText("«Î ‰»Î∂¡¿÷¿÷∑˛ŒÒURL");
-		panel.add(urlTxt);
-		urlTxt.setColumns(10);
+		urlCombo = new JComboBox<String>();
+		urlCombo.setEditable(true);
+		urlCombo.setToolTipText("ËØ∑ËæìÂÖ•ËØª‰πê‰πêÊúçÂä°URL");
+		panel.add(urlCombo);
+		urlCombo.addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				String newItem = String.valueOf(urlCombo.getEditor().getItem());
+				Set<String> itemSet = new HashSet<String>();
+				DefaultComboBoxModel<String> d = (DefaultComboBoxModel<String>) urlCombo.getModel();
+				d.removeAllElements();
+				try {
+					itemSet.add(String.valueOf(newItem));
+					URL url = new URL(newItem);
+					String newUrl = "http://" + String.format("%s:%s", url.getHost(), url.getPort());
+					itemSet.add(newUrl);
+					itemSet.add(String.valueOf(newUrl + FOLDER_LIST));
+					itemSet.add(String.valueOf(newUrl + FOLDER_LIST_MD5));
+				} catch (MalformedURLException e1) {
+					e1.printStackTrace();
+				}
+				for (String item : itemSet) {
+					d.addElement(item);
+				}
+				d.setSelectedItem(newItem);
+			}
 
-		final JButton backupBtn = new JButton("ø™ º±∏∑›");
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {
+			}
+		});
+		final JButton backupBtn = new JButton("ÂºÄÂßãÂ§á‰ªΩ");
 		backupBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				doStartBackup(backupBtn);
+				String comboText = getComboText(urlCombo);
+				if (comboText.endsWith(FOLDER_LIST)) {
+					Request request = new Request.Builder().addHeader("x-header", "dll")//
+							.header("sort", "_id")//
+							.url(comboText).build();
+					try {
+						Response response = DownloadUtil.get().newCall(request);
+						if (!response.isSuccessful()) {
+							return;
+						}
+						String body = response.body().string();
+
+						Map<String, JsonObject> toMap = new Gson().fromJson(body,
+								new TypeToken<Map<String, JsonObject>>() {
+								}.getType());
+						Iterator<Entry<String, JsonObject>> iter = toMap.entrySet().iterator();
+						while (iter.hasNext()) {
+							Entry<String, JsonObject> entry = iter.next();
+							JsonObject element = entry.getValue();
+							final String id = element.get(FILESERVER_MD5).getAsString();
+							final String title = element.get(FILESERVER_NAME).getAsString();
+							final String url = element.get(FILESERVER_PATH).getAsString();
+							final String size = element.get(FILESERVER_SIZE).getAsString();
+							tableModel.insertRow(-1, new Object[] { id, title, url, size, "" });
+						}
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				} else if (comboText.contains(FOLDER_LIST_MD5)) {
+					try {
+						Request request = new Request.Builder().addHeader("x-header", "dll")//
+								.header("sort", "_id")//
+								.url(comboText).build();
+						Response response = DownloadUtil.get().newCall(request);
+						if (!response.isSuccessful()) {
+							throw new IOException("Unexpected code " + response);
+						}
+						String body = response.body().string();
+						JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
+						JFileChooser fileChooser = new JFileChooser();// Êñá‰ª∂ÈÄâÊã©Âô®
+						fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);// ËÆæÂÆöÂè™ËÉΩÈÄâÊã©Âà∞Êñá‰ª∂Â§π
+						int state = fileChooser.showOpenDialog(null);// Ê≠§Âè•ÊòØÊâìÂºÄÊñá‰ª∂ÈÄâÊã©Âô®ÁïåÈù¢ÁöÑËß¶ÂèëËØ≠Âè•
+						if (state == JFileChooser.APPROVE_OPTION) {
+							File toFile = fileChooser.getSelectedFile();// toFile‰∏∫ÈÄâÊã©Âà∞ÁöÑÁõÆÂΩï
+							doSyncFolder(jsonArray, toFile);
+						}
+
+					} catch (Exception ex) {
+						LogHandler.error(ex);
+					}
+				} else {
+					doStartBackup(backupBtn);
+				}
 			}
 		});
 		backupBtn.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -115,14 +218,67 @@ public class OfflineExport {
 		table.getTableHeader().setVisible(true);
 		table.setShowGrid(true);
 
-		JScrollPane scrollPane = new JScrollPane(table); // ÷ß≥÷πˆ∂Ø
+		JScrollPane scrollPane = new JScrollPane(table); // ÊîØÊåÅÊªöÂä®
 
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 	}
 
+	private String getInputHostUrl() {
+		return null;
+	}
+
+	protected void doSyncFolder(JsonArray jsonArray, File toFile) throws IOException {
+		tableModel.getDataVector().clear();
+		for (int i = 0; i < jsonArray.size(); i++) {
+			JsonObject element = jsonArray.get(i).getAsJsonObject();
+			final String id = element.get(FILESERVER_MD5).getAsString();
+			final String title = element.get(FILESERVER_NAME).getAsString();
+			final String url = element.get(FILESERVER_PATH).getAsString();
+			final String size = element.get(FILESERVER_SIZE).getAsString();
+			tableModel.insertRow(-1, new Object[] { id, title, url, size, "" });
+
+			final int row = 0, col = tableModel.getColumnCount() - 1;
+
+			File destFile = new File(toFile, title);
+			if (destFile.exists() && id.equals(MD5Utils.encryptFileFast(destFile))) {
+				tableModel.setValueAt("100%", row, col - 1);
+				continue;
+			}
+
+			String getUrl = getInputHostUrl() + FOLDER_DOWNLOAD_MD5 + id;
+			DownloadUtil.get().download(getUrl, id, destFile, new OnDownloadListener() {
+				@Override
+				public void onDownloadSuccess(File file) {
+					try {
+						tableModel.setValueAt("100%", row, col - 1);
+						tableModel.setValueAt(file.getCanonicalFile(), row, col);
+					} catch (Exception ex) {
+						LogHandler.error(ex);
+						ex.printStackTrace();
+					}
+				}
+
+				@Override
+				public void onDownloading(int progress) {
+					tableModel.setValueAt(progress + "%", row, col - 1);
+				}
+
+				@Override
+				public void onDownloadFailed(Exception e) {
+					tableModel.setValueAt("0%", row, col - 1);
+					tableModel.setValueAt("‰∏ãËΩΩÂ§±Ë¥•" + e.getMessage(), row, col);
+				}
+			});
+		}
+	}
+
+	private String getComboText(JComboBox<String> comboBox) {
+		return String.valueOf(comboBox.getEditor().getItem());
+	}
+
 	protected boolean doBackFiles(int page) throws IOException, SQLException {
-		urlTxt.setText(urlTxt.getText().replace("//", "/").replace("£∫", ":"));
-		String backupListUrl = String.format("%s/dll/export/list", urlTxt.getText());
+		urlCombo.setSelectedItem(String.valueOf(urlCombo.getSelectedItem()).replace("Ôºö", ":"));
+		String backupListUrl = String.format("%s/dll/export/list", getComboText(urlCombo));
 		Request request = new Request.Builder().addHeader("x-header", "dll")//
 				.header("page", String.valueOf(page))//
 				.header("size", String.valueOf(100))//
@@ -137,9 +293,9 @@ public class OfflineExport {
 
 		Map<String, String> whereMap = new HashMap<String, String>();
 		for (int i = 0; i < jsonArray.size(); i++) {
-			frame.setTitle(String.format("%s (“—¥¶¿Ì: %sœÓ)", frameTitle, counter.incrementAndGet()));
+			frame.setTitle(String.format("%s (Â∑≤Â§ÑÁêÜ: %sÈ°π)", frameTitle, counter.incrementAndGet()));
 			JsonObject element = jsonArray.get(i).getAsJsonObject();
-			System.out.println("ø™ º÷¥––:" + element);
+			System.out.println("ÂºÄÂßãÊâßË°å:" + element);
 			final String id = element.get("_id").getAsString();
 			final String title = element.get("title").getAsString();
 			final String url = element.get("url").getAsString();
@@ -149,17 +305,17 @@ public class OfflineExport {
 
 			List<Map<String, Object>> resList = database.dbQuery(backupTask.getTableName(), whereMap);
 			if (resList != null && resList.size() > 0) {
-				tableModel.insertRow(0, new Object[] { id, title, url, FileUtils.getFileSize(length), "Œƒº˛“—¥Ê‘⁄£°" });
+				tableModel.insertRow(0, new Object[] { id, title, url, FileUtils.getFileSize(length), "Êñá‰ª∂Â∑≤Â≠òÂú®ÔºÅ" });
 				continue;
 			}
 			tableModel.insertRow(0, new Object[] { id, title, url, FileUtils.getFileSize(length), "0%" });
-			
+
 			table.scrollRectToVisible(table.getCellRect(0, 0, true));
 			table.setRowSelectionInterval(0, 0);
-			table.setSelectionBackground(Color.LIGHT_GRAY);// —°÷–––…Ë÷√±≥æ∞…´
+			table.setSelectionBackground(Color.LIGHT_GRAY);// ÈÄâ‰∏≠Ë°åËÆæÁΩÆËÉåÊôØËâ≤
 
 			final int row = 0, col = tableModel.getColumnCount() - 1;
-			final String getUrl = String.format("%s/dll/export/%s", urlTxt.getText(), id);
+			final String getUrl = String.format("%s/dll/export/%s", getComboText(urlCombo), id);
 
 			DownloadUtil.get().download(getUrl, id, "backup", new OnDownloadListener() {
 				@Override
@@ -186,7 +342,7 @@ public class OfflineExport {
 				@Override
 				public void onDownloadFailed(Exception e) {
 					tableModel.setValueAt("0%", row, col - 1);
-					tableModel.setValueAt("œ¬‘ÿ ß∞‹" + e.getMessage(), row, col);
+					tableModel.setValueAt("‰∏ãËΩΩÂ§±Ë¥•" + e.getMessage(), row, col);
 				}
 			});
 
@@ -199,7 +355,7 @@ public class OfflineExport {
 	}
 
 	protected void doStartBackup(final JButton backupBtn) {
-		LogHandler.debug("ø™ º±∏∑›...");
+		LogHandler.debug("ÂºÄÂßãÂ§á‰ªΩ...");
 		backupTask = new BackupTask();
 		try {
 			database = new DataBaseProxy();
@@ -230,7 +386,7 @@ public class OfflineExport {
 			}
 			startThread.start();
 
-			backupBtn.setText(startThread == null ? "ø™ º±∏∑›" : "Õ£÷π±∏∑›");
+			backupBtn.setText(startThread == null ? "ÂºÄÂßãÂ§á‰ªΩ" : "ÂÅúÊ≠¢Â§á‰ªΩ");
 		} catch (Exception ex) {
 			LogHandler.error(ex);
 			ex.printStackTrace();
