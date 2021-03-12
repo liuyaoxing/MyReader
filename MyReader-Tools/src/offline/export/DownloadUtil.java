@@ -203,10 +203,11 @@ public class DownloadUtil {
 				dispositionHeader = strings[1].replace("filename=", "");
 				dispositionHeader = dispositionHeader.replace("\"", "");
 				if (dispositionHeader.length() > 128) {
+					boolean endsWith = dispositionHeader.endsWith(".dll.zip");
 					String newName = dispositionHeader.trim().substring(0, 128);
-					if (newName.endsWith(".dll.zip"))
-						return newName;
-					return newName + ".dll.zip";
+					if (endsWith && !newName.endsWith(".dll.zip"))
+						return newName + ".dll.zip";
+					return newName;
 				}
 				return dispositionHeader.trim();
 			}

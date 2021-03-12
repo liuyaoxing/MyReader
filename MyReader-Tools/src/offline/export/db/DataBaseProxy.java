@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,8 @@ import org.apache.commons.dbutils.handlers.MapListHandler;
 public class DataBaseProxy {
 
 	Connection conn;
+
+	private boolean enabled = false;
 
 	public DataBaseProxy() {
 		this("dulele");
@@ -49,6 +52,8 @@ public class DataBaseProxy {
 	}
 
 	public List<Map<String, Object>> dbQuery(BaseDo baseDo) throws SQLException {
+		if (!enabled)
+			return Collections.emptyList();
 		return dbQuery(baseDo.getTableName(), baseDo.getAttributeMaps());
 	}
 
@@ -64,11 +69,15 @@ public class DataBaseProxy {
 	}
 
 	public List<Map<String, Object>> dbQuery(final String sql) throws SQLException {
+		if (!enabled)
+			return Collections.emptyList();
 		QueryRunner runner = new QueryRunner();
 		return runner.query(conn, sql, new MapListHandler());
 	}
 
 	public int dbInsert(BaseDo baseDo) throws SQLException {
+		if (!enabled)
+			return 0;
 		String insertTemplate = "INSERT INTO %s(%s) VALUES(%s)";
 		StringBuffer columns = new StringBuffer();
 		StringBuffer values = new StringBuffer();
@@ -86,6 +95,8 @@ public class DataBaseProxy {
 	}
 
 	public int dbUpdate(String sql) throws SQLException {
+		if (!enabled)
+			return 0;
 		Statement statement = null;
 		try {
 			statement = conn.createStatement(); // statements

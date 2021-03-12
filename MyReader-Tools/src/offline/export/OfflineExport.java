@@ -349,7 +349,7 @@ public class OfflineExport {
 			if (destFile.exists() && toSizeStr(destFile.length()).equals(size)) {
 				tableModel.setValueAt("文件已存在!", row, col - 1);
 				tableModel.setValueAt(destFile.getCanonicalFile(), row, col);
-//				continue;
+				continue;
 			}
 
 			String getUrl = getInputHostUrl() + FOLDER_DOWNLOAD_MD5 + id;
@@ -441,7 +441,7 @@ public class OfflineExport {
 			List<Map<String, Object>> resList = database.dbQuery(backupTask.getTableName(), whereMap);
 			if (resList != null && resList.size() > 0) {
 				tableModel.insertRow(0, new Object[] { id, title, url, FileUtils.getFileSize(length), "文件已存在！" });
-				continue;
+//				continue;
 			}
 			tableModel.insertRow(0, new Object[] { id, title, url, FileUtils.getFileSize(length), "0%" });
 
