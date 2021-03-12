@@ -1,9 +1,5 @@
 package offline.export.utils;
 
-import com.liuyx.common.csv.CsvUtil;
-
-import org.apache.commons.codec.ext.DigestUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,6 +8,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.codec.ext.DigestUtils;
+
+import com.liuyx.common.csv.CsvUtil;
 
 public class MD5Utils {
 

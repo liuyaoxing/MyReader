@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -54,7 +55,6 @@ import offline.export.DownloadUtil.OnDownloadListener;
 import offline.export.db.BackupTask;
 import offline.export.db.DataBaseProxy;
 import offline.export.log.LogHandler;
-import offline.export.utils.MD5Utils;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -98,6 +98,12 @@ public class OfflineExport {
 					UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 					OfflineExport window = new OfflineExport();
 					window.frame.setVisible(true);
+
+					String exeName = new java.io.File(OfflineExport.class.getProtectionDomain()//
+							.getCodeSource()//
+							.getLocation()//
+							.getPath()).getName();
+					LogHandler.debug("当前exe名称:" + exeName);
 				} catch (Exception ex) {
 					LogHandler.error(ex);
 					ex.printStackTrace();
@@ -135,6 +141,7 @@ public class OfflineExport {
 			@Override
 			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 				String newItem = String.valueOf(urlCombo.getEditor().getItem());
+
 				Set<String> itemSet = new HashSet<String>();
 				DefaultComboBoxModel<String> d = (DefaultComboBoxModel<String>) urlCombo.getModel();
 				d.removeAllElements();
@@ -148,10 +155,7 @@ public class OfflineExport {
 				} catch (MalformedURLException e1) {
 					e1.printStackTrace();
 				}
-				for (String item : itemSet) {
-					d.addElement(item);
-				}
-				d.setSelectedItem(newItem);
+				addItemsToCombo(itemSet.toArray(new String[0]), 0);
 			}
 
 			@Override
@@ -261,7 +265,8 @@ public class OfflineExport {
 									Object title = table.getValueAt(row, 1);
 									if (title != null) {
 										try {
-											currentDirectory = new File(title.toString().replace("[文件夹]", "")).getCanonicalFile();
+											currentDirectory = new File(title.toString().replace("[文件夹]", ""))
+													.getCanonicalFile();
 										} catch (IOException e1) {
 											e1.printStackTrace();
 										}
@@ -296,6 +301,12 @@ public class OfflineExport {
 		JScrollPane scrollPane = new JScrollPane(table); // 支持滚动
 
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
+
+		initDatas();
+	}
+
+	private void initDatas() {
+		addItemsToCombo(new String[] { "http://192.168.43.1:61666" }, 0);
 	}
 
 	/**
@@ -335,10 +346,10 @@ public class OfflineExport {
 			final int row = 0, col = tableModel.getColumnCount() - 1;
 
 			File destFile = new File(toFile, title);
-			if (destFile.exists() && id.equals(MD5Utils.encryptFileFast(destFile))) {
+			if (destFile.exists() && toSizeStr(destFile.length()).equals(size)) {
 				tableModel.setValueAt("文件已存在!", row, col - 1);
 				tableModel.setValueAt(destFile.getCanonicalFile(), row, col);
-				continue;
+//				continue;
 			}
 
 			String getUrl = getInputHostUrl() + FOLDER_DOWNLOAD_MD5 + id;
@@ -364,7 +375,29 @@ public class OfflineExport {
 					tableModel.setValueAt("0%", row, col - 1);
 					tableModel.setValueAt("下载失败" + e.getMessage(), row, col);
 				}
+
+				@Override
+				public boolean isFileExists(File srcFile) {
+					return srcFile.exists() && srcFile.length() > 0;
+				}
+
+				@Override
+				public void onFileExists(File file) {
+					tableModel.setValueAt("文件已存在:", row, col - 1);
+					tableModel.setValueAt(file.getPath(), row, col);
+				}
 			});
+		}
+	}
+
+	private String toSizeStr(long fileLen) {
+		DecimalFormat df = new DecimalFormat("0.00");
+		if (fileLen > 1024 * 1024) {
+			return df.format(fileLen * 1f / 1024 / 1024) + "MB";
+		} else if (fileLen > 1024) {
+			return df.format(fileLen * 1f / 1024) + "KB";
+		} else {
+			return fileLen + "B";
 		}
 	}
 
@@ -421,6 +454,11 @@ public class OfflineExport {
 
 			DownloadUtil.get().download(getUrl, id, "backup", new OnDownloadListener() {
 				@Override
+				public boolean isFileExists(File srcFile) {
+					return srcFile.exists() && srcFile.length() > 0;
+				}
+
+				@Override
 				public void onDownloadSuccess(File file) {
 					try {
 						tableModel.setValueAt("100%", row, col - 1);
@@ -446,6 +484,12 @@ public class OfflineExport {
 					tableModel.setValueAt("0%", row, col - 1);
 					tableModel.setValueAt("下载失败" + e.getMessage(), row, col);
 				}
+
+				@Override
+				public void onFileExists(File file) {
+					tableModel.setValueAt("文件已存在:", row, col - 1);
+					tableModel.setValueAt(file.getPath(), row, col);
+				}
 			});
 
 			if (tableModel.getDataVector().size() > 5000) {
@@ -464,6 +508,10 @@ public class OfflineExport {
 			frameTitle = frame.getTitle();
 			int res = database.dbCreate(backupTask);
 			System.out.println(res);
+
+			File toDir = new File("backup");
+			if (!toDir.exists())
+				toDir.mkdir();
 
 			if (startThread != null) {
 				startThread.interrupt();
@@ -493,5 +541,14 @@ public class OfflineExport {
 			LogHandler.error(ex);
 			ex.printStackTrace();
 		}
+	}
+
+	protected void addItemsToCombo(String[] items, int index) {
+		DefaultComboBoxModel<String> d = (DefaultComboBoxModel<String>) urlCombo.getModel();
+		d.removeAllElements();
+		for (String item : items) {
+			d.addElement(item);
+		}
+		d.setSelectedItem(items[index]);
 	}
 }

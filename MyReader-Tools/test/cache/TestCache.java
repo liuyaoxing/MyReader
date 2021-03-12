@@ -1,13 +1,10 @@
 package cache;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import offline.export.bigcache.BigCache;
 import offline.export.bigcache.CacheConfig;
 import offline.export.bigcache.CacheConfig.StorageMode;
-import offline.export.bigcache.storage.FileChannelStorage;
 
 public class TestCache {
 

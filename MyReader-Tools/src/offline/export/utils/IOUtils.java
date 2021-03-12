@@ -12,10 +12,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URI;
-import java.net.URL;
 import java.nio.channels.Selector;
-import java.nio.charset.Charset;
 
 public class IOUtils {
 

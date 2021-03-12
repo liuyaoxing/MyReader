@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 import offline.export.log.LogHandler;
+import offline.export.utils.IOUtils;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Dispatcher;
@@ -62,7 +63,7 @@ public class DownloadUtil {
 
 	public void download(final String url, String id, final String destFileDir, final OnDownloadListener listener)
 			throws IOException {
-		download(url, id, new File(destFileDir), listener);
+		download(url, id, new File(destFileDir).getCanonicalFile(), listener);
 	}
 
 	/**
@@ -116,21 +117,26 @@ public class DownloadUtil {
 		FileOutputStream fos = null;
 
 		// 储存下载文件的目录
-		String destFileName = null;
 		if (toFile.isDirectory()) {
 			if (!toFile.exists()) {
 				toFile.mkdirs();
 			}
-			toFile = new File(toFile, destFileName);
+			toFile = new File(toFile, getHeaderFileName(response));
 		}
 		if (toFile.getParentFile() != null && !toFile.getParentFile().exists()) {
 			toFile.getParentFile().mkdirs();
 		}
 
+		if (listener.isFileExists(toFile)) {
+			listener.onFileExists(toFile);
+			return;
+		}
+
 		try {
+			File tmpFile = new File(toFile.getParentFile(), toFile.getName() + ".td");
 			is = response.body().byteStream();
 			long total = response.body().contentLength();
-			fos = new FileOutputStream(toFile);
+			fos = new FileOutputStream(tmpFile);
 			long sum = 0;
 			while ((len = is.read(buf)) != -1) {
 				fos.write(buf, 0, len);
@@ -140,29 +146,25 @@ public class DownloadUtil {
 				listener.onDownloading(progress);
 			}
 			fos.flush();
+			IOUtils.closeQuietly(fos);
 			// 下载完成
+			tmpFile.renameTo(toFile);
 			listener.onDownloadSuccess(toFile);
 		} catch (Exception ex) {
 			LogHandler.error(ex);
 			listener.onDownloadFailed(ex);
 		} finally {
-			try {
-				if (is != null) {
-					is.close();
-				}
-				if (fos != null) {
-					fos.close();
-				}
-				if (response != null && response.body() != null) {
-					response.body().close();
-				}
-			} catch (IOException e) {
-
+			IOUtils.closeQuietly(is);
+			IOUtils.closeQuietly(fos);
+			if (response != null && response.body() != null) {
+				IOUtils.closeQuietly(response.body());
 			}
 		}
 	}
 
 	public interface OnDownloadListener {
+
+		boolean isFileExists(File srcFile);
 
 		/**
 		 * 下载成功之后的文件
@@ -179,6 +181,11 @@ public class DownloadUtil {
 		 */
 
 		void onDownloadFailed(Exception e);
+
+		/**
+		 * 文件已存在
+		 */
+		void onFileExists(File file);
 	}
 
 	/**
@@ -195,8 +202,12 @@ public class DownloadUtil {
 			if (strings.length > 1) {
 				dispositionHeader = strings[1].replace("filename=", "");
 				dispositionHeader = dispositionHeader.replace("\"", "");
-				if (dispositionHeader.length() > 50)
-					return dispositionHeader.trim().substring(0, 50);
+				if (dispositionHeader.length() > 128) {
+					String newName = dispositionHeader.trim().substring(0, 128);
+					if (newName.endsWith(".dll.zip"))
+						return newName;
+					return newName + ".dll.zip";
+				}
 				return dispositionHeader.trim();
 			}
 			return "";
