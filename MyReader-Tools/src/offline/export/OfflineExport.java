@@ -80,7 +80,7 @@ public class OfflineExport {
 	protected BackupTask backupTask;
 	protected DataBaseProxy database;
 
-	protected Thread startThread;
+	protected Thread startThread, startFolderThread;
 
 	private String frameTitle;
 
@@ -169,14 +169,17 @@ public class OfflineExport {
 		final JButton backupBtn = new JButton("开始备份");
 		backupBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				backupBtn.setText(backupBtn.getText().equals("开始备份") ? "停止备份" : "开始备份");
 				String comboText = getComboText(urlCombo);
 				if (comboText.endsWith(FOLDER_LIST)) {
+					backupBtn.setText("开始备份");
 					Request request = new Request.Builder().addHeader("x-header", "dll")//
 							.header("sort", "_id")//
 							.url(comboText).build();
 					try {
 						Response response = DownloadUtil.get().newCall(request);
 						if (!response.isSuccessful()) {
+							JOptionPane.showMessageDialog(null, response.message());
 							return;
 						}
 						String body = response.body().string();
@@ -200,25 +203,41 @@ public class OfflineExport {
 					}
 				} else if (comboText.contains(FOLDER_LIST_MD5)) {
 					try {
+						if (startFolderThread != null) {
+							startFolderThread.interrupt();
+							startFolderThread = null;
+							return;
+						}
+						JFileChooser fileChooser = new JFileChooser();// 文件选择器
+						if (currentDirectory != null)
+							fileChooser.setSelectedFile(new File(currentDirectory, "tmp"));
+						fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);// 设定只能选择到文件夹
+						int state = fileChooser.showOpenDialog(null);// 此句是打开文件选择器界面的触发语句
 						Request request = new Request.Builder().addHeader("x-header", "dll")//
 								.header("sort", "_id")//
 								.url(comboText).build();
 						Response response = DownloadUtil.get().newCall(request);
 						if (!response.isSuccessful()) {
+							JOptionPane.showMessageDialog(null, response.message());
 							throw new IOException("Unexpected code " + response);
 						}
 						String body = response.body().string();
-						JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
-						JFileChooser fileChooser = new JFileChooser();// 文件选择器
-						if (currentDirectory != null)
-							fileChooser.setCurrentDirectory(currentDirectory);
-						fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);// 设定只能选择到文件夹
-						int state = fileChooser.showOpenDialog(null);// 此句是打开文件选择器界面的触发语句
+						final JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
 						if (state == JFileChooser.APPROVE_OPTION) {
-							File toFile = fileChooser.getSelectedFile();// toFile为选择到的目录
-							doSyncFolder(jsonArray, toFile);
+							final File toFile = fileChooser.getSelectedFile();// toFile为选择到的目录
+							startFolderThread = new Thread(new Runnable() {
+								@Override
+								public void run() {
+									try {
+										doSyncFolder(jsonArray, toFile);
+										backupBtn.setText("开始备份");
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+								}
+							});
+							startFolderThread.start();
 						}
-
 					} catch (Exception ex) {
 						LogHandler.error(ex);
 					}
@@ -239,6 +258,7 @@ public class OfflineExport {
 		table.setShowGrid(true);
 		table.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
+				frameTitle = frame.getTitle();
 				if (SwingUtilities.isRightMouseButton(me)) {
 					final int row = table.rowAtPoint(me.getPoint());
 					table.setRowSelectionInterval(row, row);
@@ -341,7 +361,12 @@ public class OfflineExport {
 			final String title = element.get(FILESERVER_NAME).getAsString();
 			final String url = element.get(FILESERVER_PATH).getAsString();
 			final String size = element.get(FILESERVER_SIZE).getAsString();
+
+			if (title.startsWith(".") || (title.contains("[文件夹]")) || "0B".equals(size))
+				continue;
+
 			tableModel.insertRow(0, new Object[] { id, title, url, size, "", "" });
+			table.setRowSelectionInterval(0, 0);
 
 			final int row = 0, col = tableModel.getColumnCount() - 1;
 
@@ -352,42 +377,53 @@ public class OfflineExport {
 				continue;
 			}
 
-			String getUrl = getInputHostUrl() + FOLDER_DOWNLOAD_MD5 + id;
-			DownloadUtil.get().download(getUrl, id, destFile, new OnDownloadListener() {
-				@Override
-				public void onDownloadSuccess(File file) {
-					try {
-						tableModel.setValueAt("100%", row, col - 1);
-						tableModel.setValueAt(file.getCanonicalFile(), row, col);
-					} catch (Exception ex) {
-						LogHandler.error(ex);
-						ex.printStackTrace();
-					}
-				}
-
-				@Override
-				public void onDownloading(int progress) {
-					tableModel.setValueAt(progress + "%", row, col - 1);
-				}
-
-				@Override
-				public void onDownloadFailed(Exception e) {
-					tableModel.setValueAt("0%", row, col - 1);
-					tableModel.setValueAt("下载失败" + e.getMessage(), row, col);
-				}
-
-				@Override
-				public boolean isFileExists(File srcFile) {
-					return srcFile.exists() && srcFile.length() > 0;
-				}
-
-				@Override
-				public void onFileExists(File file) {
-					tableModel.setValueAt("文件已存在:", row, col - 1);
-					tableModel.setValueAt(file.getPath(), row, col);
-				}
-			});
+			try {
+				frame.setTitle(String.format("%s (已处理: %s项)", frameTitle, counter.incrementAndGet()));
+				String getUrl = downloadFile(id, row, col, destFile);
+				System.out.println(getUrl);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
+	}
+
+	protected String downloadFile(final String id, final int row, final int col, File destFile) throws IOException {
+		String getUrl = getInputHostUrl() + FOLDER_DOWNLOAD_MD5 + id;
+		DownloadUtil.get().download(getUrl, id, destFile, new OnDownloadListener() {
+			@Override
+			public void onDownloadSuccess(File file) {
+				try {
+					tableModel.setValueAt("100%", row, col - 1);
+					tableModel.setValueAt(file.getCanonicalFile(), row, col);
+				} catch (Exception ex) {
+					LogHandler.error(ex);
+					ex.printStackTrace();
+				}
+			}
+
+			@Override
+			public void onDownloading(int progress) {
+				tableModel.setValueAt(progress + "%", row, col - 1);
+			}
+
+			@Override
+			public void onDownloadFailed(Exception e) {
+				tableModel.setValueAt("0%", row, col - 1);
+				tableModel.setValueAt("下载失败" + e.getMessage(), row, col);
+			}
+
+			@Override
+			public boolean isFileExists(File srcFile) {
+				return srcFile.exists() && srcFile.length() > 0;
+			}
+
+			@Override
+			public void onFileExists(File file) {
+				tableModel.setValueAt("文件已存在:", row, col - 1);
+				tableModel.setValueAt(file.getPath(), row, col);
+			}
+		});
+		return getUrl;
 	}
 
 	private String toSizeStr(long fileLen) {
@@ -421,7 +457,7 @@ public class OfflineExport {
 				.url(backupListUrl).build();
 		Response response = DownloadUtil.get().newCall(request);
 		if (!response.isSuccessful()) {
-			throw new IOException("Unexpected code " + response);
+			throw new UnsupportedOperationException("文件下载失败:" + response.message());
 		}
 		String body = response.body().string();
 		JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
@@ -526,11 +562,15 @@ public class OfflineExport {
 									break;
 								if (!doBackFiles(i))
 									break;
+							} catch (UnsupportedOperationException ex) {
+								JOptionPane.showMessageDialog(null, ex.getMessage());
+								throw ex;
 							} catch (Exception ex) {
 								LogHandler.error(ex);
 								ex.printStackTrace();
 							}
 						}
+						backupBtn.setText("开始备份");
 					}
 				});
 			}
