@@ -86,11 +86,11 @@ public class Version_Apk {
 		Version_Apk version = new Version_Apk();
 		version.setTitle("左右手v3.17");
 		version.setFileName(srcFile.getName());
-		version.setChangeLog("01、适配Android 11系统。\r\n02、适配鸿蒙系统。");
-		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20210820/MyBleChat-release-3.17.apk");
+		version.setChangeLog("01、适配Android 11系统。\r\n02、适配鸿蒙系统。\r\n03、修复了一些体验的问题");
+		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20210905/MyReader-release-3.25.apk");
 		version.setFileSize(srcFile.length());
 		version.setVcode(25);
-		version.setVersion(202108190900L);
+		version.setVersion(202109050000L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();

@@ -92,11 +92,11 @@ public class Version_Apk {
 		Version_Apk version = new Version_Apk();
 		version.setTitle("读乐乐v3.25");
 		version.setFileName(srcFile.getName());
-		version.setChangeLog("01、适配Android 11系统。\r\n02、适配鸿蒙系统。");
-		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20210817/MyReader-release-3.25.apk");
+		version.setChangeLog("01、适配Android 11系统。\r\n02、适配鸿蒙系统。\r\n03、修复了一些体验的问题");
+		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20210905/MyReader-release-3.25.apk");
 		version.setFileSize(srcFile.length());
 		version.setVcode(71);
-		version.setVersion(202108171056L);
+		version.setVersion(202109050000L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();

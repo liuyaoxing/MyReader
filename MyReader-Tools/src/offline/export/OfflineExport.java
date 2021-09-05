@@ -173,6 +173,7 @@ public class OfflineExport {
 				String comboText = getComboText(urlCombo);
 				if (comboText.endsWith(FOLDER_LIST)) {
 					backupBtn.setText("开始备份");
+					tableModel.getDataVector().clear();
 					Request request = new Request.Builder().addHeader("x-header", "dll")//
 							.header("sort", "_id")//
 							.url(comboText).build();
