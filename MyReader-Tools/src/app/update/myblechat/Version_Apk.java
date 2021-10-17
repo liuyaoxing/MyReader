@@ -82,15 +82,15 @@ public class Version_Apk {
 	}
 
 	public static void main(String[] args) {
-		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyBLEChatv30\\app\\release\\MyBleChat-release-3.17.apk");
+		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyBLEChatv30\\app\\release\\MyBleChat-release-3.18.apk");
 		Version_Apk version = new Version_Apk();
-		version.setTitle("左右手v3.17");
+		version.setTitle("左右手v3.18");
 		version.setFileName(srcFile.getName());
-		version.setChangeLog("01、适配Android 11系统。\r\n02、适配鸿蒙系统。\r\n03、修复了一些体验的问题");
-		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20210905/MyReader-release-3.25.apk");
+		version.setChangeLog("01、增加电子卷尺功能、长度单位换算器和重量单位换算器。\r\n02、适配鸿蒙系统。\r\n03、修复了一些体验的问题");
+		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20211018/MyBleChat-release-3.18.apk");
 		version.setFileSize(srcFile.length());
-		version.setVcode(25);
-		version.setVersion(202109050000L);
+		version.setVcode(26);
+		version.setVersion(202110180902L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();

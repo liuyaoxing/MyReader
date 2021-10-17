@@ -88,22 +88,22 @@ public class Version_Apk {
 	}
 
 	public static void main(String[] args) {
-		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyReaderv30\\app\\release\\MyReader-release-3.25.apk");
+		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyReaderv30\\app\\release\\MyReader-release-3.26.apk");
 		Version_Apk version = new Version_Apk();
-		version.setTitle("读乐乐v3.25");
+		version.setTitle("读乐乐v3.26");
 		version.setFileName(srcFile.getName());
-		version.setChangeLog("01、适配Android 11系统。\r\n02、适配鸿蒙系统。\r\n03、修复了一些体验的问题");
-		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20210905/MyReader-release-3.25.apk");
+		version.setChangeLog("01、适配Android 11系统。\r\n02、适配鸿蒙系统。\r\n04、修复获取新鲜事失败。\r\n04、修复了一些体验的问题");
+		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20210925/MyReader-release-3.26.apk");
 		version.setFileSize(srcFile.length());
-		version.setVcode(71);
-		version.setVersion(202109050000L);
+		version.setVcode(72);
+		version.setVersion(202109250000L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();
 		String toJson = gson.toJson(version);
 		System.out.println("Json = " + toJson);
 
-		Version_Apk version0 = gson.fromJson(toJson, Version_Apk.class);
-		System.out.println(version0);
+//		Version_Apk version0 = gson.fromJson(toJson, Version_Apk.class);
+//		System.out.println(version0);
 	}
 }
