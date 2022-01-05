@@ -22,7 +22,7 @@ public class FileUtils {
 	public static final long ONE_PB = ONE_KB * ONE_TB;
 
 	/**
-	 * ¸ù¾İÎÄ¼şµÄ¾ø¶ÔÂ·¾¶»ñÈ¡ÎÄ¼şÃûµ«²»°üº¬À©Õ¹Ãû
+	 * æ ¹æ®æ–‡ä»¶çš„ç»å¯¹è·¯å¾„è·å–æ–‡ä»¶åä½†ä¸åŒ…å«æ‰©å±•å
 	 *
 	 * @param filePath
 	 * @return
@@ -38,7 +38,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * »ñÈ¡ÎÄ¼şÀ©Õ¹Ãû
+	 * è·å–æ–‡ä»¶æ‰©å±•å
 	 *
 	 * @param fileName
 	 * @return
@@ -52,7 +52,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * »ñÈ¡ÎÄ¼ş´óĞ¡
+	 * è·å–æ–‡ä»¶å¤§å°
 	 *
 	 * @param filePath
 	 * @return
@@ -68,7 +68,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * »ñÈ¡ÎÄ¼ş´óĞ¡
+	 * è·å–æ–‡ä»¶å¤§å°
 	 *
 	 * @param destFolder
 	 * @return
@@ -78,9 +78,9 @@ public class FileUtils {
 	}
 
 	/**
-	 * »ñÈ¡ÎÄ¼ş´óĞ¡ 10.24M
+	 * è·å–æ–‡ä»¶å¤§å° 10.24M
 	 *
-	 * @param size ×Ö½Ú
+	 * @param size å­—èŠ‚
 	 * @return
 	 */
 	public static String getFileSize(long size) {
@@ -96,7 +96,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * ×ª»»ÎÄ¼ş´óĞ¡
+	 * è½¬æ¢æ–‡ä»¶å¤§å°
 	 *
 	 * @param fileS
 	 * @return B/KB/MB/GB
@@ -117,7 +117,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * »ñÈ¡Ä¿Â¼ÎÄ¼ş´óĞ¡
+	 * è·å–ç›®å½•æ–‡ä»¶å¤§å°
 	 *
 	 * @param dir
 	 * @return
@@ -129,7 +129,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * »ñÈ¡Ä¿Â¼ÎÄ¼ş´óĞ¡
+	 * è·å–ç›®å½•æ–‡ä»¶å¤§å°
 	 *
 	 * @param dir
 	 * @return
@@ -148,14 +148,14 @@ public class FileUtils {
 				dirSize += file.length();
 			} else if (file.isDirectory()) {
 				dirSize += file.length();
-				dirSize += getDirSize(file); // µİ¹éµ÷ÓÃ¼ÌĞøÍ³¼Æ
+				dirSize += getDirSize(file); // é€’å½’è°ƒç”¨ç»§ç»­ç»Ÿè®¡
 			}
 		}
 		return dirSize;
 	}
 
 	/**
-	 * »ñÈ¡Ä¿Â¼ÎÄ¼ş¸öÊı
+	 * è·å–ç›®å½•æ–‡ä»¶ä¸ªæ•°
 	 */
 	public static long getFileList(File dir) {
 		long count = 0;
@@ -165,7 +165,7 @@ public class FileUtils {
 		count = files.length;
 		for (File file : files) {
 			if (file.isDirectory()) {
-				count = count + getFileList(file);// µİ¹é
+				count = count + getFileList(file);// é€’å½’
 				count--;
 			}
 		}
@@ -184,9 +184,9 @@ public class FileUtils {
 	}
 
 	/**
-	 * É¾³ı¿ÕÄ¿Â¼
+	 * åˆ é™¤ç©ºç›®å½•
 	 * <p/>
-	 * ·µ»Ø 0´ú±í³É¹¦ ,1 ´ú±íÃ»ÓĞÉ¾³ıÈ¨ÏŞ, 2´ú±í²»ÊÇ¿ÕÄ¿Â¼,3 ´ú±íÎ´Öª´íÎó
+	 * è¿”å› 0ä»£è¡¨æˆåŠŸ ,1 ä»£è¡¨æ²¡æœ‰åˆ é™¤æƒé™, 2ä»£è¡¨ä¸æ˜¯ç©ºç›®å½•,3 ä»£è¡¨æœªçŸ¥é”™è¯¯
 	 *
 	 * @return
 	 */
@@ -205,7 +205,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * ÖØÃüÃû
+	 * é‡å‘½å
 	 *
 	 * @param oldName
 	 * @param newName
@@ -217,7 +217,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * Çå¿ÕÒ»¸öÎÄ¼ş¼Ğ
+	 * æ¸…ç©ºä¸€ä¸ªæ–‡ä»¶å¤¹
 	 */
 	public static void clearFileWithPath(String filePath) {
 		List<File> files = FileUtils.listPathFiles(filePath);
@@ -234,14 +234,14 @@ public class FileUtils {
 	}
 
 	/**
-	 * ÁĞ³örootÄ¿Â¼ÏÂËùÓĞ×ÓÄ¿Â¼
+	 * åˆ—å‡ºrootç›®å½•ä¸‹æ‰€æœ‰å­ç›®å½•
 	 */
 	public static List<String> listPath(String root) {
 		List<String> allDir = new ArrayList<String>();
 		SecurityManager checker = new SecurityManager();
 		File path = new File(root);
 		checker.checkRead(root);
-		// ¹ıÂËµôÒÔ.¿ªÊ¼µÄÎÄ¼ş¼Ğ
+		// è¿‡æ»¤æ‰ä»¥.å¼€å§‹çš„æ–‡ä»¶å¤¹
 		if (path.isDirectory()) {
 			for (File f : path.listFiles()) {
 				if (f.isDirectory() && !f.getName().startsWith(".")) {
@@ -253,7 +253,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * »ñÈ¡Ò»¸öÎÄ¼ş¼ĞÏÂµÄËùÓĞÎÄ¼ş
+	 * è·å–ä¸€ä¸ªæ–‡ä»¶å¤¹ä¸‹çš„æ‰€æœ‰æ–‡ä»¶
 	 *
 	 * @param root
 	 * @return
@@ -278,7 +278,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * ´´½¨Ä¿Â¼
+	 * åˆ›å»ºç›®å½•
 	 */
 	public static PathStatus createPath(String newPath) {
 		File path = new File(newPath);
@@ -293,7 +293,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * ½ØÈ¡Â·¾¶Ãû
+	 * æˆªå–è·¯å¾„å
 	 *
 	 * @return
 	 */
@@ -304,7 +304,7 @@ public class FileUtils {
 	}
 
 	public static Set<File> listFiles(File srcDir) throws IOException {
-		Set<File> fileSet = new LinkedHashSet<>();
+		Set<File> fileSet = new LinkedHashSet<File>();
 		listFiles(srcDir, fileSet);
 		return fileSet;
 	}

@@ -10,7 +10,7 @@ import gson.formatterentry.FormatterEntry;
 public class PreferenceHostFactory {
 
 	public static void main(String[] args) {
-		List<PreferenceHost> hostList = new ArrayList<>();
+		List<PreferenceHost> hostList = new ArrayList<PreferenceHost>();
 //		{
 //			PreferenceHost host1 = new PreferenceHost();
 //			host1.setUrl("fuliba.net");
@@ -97,7 +97,7 @@ public class PreferenceHostFactory {
 					"data-canonical-src", "data-link" });
 			FormatterEntry entry = new FormatterEntry();
 			entry.setRemove_tags(new String[] {});
-			entry.setAuthor_select(new String[] { "¶¡¶¡" });
+			entry.setAuthor_select(new String[] { "ï¿½ï¿½ï¿½ï¿½" });
 			entry.setDate_select(new String[] { "time.new" });
 			entry.setContent_select(new String[] { "article.article-content" });
 			entry.setComments_select(new String[] {});
@@ -111,7 +111,7 @@ public class PreferenceHostFactory {
 			host.setDeleteRelates(new String[] { "div.entry-copyright", "div.entry-footer" });
 			FormatterEntry entry = new FormatterEntry();
 			entry.setRemove_tags(new String[] { "[name=MobileOptimized]" });
-			entry.setAuthor_select(new String[] { "¶¡¶¡" });
+			entry.setAuthor_select(new String[] { "ï¿½ï¿½ï¿½ï¿½" });
 			entry.setDate_select(new String[] { "div.entry-info span" });
 			entry.setContent_select(new String[] { "div.entry-content" });
 			entry.setComments_select(new String[] {});

@@ -13,7 +13,7 @@ public class Csv {
 
 	static public char BLOCK_DELIMITER = '\n';
 
-	private LinkedList<String[]> list = new LinkedList<>();
+	private LinkedList<String[]> list = new LinkedList<String[]>();
 
 	private String[] headers;
 
@@ -28,7 +28,7 @@ public class Csv {
 	}
 
 	public String[] getAll(String header) {
-		HashSet<String> values = new HashSet<>();
+		HashSet<String> values = new HashSet<String>();
 		int idx = getHeaderIndex(header);
 		Iterator<String[]> iterator = list.iterator();
 		while (iterator.hasNext()) {
@@ -47,7 +47,7 @@ public class Csv {
 	}
 
 	public String[] get(String header, String subheader, String value) {
-		HashSet<String> values = new HashSet<>();
+		HashSet<String> values = new HashSet<String>();
 		int idx = getHeaderIndex(header);
 		int subidx = getHeaderIndex(subheader);
 		Iterator<String[]> iterator = list.iterator();
@@ -68,7 +68,7 @@ public class Csv {
 			return ret;
 		}
 
-		HashSet<String> values = new HashSet<>();
+		HashSet<String> values = new HashSet<String>();
 		int idx = getHeaderIndex(header);
 		Iterator<String[]> iterator = list.iterator();
 		Set<?> keys = context.keySet();

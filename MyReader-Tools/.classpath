@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
@@ -15,5 +15,7 @@
 	<classpathentry kind="lib" path="libs/okio-1.17.5.jar"/>
 	<classpathentry kind="lib" path="libs/hsqldb-2.5.1.jar"/>
 	<classpathentry kind="lib" path="libs/commons-dbutils-1.7.jar" sourcepath="libs/commons-dbutils-1.7-sources.jar"/>
+	<classpathentry kind="lib" path="libs/zxing-core-3.4.1.jar"/>
+	<classpathentry kind="lib" path="libs/zxing-javase-3.4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

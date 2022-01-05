@@ -58,7 +58,7 @@ public class MD5Utils {
 	public static String encryptFileFast(File file) throws IOException {
 		if (file.isFile() && file.length() < ONE_MB * 20)
 			return encryptFile(file);
-		Map<String, String> fileMap = new HashMap<>();
+		Map<String, String> fileMap = new HashMap<String, String>();
 		fileMap.put("FILENAME", file.getName());
 		fileMap.put("LENGTH", String.valueOf(file.length()));
 		fileMap.put("PATH", file.getPath());

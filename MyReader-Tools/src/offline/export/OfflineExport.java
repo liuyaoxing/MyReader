@@ -1,14 +1,19 @@
 package offline.export;
 
+import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.FileDialog;
+import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -57,6 +62,8 @@ import offline.export.db.DataBaseProxy;
 import offline.export.log.LogHandler;
 import okhttp3.Request;
 import okhttp3.Response;
+import javax.swing.JMenuBar;
+import java.awt.Component;
 
 public class OfflineExport {
 
@@ -87,6 +94,9 @@ public class OfflineExport {
 	private AtomicLong counter = new AtomicLong(0);
 
 	private File currentDirectory;
+	private JButton btnNewButton;
+	private JPopupMenu popupMenu;
+	private JMenuItem mntmNewMenuItem;
 
 	/**
 	 * Launch the application.
@@ -185,9 +195,8 @@ public class OfflineExport {
 						}
 						String body = response.body().string();
 
-						Map<String, JsonObject> toMap = new Gson().fromJson(body,
-								new TypeToken<Map<String, JsonObject>>() {
-								}.getType());
+						Map<String, JsonObject> toMap = new Gson().fromJson(body, new TypeToken<Map<String, JsonObject>>() {
+						}.getType());
 						Iterator<Entry<String, JsonObject>> iter = toMap.entrySet().iterator();
 						while (iter.hasNext()) {
 							Entry<String, JsonObject> entry = iter.next();
@@ -250,6 +259,36 @@ public class OfflineExport {
 		backupBtn.setHorizontalAlignment(SwingConstants.RIGHT);
 		panel.add(backupBtn);
 
+		btnNewButton = new JButton("菜单栏");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Robot robot = new Robot();
+					robot.mousePress(InputEvent.BUTTON3_MASK);
+					robot.mouseRelease(InputEvent.BUTTON3_MASK);
+				} catch (AWTException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		panel.add(btnNewButton);
+
+		popupMenu = new JPopupMenu();
+		addPopup(btnNewButton, popupMenu);
+
+		mntmNewMenuItem = new JMenuItem("码云传");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				FileDialog fd = new FileDialog(frame);
+				fd.setMultipleMode(false);
+				fd.setTitle("请选择文件");
+				fd.setVisible(true);
+				File[] getFiles = fd.getFiles();
+				System.out.println(getFiles[0]);
+			}
+		});
+		popupMenu.add(mntmNewMenuItem);
+
 		tableModel = new DefaultTableModel(null, columnNames);
 		table = new JTable(tableModel);
 		for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
@@ -286,8 +325,7 @@ public class OfflineExport {
 									Object title = table.getValueAt(row, 1);
 									if (title != null) {
 										try {
-											currentDirectory = new File(title.toString().replace("[文件夹]", ""))
-													.getCanonicalFile();
+											currentDirectory = new File(title.toString().replace("[文件夹]", "")).getCanonicalFile();
 										} catch (IOException e1) {
 											e1.printStackTrace();
 										}
@@ -591,5 +629,25 @@ public class OfflineExport {
 			d.addElement(item);
 		}
 		d.setSelectedItem(items[index]);
+	}
+
+	private static void addPopup(Component component, final JPopupMenu popup) {
+		component.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+
+			private void showMenu(MouseEvent e) {
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		});
 	}
 }
