@@ -1,20 +1,19 @@
 package offline.export;
 
-import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FileDialog;
 import java.awt.Point;
-import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -65,10 +64,6 @@ import offline.export.log.LogHandler;
 import offline.export.utils.Base64FileUtil;
 import okhttp3.Request;
 import okhttp3.Response;
-import javax.swing.JMenuBar;
-import java.awt.Component;
-import java.awt.Desktop;
-import java.awt.Dimension;
 
 public class OfflineExport {
 
@@ -141,7 +136,7 @@ public class OfflineExport {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setTitle("读乐乐备份工具 v3.24");
+		frame.setTitle("读乐乐备份工具 v3.26");
 		frame.setSize(888, 666);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
