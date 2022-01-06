@@ -24,8 +24,8 @@ public class Base64FileUtil {
 
 	public static void main(String[] args) throws Exception {
 //		File srcFile = new File("D:\\Jobs\\市场支持\\华润银行\\AB.docx");
-//		File srcFile = new File("D:\\Jobs\\市场支持\\华润银行\\ABC.txt");
-		File srcFile = new File("C:\\Users\\liuyaoxing\\Desktop\\plugins\\ESB改造计划ESB改造计划ESB改造计划ESB改造计划ESB改造计划.xlsx");
+		File srcFile = new File("D:\\Jobs\\市场支持\\华润银行\\ABC.txt");
+//		File srcFile = new File("C:\\Users\\liuyaoxing\\Desktop\\plugins\\ESB改造计划ESB改造计划ESB改造计划ESB改造计划ESB改造计划.xlsx");
 
 		String fileStr = getFileStr(srcFile.getCanonicalPath());
 		System.out.println(generateFile(srcFile, fileStr));

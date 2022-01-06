@@ -30,7 +30,7 @@ public class QRCodeUtil {
 	private static final String CHARSET = "utf-8";
 	private static final String FORMAT = "JPG";
 	// 二维码尺寸
-	private static final int QRCODE_SIZE = 600;
+	private static final int QRCODE_SIZE = 800;
 	// LOGO宽度
 	private static final int LOGO_WIDTH = 60;
 	// LOGO高度
@@ -38,7 +38,7 @@ public class QRCodeUtil {
 
 	private static BufferedImage createImage(String content, String logoPath, boolean needCompress) throws Exception {
 		Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();
-		hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
+		hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
 		hints.put(EncodeHintType.CHARACTER_SET, CHARSET);
 		hints.put(EncodeHintType.MARGIN, 1);
 		BitMatrix bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, QRCODE_SIZE, QRCODE_SIZE, hints);
