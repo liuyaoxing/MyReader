@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.FileDialog;
+import java.awt.Point;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -274,10 +275,14 @@ public class OfflineExport {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					Robot robot = new Robot();
-					robot.mousePress(InputEvent.BUTTON3_MASK);
-					robot.mouseRelease(InputEvent.BUTTON3_MASK);
-				} catch (AWTException e) {
+//					Robot robot = new Robot();
+//					robot.mousePress(InputEvent.BUTTON3_MASK);
+//					robot.mouseRelease(InputEvent.BUTTON3_MASK);
+
+					Point location = btnNewButton.getLocationOnScreen();
+					popupMenu.setLocation(location.x, location.y + btnNewButton.getSize().height);
+					popupMenu.setVisible(true);
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -291,6 +296,7 @@ public class OfflineExport {
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					popupMenu.setVisible(false);
 					FileDialog fd = new FileDialog(frame);
 					fd.setMultipleMode(false);
 					fd.setTitle("请选择文件");
