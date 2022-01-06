@@ -129,7 +129,7 @@ public class QRCodeUtil {
 	public static String encode(String content, String logoPath, String destPath, String fileName, boolean needCompress) throws Exception {
 		BufferedImage image = QRCodeUtil.createImage(content, logoPath, needCompress);
 		mkdirs(destPath);
-		fileName = fileName.substring(0, fileName.indexOf(".") > 0 ? fileName.indexOf(".") : fileName.length()) + "." + FORMAT.toLowerCase();
+		fileName = fileName + "." + FORMAT.toLowerCase();
 		ImageIO.write(image, FORMAT, new File(destPath + "/" + fileName));
 		return fileName;
 	}

@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.liuyx.common.csv.CsvUtil;
@@ -18,39 +20,42 @@ import sun.misc.BASE64Encoder;
 
 public class Base64FileUtil {
 
-	public static final int CAPACITY = 1000;
+	public static final int CAPACITY = 2048;
 
 	public static void main(String[] args) throws Exception {
 //		File srcFile = new File("D:\\Jobs\\市场支持\\华润银行\\AB.docx");
-		File srcFile = new File("D:\\Jobs\\市场支持\\华润银行\\ABC.txt");
-		
+//		File srcFile = new File("D:\\Jobs\\市场支持\\华润银行\\ABC.txt");
+		File srcFile = new File("C:\\Users\\liuyaoxing\\Desktop\\plugins\\ESB改造计划ESB改造计划ESB改造计划ESB改造计划ESB改造计划.xlsx");
+
 		String fileStr = getFileStr(srcFile.getCanonicalPath());
 		System.out.println(generateFile(srcFile, fileStr));
 	}
 
-	private static String generateFile(File srcFile, String fileStr) throws Exception {
-		int segments = (int) (srcFile.length() / CAPACITY) + (srcFile.length() % CAPACITY > 0 ? 1 : 0);
+	public static String generateFile(File srcFile, String fileStr) throws Exception {
 		String fileMD5 = MD5Utils.encryptFile(srcFile);
 		StringBuffer source = new StringBuffer(fileStr);
 		File srcDir = new File(System.getProperty("user.dir") + File.separator + "temp", FileUtils.getFileNameNoFormat(srcFile.getName()));
 		srcDir.mkdir();
-		for (int i = 0; i < segments; i++) {
-			String segment = source.length() > CAPACITY ? source.substring(0, CAPACITY) : source.toString();
-			System.out.println(segment.length() + "\n" + segment);
-			String fileName = String.format("%s[%s-%s]", FileUtils.getFileNameNoFormat(srcFile.getName()), segments, i + 1);
+		List<String> segmentList = new ArrayList<String>();
+		while (source.length() > 0) {
+			String segment = source.length() >= CAPACITY ? source.substring(0, CAPACITY) : source.toString();
+			segmentList.add(segment);
+			source = source.length() >= CAPACITY ? source.delete(0, CAPACITY) : source.delete(0, source.length());
+		}
+		for (int i = 0; i < segmentList.size(); i++) {
 			Map<String, String> fileMeta = new LinkedHashMap<String, String>();
-			fileMeta.put("name", fileName);
+			fileMeta.put("name", FileUtils.getFileNameNoFormat(srcFile.getName()));
 			fileMeta.put("md5", fileMD5);
-			fileMeta.put("total", String.valueOf(segments));
+			fileMeta.put("total", String.valueOf(segmentList.size()));
 			fileMeta.put("index", String.valueOf(i));
 			fileMeta.put("ext", FileUtils.getFileFormat(srcFile.getName()));
 			fileMeta.put("length", String.valueOf(srcFile.length()));
-			fileMeta.put("capacity", String.valueOf(segment.length()));
-			fileMeta.put("content", segment);
+			fileMeta.put("capacity", String.valueOf(segmentList.get(i).length()));
+			fileMeta.put("content", segmentList.get(i));
+			String fileName = String.format("%s[%s-%s]", FileUtils.getFileNameNoFormat(srcFile.getName()), segmentList.size(), i + 1);
 			QRCodeUtil.encode(CsvUtil.mapToCsv(fileMeta), null, srcDir.getCanonicalPath(), fileName, true);
-			source = source.length() > CAPACITY ? source.delete(0, CAPACITY) : source.delete(0, source.length());
 		}
-		return "";
+		return srcDir.getCanonicalPath();
 	}
 
 	/**
@@ -74,10 +79,11 @@ public class Base64FileUtil {
 				e.printStackTrace();
 			}
 		}
-		// 对字节数组Base64编码
-		BASE64Encoder encoder = new BASE64Encoder();
-		// 返回 Base64 编码过的字节数组字符串
-		return encoder.encode(data);
+		return new String(Base64.encodeBase64(data));
+//		// 对字节数组Base64编码
+//		BASE64Encoder encoder = new BASE64Encoder();
+//		// 返回 Base64 编码过的字节数组字符串
+//		return encoder.encode(data);
 	}
 
 	/**

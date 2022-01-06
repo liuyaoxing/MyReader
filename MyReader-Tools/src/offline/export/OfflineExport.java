@@ -60,10 +60,12 @@ import offline.export.DownloadUtil.OnDownloadListener;
 import offline.export.db.BackupTask;
 import offline.export.db.DataBaseProxy;
 import offline.export.log.LogHandler;
+import offline.export.utils.Base64FileUtil;
 import okhttp3.Request;
 import okhttp3.Response;
 import javax.swing.JMenuBar;
 import java.awt.Component;
+import java.awt.Desktop;
 
 public class OfflineExport {
 
@@ -279,12 +281,21 @@ public class OfflineExport {
 		mntmNewMenuItem = new JMenuItem("码云传");
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				FileDialog fd = new FileDialog(frame);
-				fd.setMultipleMode(false);
-				fd.setTitle("请选择文件");
-				fd.setVisible(true);
-				File[] getFiles = fd.getFiles();
-				System.out.println(getFiles[0]);
+				try {
+					FileDialog fd = new FileDialog(frame);
+					fd.setMultipleMode(false);
+					fd.setTitle("请选择文件");
+					fd.setVisible(true);
+					File[] getFiles = fd.getFiles();
+					if (getFiles == null || getFiles.length == 0)
+						return;
+					String fileStr = Base64FileUtil.getFileStr(getFiles[0].getCanonicalPath());
+					String generateFile = Base64FileUtil.generateFile(getFiles[0], fileStr);
+					JOptionPane.showMessageDialog(null, "文件生成成功:" + generateFile);
+					Desktop.getDesktop().open(new File(generateFile));
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 		});
 		popupMenu.add(mntmNewMenuItem);
