@@ -59,6 +59,7 @@ import com.google.gson.reflect.TypeToken;
 import offline.export.DownloadUtil.OnDownloadListener;
 import offline.export.db.BackupTask;
 import offline.export.db.DataBaseProxy;
+import offline.export.dialog.InfiniteProgressPanel;
 import offline.export.log.LogHandler;
 import offline.export.utils.Base64FileUtil;
 import okhttp3.Request;
@@ -66,6 +67,7 @@ import okhttp3.Response;
 import javax.swing.JMenuBar;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Dimension;
 
 public class OfflineExport {
 
@@ -99,6 +101,8 @@ public class OfflineExport {
 	private JButton btnNewButton;
 	private JPopupMenu popupMenu;
 	private JMenuItem mntmNewMenuItem;
+
+	private InfiniteProgressPanel glassPane;
 
 	/**
 	 * Launch the application.
@@ -140,6 +144,11 @@ public class OfflineExport {
 		frame.setSize(888, 666);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		glassPane = new InfiniteProgressPanel();
+		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+		glassPane.setBounds(100, 100, (dimension.width) / 2, (dimension.height) / 2);
+		frame.setGlassPane(glassPane);
 
 		JPanel panel = new JPanel();
 		frame.getContentPane().add(panel, BorderLayout.NORTH);
@@ -286,13 +295,33 @@ public class OfflineExport {
 					fd.setMultipleMode(false);
 					fd.setTitle("请选择文件");
 					fd.setVisible(true);
-					File[] getFiles = fd.getFiles();
+					final File[] getFiles = fd.getFiles();
 					if (getFiles == null || getFiles.length == 0)
 						return;
-					String fileStr = Base64FileUtil.getFileStr(getFiles[0].getCanonicalPath());
-					String generateFile = Base64FileUtil.generateFile(getFiles[0], fileStr);
-					JOptionPane.showMessageDialog(null, "文件生成成功:" + generateFile);
-					Desktop.getDesktop().open(new File(generateFile));
+					if (getFiles[0].length() > FileUtils.ONE_MB) {
+						JOptionPane.showMessageDialog(null, "文件大小超过1M！不允许使用：" + getFiles[0].length() + "," + getFiles[0].getPath());
+						return;
+					}
+
+					glassPane.start();// 开始动画加载效果
+					frame.setVisible(true);
+
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								String fileStr = Base64FileUtil.getFileStr(getFiles[0].getCanonicalPath());
+								String generateFile = Base64FileUtil.generateFile(getFiles[0], fileStr);
+
+								glassPane.stop();
+								JOptionPane.showMessageDialog(null, "文件生成成功:" + generateFile);
+								Desktop.getDesktop().open(new File(generateFile));
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}).start();
+
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
