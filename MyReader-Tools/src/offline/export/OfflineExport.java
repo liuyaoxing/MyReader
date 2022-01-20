@@ -296,11 +296,9 @@ public class OfflineExport {
 					fd.setMultipleMode(false);
 					fd.setTitle("请选择文件");
 					fd.setVisible(true);
-					final File[] getFiles = fd.getFiles();
-					if (getFiles == null || getFiles.length == 0)
-						return;
-					if (getFiles[0].length() > FileUtils.ONE_MB) {
-						JOptionPane.showMessageDialog(null, "文件大小超过1M！不允许使用：" + getFiles[0].length() + "," + getFiles[0].getPath());
+					final File getFile = new File(fd.getDirectory(), fd.getFile());
+					if (getFile.length() > FileUtils.ONE_MB) {
+						JOptionPane.showMessageDialog(null, "文件大小超过1M！不允许使用：" + getFile.length() + "," + getFile.getPath());
 						return;
 					}
 
@@ -311,8 +309,8 @@ public class OfflineExport {
 						@Override
 						public void run() {
 							try {
-								String fileStr = Base64FileUtil.getFileStr(getFiles[0].getCanonicalPath());
-								String generateFile = Base64FileUtil.generateFile(getFiles[0], fileStr);
+								String fileStr = Base64FileUtil.getFileStr(getFile.getCanonicalPath());
+								String generateFile = Base64FileUtil.generateFile(getFile, fileStr);
 
 								glassPane.stop();
 								JOptionPane.showMessageDialog(null, "文件生成成功:" + generateFile);
