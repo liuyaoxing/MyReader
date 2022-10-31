@@ -90,7 +90,7 @@ public class Version_Apk {
 		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20220119/MyBleChat-release-3.19.apk");
 		version.setFileSize(srcFile.length());
 		version.setVcode(27);
-		version.setVersion(202201191200L);
+		version.setVersion(202203271300L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();

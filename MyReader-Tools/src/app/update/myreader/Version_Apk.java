@@ -17,6 +17,26 @@ public class Version_Apk {
 	private long fileSize;
 	private boolean forceUpdate;
 
+	public static void main(String[] args) {
+		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyReaderv30\\app\\release\\MyReader-release-3.27.apk");
+		Version_Apk version = new Version_Apk();
+		version.setTitle("读乐乐v3.27");
+		version.setFileName(srcFile.getName());
+		version.setChangeLog("01、修复获取新鲜事失败。\r\n02、修复了一些体验的问题");
+		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20220627/MyReader-release-3.27.apk");
+		version.setFileSize(srcFile.length());
+		version.setVcode(73);
+		version.setVersion(202206261300L);
+		version.setForceUpdate(true);
+
+		Gson gson = new Gson();
+		String toJson = gson.toJson(version);
+		System.out.println("Json = " + toJson);
+
+//		Version_Apk version0 = gson.fromJson(toJson, Version_Apk.class);
+//		System.out.println(version0);
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -83,27 +103,8 @@ public class Version_Apk {
 
 	@Override
 	public String toString() {
-		return "Version_Apk [fileName=" + fileName + ", changelog=" + changelog + ", version=" + version + ", fileSize=" + fileSize
-				+ ", forceUpdate=" + forceUpdate + "]";
+		return "Version_Apk [fileName=" + fileName + ", changelog=" + changelog + ", version=" + version + ", fileSize=" + fileSize + ", forceUpdate="
+				+ forceUpdate + "]";
 	}
 
-	public static void main(String[] args) {
-		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyReaderv30\\app\\release\\MyReader-release-3.26.apk");
-		Version_Apk version = new Version_Apk();
-		version.setTitle("读乐乐v3.26");
-		version.setFileName(srcFile.getName());
-		version.setChangeLog("01、适配Android 11系统。\r\n02、适配鸿蒙系统。\r\n04、修复获取新鲜事失败。\r\n04、修复了一些体验的问题");
-		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20211200/MyReader-release-3.26.apk");
-		version.setFileSize(srcFile.length());
-		version.setVcode(72);
-		version.setVersion(202112000900L);
-		version.setForceUpdate(true);
-
-		Gson gson = new Gson();
-		String toJson = gson.toJson(version);
-		System.out.println("Json = " + toJson);
-
-//		Version_Apk version0 = gson.fromJson(toJson, Version_Apk.class);
-//		System.out.println(version0);
-	}
 }

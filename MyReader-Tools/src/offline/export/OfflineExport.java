@@ -187,7 +187,7 @@ public class OfflineExport {
 		backupBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				backupBtn.setText(backupBtn.getText().equals("开始备份") ? "停止备份" : "开始备份");
-				String comboText = getComboText(urlCombo);
+				final String comboText = getComboText(urlCombo);
 				if (comboText.endsWith(FOLDER_LIST)) {
 					backupBtn.setText("开始备份");
 					tableModel.getDataVector().clear();
@@ -225,27 +225,31 @@ public class OfflineExport {
 							startFolderThread = null;
 							return;
 						}
-						JFileChooser fileChooser = new JFileChooser();// 文件选择器
+						final JFileChooser fileChooser = new JFileChooser();// 文件选择器
 						if (currentDirectory != null)
 							fileChooser.setSelectedFile(new File(currentDirectory, "tmp"));
 						fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);// 设定只能选择到文件夹
 						int state = fileChooser.showOpenDialog(null);// 此句是打开文件选择器界面的触发语句
-						Request request = new Request.Builder().addHeader("x-header", "dll")//
-								.header("sort", "_id")//
-								.url(comboText).build();
-						Response response = DownloadUtil.get().newCall(request);
-						if (!response.isSuccessful()) {
-							JOptionPane.showMessageDialog(null, response.message());
-							throw new IOException("Unexpected code " + response);
-						}
-						String body = response.body().string();
-						final JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
 						if (state == JFileChooser.APPROVE_OPTION) {
-							final File toFile = fileChooser.getSelectedFile();// toFile为选择到的目录
+							glassPane.start();// 开始动画加载效果
+							frame.setVisible(true);
+
 							startFolderThread = new Thread(new Runnable() {
 								@Override
 								public void run() {
 									try {
+										Request request = new Request.Builder().addHeader("x-header", "dll")//
+												.header("sort", "_id")//
+												.url(comboText).build();
+										Response response = DownloadUtil.get().newCall(request);
+										if (!response.isSuccessful()) {
+											JOptionPane.showMessageDialog(null, response.message());
+											throw new IOException("Unexpected code " + response);
+										}
+										String body = response.body().string();
+										final JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
+										final File toFile = fileChooser.getSelectedFile();// toFile为选择到的目录
+										glassPane.stop();
 										doSyncFolder(jsonArray, toFile);
 										backupBtn.setText("开始备份");
 									} catch (IOException e) {
@@ -293,7 +297,7 @@ public class OfflineExport {
 				try {
 					popupMenu.setVisible(false);
 					FileDialog fd = new FileDialog(frame);
-					fd.setMultipleMode(false);
+//					fd.setMultipleMode(false);
 					fd.setTitle("请选择文件");
 					fd.setVisible(true);
 					final File getFile = new File(fd.getDirectory(), fd.getFile());

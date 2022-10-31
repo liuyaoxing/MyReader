@@ -20,7 +20,7 @@ import sun.misc.BASE64Encoder;
 
 public class Base64FileUtil {
 
-	public static final int CAPACITY = 2048;
+	public static final int CAPACITY = 1666;
 
 	public static void main(String[] args) throws Exception {
 //		File srcFile = new File("D:\\Jobs\\市场支持\\华润银行\\AB.docx");
