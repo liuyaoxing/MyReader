@@ -18,15 +18,15 @@ public class Version_Apk {
 	private boolean forceUpdate;
 
 	public static void main(String[] args) {
-		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyReaderv30\\app\\release\\MyReader-release-3.27.apk");
+		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyReaderv30\\app\\release\\MyReader-release-3.28.apk");
 		Version_Apk version = new Version_Apk();
-		version.setTitle("读乐乐v3.27");
+		version.setTitle("读乐乐v3.28");
 		version.setFileName(srcFile.getName());
 		version.setChangeLog("01、修复获取新鲜事失败。\r\n02、修复了一些体验的问题");
-		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20220627/MyReader-release-3.27.apk");
+		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20221108/MyReader-release-3.28.apk");
 		version.setFileSize(srcFile.length());
-		version.setVcode(73);
-		version.setVersion(202206261300L);
+		version.setVcode(74);
+		version.setVersion(202212190900L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();

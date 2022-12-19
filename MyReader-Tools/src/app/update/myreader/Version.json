@@ -1,9 +1,10 @@
 {
-    "title": "读乐乐v3.21",
-    "fileName": "MyReader_v3.21_sign.v202005271700.apk",
-	"url": "https://github.com/liuyaoxing/repository/releases/download/v20200527/MyReader_v3.21_sign.v202005271700.apk",
-    "changelog": "01、增加用户隐私权利说明。\r\n02、优化阅读模版改进。\r\n03、支持批量离线文章设置标签。\r\n04、修复某些网页的图片保存失败\r\n05、增加图片自适应功能，可以智能调节图片展示大小。\r\n06、增加app检查更新功能。",
-    "version": 202005271700,
-    "fileSize": 5472195,
-    "forceUpdate": true
+	"title": "读乐乐v3.28",
+	"fileName": "MyReader-release-3.28.apk",
+	"url": "https://github.com/liuyaoxing/repository/releases/download/v20221108/MyReader-release-3.28.apk",
+	"changelog": "01、修复获取新鲜事失败。\r\n02、修复了一些体验的问题",
+	"vcode": 74,
+	"version": 202212190900,
+	"fileSize": 13793656,
+	"forceUpdate": true
 }
