@@ -1,4 +1,9 @@
 # 读乐乐
+
+## 下载最新版
+
+下载读乐乐：https://github.com/liuyaoxing/MyReader/releases/download/MyReader.v3.28/MyReader-release-3.28.apk
+
 ## 没有4G、3G或Wi-Fi？随时查看网页图片和视频，不受网络限制！
 
 #### 01、轻松保存网页文件(图片和视频)到手机和平板，稍后阅读。
