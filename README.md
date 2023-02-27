@@ -148,7 +148,7 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
 ## 应用截图
 #### 首页应用
 
-![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2018_main.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2023_main.png)
 
 #### 查看文章
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinedetail.png)
