@@ -82,15 +82,15 @@ public class Version_Apk {
 	}
 
 	public static void main(String[] args) {
-		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyBLEChatv30\\app\\release\\MyBleChat-release-3.20.apk");
+		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyBleChatv33\\app\\release\\MyBleChat-release-3.21.apk");
 		Version_Apk version = new Version_Apk();
-		version.setTitle("左右手v3.20");
+		version.setTitle("左右手v3.21");
 		version.setFileName(srcFile.getName());
-		version.setChangeLog("00、增加二维码传文件的功能：手机开启文件共享服务，在电脑浏览器打开文件服务管理页面，在左下方下载【备份工具专业版】后，用备份工具生产文件的二维码，在手机App上用码云传功能可以识别并合并文件。\r\n01、增加电子卷尺功能、长度单位换算器和重量单位换算器。\r\n02、适配鸿蒙系统。\r\n03、修复了一些体验的问题");
-		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20221117/MyBleChat-release-3.20.apk");
+		version.setChangeLog("00、增加二维码传文件的功能：手机开启文件共享服务，在电脑浏览器打开文件服务管理页面，在左下方下载【备份工具专业版】后，用备份工具生产文件的二维码，在手机App上用码云传功能可以识别并合并文件。\r\n01、增加电子卷尺功能、长度单位换算器和重量单位换算器。\r\n02、适配Android13。\r\n03、修复了一些体验的问题");
+		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20230407/MyBleChat-release-3.21.apk");
 		version.setFileSize(srcFile.length());
-		version.setVcode(28);
-		version.setVersion(202211171700L);
+		version.setVcode(29);
+		version.setVersion(202304070900L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();

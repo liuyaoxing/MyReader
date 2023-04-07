@@ -18,6 +18,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -104,6 +105,8 @@ public class OfflineExport {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		String name = ManagementFactory.getRuntimeMXBean().getName();
+		System.out.println("ManagementFactory.getRuntimeMXBean().getName():" + name);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
