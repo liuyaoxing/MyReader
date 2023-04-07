@@ -1,15 +1,21 @@
 # 读乐乐
+
+## 下载最新版
+
+下载读乐乐：[https://github.com/liuyaoxing/repository/releases/download/v20230313/MyReader-release-3.29.apk](https://github.com/liuyaoxing/repository/releases/download/v20230313/MyReader-release-3.29.apk)
+
 ## 没有4G、3G或Wi-Fi？随时查看网页图片和视频，不受网络限制！
 
 #### 01、轻松保存网页文件(图片和视频)到手机和平板，稍后阅读。
 #### 02、提供优化阅读功能，自动排版功能，优雅的字体，可调节文字大小，为您提供愉悦的阅读体验。
-#### 03、支持知乎日报订阅和阅读，随时涨姿势。
-#### 04、可以一边微信聊天一边查看公众号文章。
+#### 03、支持知乎日报订阅和阅读。
+#### 04、支持订阅微信公众号文章列表，轻松查看历史文章。
 #### 05、支持保存网页长图片、网页另存为、网址黑名单。
 #### 06、支持标签管理，可以使用 #独乐乐# 标签隐藏指定离线文章。
 #### 07、支持RSS订阅。
-#### 08、支持快捷分享到微信和朋友圈等，独乐乐不如众乐乐。可通过蓝牙轻松分享文章图片和视频。。
-#### 09、看公众号文章不影响您聊天。
+#### 08、支持快捷分享到微信和朋友圈等，独乐乐不如众乐乐。可通过蓝牙轻松分享文章图片和视频。
+#### 09、支持文件快传。
+
 #### Offline Save,Video Saver,Web Saver,Html Saver,Rss Reader。
 
 ---
@@ -129,7 +135,7 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
 ---
 ## 下载最新版
 
-下载读乐乐：https://github.com/liuyaoxing/MyReader/raw/master/releases/MyReader_v3.18_sign_legu_signed_zipalign.apk
+下载读乐乐：https://github.com/liuyaoxing/MyReader/releases/download/MyReader.v3.28/MyReader-release-3.28.apk
 
 ---
 ## 使用指南
@@ -142,7 +148,7 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
 ## 应用截图
 #### 首页应用
 
-![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2018_main.png)
+![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2023_main.png)
 
 #### 查看文章
 ![image](https://github.com/liuyaoxing/MyReader/raw/master/images/readme/Screenshot_2016_offlinedetail.png)
