@@ -26,17 +26,14 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
+import offline.export.config.Configuration;
+
 public class QRCodeUtil {
 	private static final String CHARSET = "utf-8";
 	private static final String FORMAT = "JPG";
-	// 二维码尺寸
-	private static final int QRCODE_SIZE = 800;
-	// LOGO宽度
-	private static final int LOGO_WIDTH = 60;
-	// LOGO高度
-	private static final int LOGO_HEIGHT = 60;
 
 	private static BufferedImage createImage(String content, String logoPath, boolean needCompress) throws Exception {
+		int QRCODE_SIZE = Configuration.getInstance().getQrCodeSize();
 		Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();
 		hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
 		hints.put(EncodeHintType.CHARACTER_SET, CHARSET);
@@ -67,6 +64,10 @@ public class QRCodeUtil {
 	 * @throws Exception
 	 */
 	private static void insertImage(BufferedImage source, String logoPath, boolean needCompress) throws Exception {
+		int QRCODE_SIZE = Configuration.getInstance().getQrCodeSize();
+		int LOGO_WIDTH = Configuration.getInstance().getQrCodeLogoWidth();
+		int LOGO_HEIGHT = Configuration.getInstance().getQrCodeLogoHeight();
+		
 		File file = new File(logoPath);
 		if (!file.exists()) {
 			throw new Exception("logo file not found.");
@@ -241,7 +242,8 @@ public class QRCodeUtil {
 	}
 
 	public static void main(String[] args) throws Exception {
-		System.out.println(decode(new File("D:\\Developer\\DeveloperWorks\\github\\MyReader\\MyReader-Tools\\temp\\AB通讯加密部署步骤\\AB通讯加密部署步骤[4-1].jpg")));
+		System.out
+				.println(decode(new File("D:\\Developer\\DeveloperWorks\\github\\MyReader\\MyReader-Tools\\temp\\AB通讯加密部署步骤\\AB通讯加密部署步骤[4-1].jpg")));
 //		String text = "";
 //		for (int i = 0; i < 4096; i++) {
 //			text += "A";

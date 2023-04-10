@@ -10,15 +10,20 @@ import java.awt.FileDialog;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -58,6 +63,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import offline.export.DownloadUtil.OnDownloadListener;
+import offline.export.config.Configuration;
 import offline.export.db.BackupTask;
 import offline.export.db.DataBaseProxy;
 import offline.export.dialog.InfiniteProgressPanel;
@@ -105,8 +111,7 @@ public class OfflineExport {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		String name = ManagementFactory.getRuntimeMXBean().getName();
-		System.out.println("ManagementFactory.getRuntimeMXBean().getName():" + name);
+		onBeforeCommandLineProcessing(args);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -127,6 +132,44 @@ public class OfflineExport {
 		});
 	}
 
+	public static void onBeforeCommandLineProcessing(String[] args) {
+		StringBuffer sb = new StringBuffer("用法：java -jar MyReader.Backup.jar --capacity=1234");
+		System.out.println(sb.toString());
+		LogHandler.debug(sb.toString());
+
+		for (String arg : args) {
+			int switchCnt = arg.startsWith("--") ? 2 : arg.startsWith("/") ? 1 : arg.startsWith("-") ? 1 : 0;
+			switch (switchCnt) {
+			case 2:
+				if (arg.length() == 2) {
+					continue;
+				}
+			case 1: {
+				String[] switchVals = arg.substring(switchCnt).split("=");
+				if (switchVals.length == 2) {
+					String key = switchVals[0], value = switchVals[1];
+					if ("CAPACITY".equalsIgnoreCase(key) || "QRCODECAPACITY".equalsIgnoreCase(key)) {
+						Configuration.getInstance().setQrCodeCapacity(Integer.valueOf(value));
+					}
+					if ("qrCodeSize".equalsIgnoreCase(key)) {
+						Configuration.getInstance().setQrCodeSize(Integer.valueOf(value));
+					}
+					if ("qrCodeLogoWidth".equalsIgnoreCase(key)) {
+						Configuration.getInstance().setQrCodeLogoWidth(Integer.valueOf(value));
+					}
+					if ("qrCodeLogoHeight".equalsIgnoreCase(key)) {
+						Configuration.getInstance().setQrCodeLogoHeight(Integer.valueOf(value));
+					}
+				} else {
+				}
+				break;
+			}
+			case 0:
+				break;
+			}
+		}
+	}
+
 	/**
 	 * Create the application.
 	 */
@@ -139,7 +182,7 @@ public class OfflineExport {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setTitle("读乐乐备份工具 v3.26");
+		frame.setTitle("读乐乐备份工具 v3.29");
 		frame.setSize(888, 666);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -303,30 +346,10 @@ public class OfflineExport {
 //					fd.setMultipleMode(false);
 					fd.setTitle("请选择文件");
 					fd.setVisible(true);
-					final File getFile = new File(fd.getDirectory(), fd.getFile());
-					if (getFile.length() > FileUtils.ONE_MB) {
-						JOptionPane.showMessageDialog(null, "文件大小超过1M！不允许使用：" + getFile.length() + "," + getFile.getPath());
-						return;
-					}
 
-					glassPane.start();// 开始动画加载效果
-					frame.setVisible(true);
+					File getFile = new File(fd.getDirectory(), fd.getFile());
 
-					new Thread(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								String fileStr = Base64FileUtil.getFileStr(getFile.getCanonicalPath());
-								String generateFile = Base64FileUtil.generateFile(getFile, fileStr);
-
-								glassPane.stop();
-								JOptionPane.showMessageDialog(null, "文件生成成功:" + generateFile);
-								Desktop.getDesktop().open(new File(generateFile));
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-					}).start();
+					parseFile2QrCodes(getFile);
 
 				} catch (Exception ex) {
 					ex.printStackTrace();
@@ -408,6 +431,38 @@ public class OfflineExport {
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 
 		initDatas();
+		initDnd();
+	}
+
+	private void initDnd() {
+		new DropTarget(frame, DnDConstants.ACTION_COPY_OR_MOVE, new DropTargetAdapter() {
+			@Override
+			public void dragEnter(DropTargetDragEvent evt) {
+				Transferable t = evt.getTransferable();
+				if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+					try {
+						Object td = t.getTransferData(DataFlavor.javaFileListFlavor);
+						if (td instanceof List) {
+							for (Object value : ((List<?>) td)) {
+								if (value instanceof File) {
+									File file = (File) value;
+									parseFile2QrCodes(file);
+								}
+							}
+						}
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+				evt.acceptDrag(DnDConstants.ACTION_COPY);
+			}
+
+			@Override
+			public void drop(DropTargetDropEvent dtde) {
+
+			}
+		});
+
 	}
 
 	private void initDatas() {
@@ -675,6 +730,33 @@ public class OfflineExport {
 			d.addElement(item);
 		}
 		d.setSelectedItem(items[index]);
+	}
+
+	private void parseFile2QrCodes(final File getFile) {
+		if (getFile.length() > FileUtils.ONE_MB) {
+			JOptionPane.showMessageDialog(null, getFile.getPath(), String.format("文件大小[%s]超过1M！不允许使用!", FileUtils.getFileSize(getFile.length())),
+					JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+
+		glassPane.start();// 开始动画加载效果
+		frame.setVisible(true);
+
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					String fileStr = Base64FileUtil.getFileStr(getFile.getCanonicalPath());
+					String generateFile = Base64FileUtil.generateFile(getFile, fileStr);
+
+					glassPane.stop();
+					JOptionPane.showMessageDialog(null, "文件生成成功:" + generateFile);
+					Desktop.getDesktop().open(new File(generateFile));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}
 
 	private static void addPopup(Component component, final JPopupMenu popup) {

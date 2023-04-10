@@ -15,12 +15,11 @@ import java.util.Map;
 import com.liuyx.common.csv.CsvUtil;
 
 import offline.export.FileUtils;
+import offline.export.config.Configuration;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 public class Base64FileUtil {
-
-	public static final int CAPACITY = 1234;
 
 	public static void main(String[] args) throws Exception {
 //		File srcFile = new File("D:\\Jobs\\市场支持\\华润银行\\AB.docx");
@@ -32,6 +31,7 @@ public class Base64FileUtil {
 	}
 
 	public static String generateFile(File srcFile, String fileStr) throws Exception {
+		int CAPACITY = Configuration.getInstance().getQrCodeCapacity();
 		String fileMD5 = MD5Utils.encryptFile(srcFile);
 		StringBuffer source = new StringBuffer(fileStr);
 		File srcDir = new File(System.getProperty("user.dir") + File.separator + "temp", FileUtils.getFileNameNoFormat(srcFile.getName()));
