@@ -133,7 +133,7 @@ public class OfflineExport {
 	}
 
 	public static void onBeforeCommandLineProcessing(String[] args) {
-		StringBuffer sb = new StringBuffer("用法：java -jar MyReader.Backup.jar --capacity=1234");
+		StringBuffer sb = new StringBuffer("用法：java -jar MyReader.Backup.jar --capacity=1234 --qrCodeSize=800");
 		System.out.println(sb.toString());
 		LogHandler.debug(sb.toString());
 
