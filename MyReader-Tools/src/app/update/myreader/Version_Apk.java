@@ -22,11 +22,11 @@ public class Version_Apk {
 		Version_Apk version = new Version_Apk();
 		version.setTitle("读乐乐v3.29");
 		version.setFileName(srcFile.getName());
-		version.setChangeLog("01、适配Android 13。\r\n02、优化通知栏，通知栏增加无图模式和监听剪贴板快捷按钮。\r\n03、优化体验功能");
-		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20230407/MyReader-release-3.29.apk");
+		version.setChangeLog("01、适配Android 13。\r\n02、优化通知栏，通知栏增加无图模式和监听剪贴板快捷按钮。\r\n03、修复自动更新功能");
+		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20230413/MyReader-release-3.29.apk");
 		version.setFileSize(srcFile.length());
 		version.setVcode(75);
-		version.setVersion(202304030900L);
+		version.setVersion(202304130900L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();
