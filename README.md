@@ -135,7 +135,7 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
 ---
 ## 下载最新版
 
-下载读乐乐：https://github.com/liuyaoxing/MyReader/releases/download/MyReader.v3.28/MyReader-release-3.28.apk
+下载读乐乐：https://github.com/liuyaoxing/repository/releases/download/v20230413/MyReader-release-3.29.apk
 
 ---
 ## 使用指南
