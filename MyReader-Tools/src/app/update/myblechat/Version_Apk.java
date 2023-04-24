@@ -87,10 +87,10 @@ public class Version_Apk {
 		version.setTitle("左右手v3.21");
 		version.setFileName(srcFile.getName());
 		version.setChangeLog("00、增加二维码传文件的功能：手机开启文件共享服务，在电脑浏览器打开文件服务管理页面，在左下方下载【备份工具专业版】后，用备份工具生产文件的二维码，在手机App上用码云传功能可以识别并合并文件。\r\n01、修复更新失败问题。\r\n02、适配Android13。\r\n03、修复了一些体验的问题");
-		version.setUrl("https://github.com/liuyaoxing/repository/releases/download/v20230413/MyBleChat-release-3.21.apk");
+		version.setUrl("https://github.com/liuyaoxing/MyBLEChat/releases/download/v3.21/MyBleChat-release-3.21.apk");
 		version.setFileSize(srcFile.length());
 		version.setVcode(29);
-		version.setVersion(202304130800L);
+		version.setVersion(202304240900L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();
