@@ -4,7 +4,7 @@
 	"url": "https://github.com/liuyaoxing/MyReader/releases/download/v3.29/MyReader-release-3.29.apk",
 	"changelog": "01、适配Android 13。\r\n02、优化通知栏，通知栏增加无图模式和监听剪贴板快捷按钮。\r\n03、修复自动更新功能",
 	"vcode": 75,
-	"version": 202304240900,
-	"fileSize": 16425511,
+	"version": 202308040900,
+	"fileSize": 16421013,
 	"forceUpdate": true
 }

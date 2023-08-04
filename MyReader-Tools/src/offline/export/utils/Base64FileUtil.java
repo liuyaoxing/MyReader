@@ -34,7 +34,7 @@ public class Base64FileUtil {
 		int CAPACITY = Configuration.getInstance().getQrCodeCapacity();
 		String fileMD5 = MD5Utils.encryptFile(srcFile);
 		StringBuffer source = new StringBuffer(fileStr);
-		File srcDir = new File(System.getProperty("user.dir") + File.separator + "temp", FileUtils.getFileNameNoFormat(srcFile.getName()));
+		File srcDir = new File(System.getProperty("user.dir") + File.separator + "temp", srcFile.getName());
 		srcDir.mkdir();
 		List<String> segmentList = new ArrayList<String>();
 		while (source.length() > 0) {

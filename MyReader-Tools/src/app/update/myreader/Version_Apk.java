@@ -26,7 +26,7 @@ public class Version_Apk {
 		version.setUrl("https://github.com/liuyaoxing/MyReader/releases/download/v3.29/MyReader-release-3.29.apk");
 		version.setFileSize(srcFile.length());
 		version.setVcode(75);
-		version.setVersion(202304240900L);
+		version.setVersion(202308040900L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();
