@@ -36,6 +36,12 @@ public class ViewerService {
 
 	private Timer timer;
 
+	/** 是否暂停播放 */
+	protected boolean playPaused = false;
+
+	/** 自动播放间隔时间 */
+	protected double playTimerPeriod = 0;
+
 	private ViewerService() {
 	}
 
@@ -136,6 +142,20 @@ public class ViewerService {
 			} catch (Exception e) {
 			}
 		}
+		if (cmd.equals(ViewerFrame.MENU_PLAY_PAUSE)) {
+			playPaused = !playPaused;
+			refreshTitle(frame);
+		}
+
+		if (cmd.equals(ViewerFrame.MENU_PLAY_STOP)) {
+			playPaused = true;
+			playTimerPeriod = 0;
+			if (timer != null) {
+				timer.cancel();
+				timer = null;
+			}
+			refreshTitle(frame);
+		}
 
 		// 退出
 		if (cmd.equals(ViewerFrame.MENU_EXIT)) {
@@ -144,13 +164,22 @@ public class ViewerService {
 	}
 
 	public void setImageFile(ViewerFrame frame, File imageFile) {
-		frame.setTitle(currentFile.getName() + String.format(" [%s - %s]", currentFiles.size(), currentFiles.indexOf(currentFile) + 1));
+		refreshTitle(frame);
 		this.currentFile = imageFile;
 		if (zoomFit) {
 			doZoomFit(frame);
 		} else {
 			onZoom(frame);
 		}
+	}
+
+	private void refreshTitle(ViewerFrame frame) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(currentFile.getName() + String.format(" [%s - %s]", currentFiles.size(), currentFiles.indexOf(currentFile) + 1));
+		if (timer != null) {
+			sb.append(playPaused ? " 播放暂停中" : String.format(" 自动播放每%s秒", playTimerPeriod));
+		}
+		frame.setTitle(sb.toString());
 	}
 
 	public File getImageFile() {
@@ -218,6 +247,7 @@ public class ViewerService {
 	}
 
 	public void doAutoPlay(final ViewerFrame frame, double period) {
+		this.playTimerPeriod = period;
 		if (timer != null) {
 			timer.cancel();
 			timer = null;
@@ -226,7 +256,8 @@ public class ViewerService {
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				doNext(frame);
+				if (!playPaused)
+					doNext(frame);
 			}
 		}, 2000, (long) (period * 1000));
 	}

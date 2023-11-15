@@ -41,6 +41,10 @@ public class ViewerFrame extends JFrame {
 
 	public static final String MENU_PLAYCUSTOMS = "播放(自定义)";
 
+	public static final String MENU_PLAY_PAUSE = "暂停播放";
+
+	public static final String MENU_PLAY_STOP = "停止播放";
+
 	public static final String MENU_SET_ALWAYS_ONTOP = "窗口置顶";
 
 	public static final String MENU_PREVIOUS = "上一个";
@@ -116,6 +120,12 @@ public class ViewerFrame extends JFrame {
 						break;
 					case KeyEvent.VK_RIGHT:
 						service.doNext(ViewerFrame.this);
+						break;
+					case KeyEvent.VK_SPACE:
+						service.menuDo(ViewerFrame.this, ViewerFrame.MENU_PLAY_PAUSE);
+						break;
+					case KeyEvent.VK_ESCAPE:
+						service.menuDo(ViewerFrame.this, ViewerFrame.MENU_PLAY_STOP);
 						break;
 					}
 				}
@@ -246,7 +256,8 @@ public class ViewerFrame extends JFrame {
 		String[] menuArr = { MENUBAR_FILE, MENUBAR_TOOLS };
 		// 菜单项文字数组
 		String[][] menuItemArr = { { MENU_OPENFILE, "-", MENU_SET_ALWAYS_ONTOP, "-", MENU_EXIT }, //
-				{ MENU_ZOOM_IN, MENU_ZOOM_OUT, MENU_ZOOM_FIX, "-", MENU_PREVIOUS, MENU_NEXT, "-", MENU_PLAY1_0S, MENU_PLAYCUSTOMS } };
+				{ MENU_ZOOM_IN, MENU_ZOOM_OUT, MENU_ZOOM_FIX, "-", MENU_PREVIOUS, MENU_NEXT, "-", MENU_PLAY1_0S, MENU_PLAYCUSTOMS, MENU_PLAY_PAUSE,
+						MENU_PLAY_STOP } };
 		// 遍历menuArr与menuItemArr去创建菜单
 		for (int i = 0; i < menuArr.length; i++) {
 			// 新建一个JMenu菜单
