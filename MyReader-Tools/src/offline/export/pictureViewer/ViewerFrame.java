@@ -39,9 +39,9 @@ public class ViewerFrame extends JFrame {
 
 	public static final String MENU_PLAY1_0S = "播放(1s)";
 
-	public static final String MENU_PLAY1_5S = "播放(1.5s)";
+	public static final String MENU_PLAYCUSTOMS = "播放(自定义)";
 
-	public static final String MENU_PLAY2_0S = "播放(2s)";
+	public static final String MENU_SET_ALWAYS_ONTOP = "窗口置顶";
 
 	public static final String MENU_PREVIOUS = "上一个";
 
@@ -245,8 +245,8 @@ public class ViewerFrame extends JFrame {
 		// 菜单文字数组，以下面的menuItemArr一一对应
 		String[] menuArr = { MENUBAR_FILE, MENUBAR_TOOLS };
 		// 菜单项文字数组
-		String[][] menuItemArr = { { MENU_OPENFILE, "-", MENU_EXIT }, //
-				{ MENU_ZOOM_IN, MENU_ZOOM_OUT, MENU_ZOOM_FIX, "-", MENU_PREVIOUS, MENU_NEXT, MENU_PLAY1_0S, MENU_PLAY1_5S, MENU_PLAY2_0S } };
+		String[][] menuItemArr = { { MENU_OPENFILE, "-", MENU_SET_ALWAYS_ONTOP, "-", MENU_EXIT }, //
+				{ MENU_ZOOM_IN, MENU_ZOOM_OUT, MENU_ZOOM_FIX, "-", MENU_PREVIOUS, MENU_NEXT, "-", MENU_PLAY1_0S, MENU_PLAYCUSTOMS } };
 		// 遍历menuArr与menuItemArr去创建菜单
 		for (int i = 0; i < menuArr.length; i++) {
 			// 新建一个JMenu菜单

@@ -9,6 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import offline.export.utils.ComparatorFactory;
@@ -99,6 +100,9 @@ public class ViewerService {
 		if (cmd.equals(ViewerFrame.MENU_OPENFILE)) {
 			open(frame);
 		}
+		if (cmd.equals(ViewerFrame.MENU_SET_ALWAYS_ONTOP)) {
+			frame.setAlwaysOnTop(!frame.isAlwaysOnTop());
+		}
 		if (currentFile == null)
 			return;
 		// 放大
@@ -124,14 +128,17 @@ public class ViewerService {
 		if (cmd.equals(ViewerFrame.MENU_PLAY1_0S)) {
 			doAutoPlay(frame, 1);
 		}
-		if (cmd.equals(ViewerFrame.MENU_PLAY1_5S)) {
-			doAutoPlay(frame, 1.5);
+		if (cmd.equals(ViewerFrame.MENU_PLAYCUSTOMS)) {
+			String m = JOptionPane.showInputDialog("请输入轮播间隔,单位秒");
+			try {
+				double period = Double.parseDouble(m);
+				doAutoPlay(frame, period);
+			} catch (Exception e) {
+			}
 		}
-		if (cmd.equals(ViewerFrame.MENU_PLAY2_0S)) {
-			doAutoPlay(frame, 2);
-		}
+
 		// 退出
-		if (cmd.equals("退出(X)")) {
+		if (cmd.equals(ViewerFrame.MENU_EXIT)) {
 			System.exit(0);
 		}
 	}
