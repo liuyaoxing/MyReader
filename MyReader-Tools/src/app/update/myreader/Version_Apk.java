@@ -18,15 +18,15 @@ public class Version_Apk {
 	private boolean forceUpdate;
 
 	public static void main(String[] args) {
-		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyReaderv33\\app\\release\\MyReader-release-3.29.apk");
+		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyReaderv33\\app\\release\\MyReader-release-3.30.apk");
 		Version_Apk version = new Version_Apk();
-		version.setTitle("读乐乐v3.29");
+		version.setTitle("读乐乐v3.30");
 		version.setFileName(srcFile.getName());
-		version.setChangeLog("01、适配Android 13。\r\n02、优化通知栏，通知栏增加无图模式和监听剪贴板快捷按钮。\r\n03、修复自动更新功能");
-		version.setUrl("https://github.com/liuyaoxing/MyReader/releases/download/v3.29/MyReader-release-3.29.apk");
+		version.setChangeLog("01、增加epub电子书阅读功能");
+		version.setUrl("https://github.com/liuyaoxing/MyReader/releases/download/v3.30/MyReader-release-3.30.apk");
 		version.setFileSize(srcFile.length());
-		version.setVcode(75);
-		version.setVersion(202308040900L);
+		version.setVcode(76);
+		version.setVersion(202310111200L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();

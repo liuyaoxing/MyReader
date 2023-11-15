@@ -7,12 +7,14 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FileDialog;
+import java.awt.Frame;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
@@ -28,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -68,7 +71,9 @@ import offline.export.db.BackupTask;
 import offline.export.db.DataBaseProxy;
 import offline.export.dialog.InfiniteProgressPanel;
 import offline.export.log.LogHandler;
+import offline.export.pictureViewer.ViewerFrame;
 import offline.export.utils.Base64FileUtil;
+import offline.export.utils.ComparatorFactory;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -103,7 +108,8 @@ public class OfflineExport {
 	private File currentDirectory;
 	private JButton btnNewButton;
 	private JPopupMenu popupMenu;
-	private JMenuItem mntmNewMenuItem;
+	private JMenuItem qrCodeTransferMenuItem;
+	private JMenuItem photoViewerMenuItem;
 
 	private InfiniteProgressPanel glassPane;
 
@@ -182,7 +188,7 @@ public class OfflineExport {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setTitle("读乐乐备份工具 v3.29");
+		frame.setTitle("读乐乐备份工具 v3.30");
 		frame.setSize(888, 666);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -320,10 +326,6 @@ public class OfflineExport {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-//					Robot robot = new Robot();
-//					robot.mousePress(InputEvent.BUTTON3_MASK);
-//					robot.mouseRelease(InputEvent.BUTTON3_MASK);
-
 					Point location = btnNewButton.getLocationOnScreen();
 					popupMenu.setLocation(location.x, location.y + btnNewButton.getSize().height);
 					popupMenu.setVisible(true);
@@ -337,8 +339,8 @@ public class OfflineExport {
 		popupMenu = new JPopupMenu();
 		addPopup(btnNewButton, popupMenu);
 
-		mntmNewMenuItem = new JMenuItem("码云传");
-		mntmNewMenuItem.addActionListener(new ActionListener() {
+		qrCodeTransferMenuItem = new JMenuItem("码云传");
+		qrCodeTransferMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					popupMenu.setVisible(false);
@@ -356,7 +358,23 @@ public class OfflineExport {
 				}
 			}
 		});
-		popupMenu.add(mntmNewMenuItem);
+		popupMenu.add(qrCodeTransferMenuItem);
+
+		photoViewerMenuItem = new JMenuItem("图片浏览器");
+		photoViewerMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					popupMenu.setVisible(false);
+					frame.setExtendedState(Frame.ICONIFIED);
+					ViewerFrame viewerFrame = new ViewerFrame();
+					viewerFrame.setLocationRelativeTo(null);
+					viewerFrame.openFile();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		popupMenu.add(photoViewerMenuItem);
 
 		tableModel = new DefaultTableModel(null, columnNames);
 		table = new JTable(tableModel);
@@ -439,9 +457,22 @@ public class OfflineExport {
 			@Override
 			public void dragEnter(DropTargetDragEvent evt) {
 				Transferable t = evt.getTransferable();
-				if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+				if (!t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+					evt.rejectDrag(); // 没有需要的类型，拒绝进入
+				}
+//				evt.acceptDrag(DnDConstants.ACTION_COPY);
+			}
+
+			@Override
+			public void drop(DropTargetDropEvent dtde) {
+				// 检测拖放进来的数据类型
+				Transferable transfer = dtde.getTransferable();
+				if (transfer.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+					// 必须先调用acceptDrop
+					dtde.acceptDrop(DnDConstants.ACTION_COPY);
+
 					try {
-						Object td = t.getTransferData(DataFlavor.javaFileListFlavor);
+						Object td = transfer.getTransferData(DataFlavor.javaFileListFlavor);
 						if (td instanceof List) {
 							for (Object value : ((List<?>) td)) {
 								if (value instanceof File) {
@@ -454,15 +485,8 @@ public class OfflineExport {
 						ex.printStackTrace();
 					}
 				}
-				evt.acceptDrag(DnDConstants.ACTION_COPY);
-			}
-
-			@Override
-			public void drop(DropTargetDropEvent dtde) {
-
 			}
 		});
-
 	}
 
 	private void initDatas() {
@@ -752,6 +776,13 @@ public class OfflineExport {
 					glassPane.stop();
 					JOptionPane.showMessageDialog(null, "文件生成成功:" + generateFile);
 					Desktop.getDesktop().open(new File(generateFile));
+
+					ViewerFrame viewerFrame = new ViewerFrame();
+					viewerFrame.setLocationRelativeTo(null);
+
+					File[] files = new File(generateFile).listFiles();
+					Arrays.sort(files, new ComparatorFactory.WindowsExplorerComparator());
+					viewerFrame.openFile(files[0]);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

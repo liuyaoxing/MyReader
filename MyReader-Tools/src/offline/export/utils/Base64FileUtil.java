@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +19,6 @@ import com.liuyx.common.csv.CsvUtil;
 import offline.export.FileUtils;
 import offline.export.config.Configuration;
 import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 public class Base64FileUtil {
 
@@ -34,7 +35,8 @@ public class Base64FileUtil {
 		int CAPACITY = Configuration.getInstance().getQrCodeCapacity();
 		String fileMD5 = MD5Utils.encryptFile(srcFile);
 		StringBuffer source = new StringBuffer(fileStr);
-		File srcDir = new File(System.getProperty("user.dir") + File.separator + "temp", srcFile.getName());
+		String newFileName = "temp/" + srcFile.getName() + ".v" + new SimpleDateFormat("MMddHHmm").format(new Date());
+		File srcDir = new File(srcFile.getParentFile().getCanonicalPath(), newFileName);
 		srcDir.mkdir();
 		List<String> segmentList = new ArrayList<String>();
 		while (source.length() > 0) {

@@ -1,0 +1,226 @@
+package offline.export.pictureViewer;
+
+import java.awt.Image;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.swing.ImageIcon;
+import javax.swing.filechooser.FileFilter;
+
+import offline.export.utils.ComparatorFactory;
+
+public class ViewerService {
+
+	private static ViewerService service = null;
+
+	private ViewerFileChooser fileChooser = new ViewerFileChooser();
+
+	private List<File> currentFiles = new ArrayList<File>();
+
+	private File currentFile = null;
+
+	/** 图片放大的比例 */
+	protected final float ZOOMIN_RATE = 1.1f;
+
+	/** 图片放大的缩小 */
+	protected final float ZOOMOUT_RATE = 0.9f;
+
+	protected double zoomScale = 1.0D;
+
+	protected boolean zoomFit = true;
+
+	private Timer timer;
+
+	private ViewerService() {
+	}
+
+	public static ViewerService getInstance() {
+		if (service == null) {
+			service = new ViewerService();
+		}
+		return service;
+	}
+
+	public void open(ViewerFrame frame) {
+		if (fileChooser.showOpenDialog(frame) == ViewerFileChooser.APPROVE_OPTION) {
+			this.currentFile = fileChooser.getSelectedFile();
+			open(frame, this.currentFile);
+		}
+	}
+
+	public void open(ViewerFrame frame, File srcFile) {
+		this.currentFile = srcFile;
+		currentFiles.clear();
+		// 如果文件夹有改变
+		// 或者fileChooser的所有FileFilter
+		FileFilter[] fileFilters = fileChooser.getChoosableFileFilters();
+		File[] files = srcFile.getParentFile().listFiles();
+		Arrays.sort(files, new ComparatorFactory.WindowsExplorerComparator());
+		for (File file : files) {
+			for (FileFilter filter : fileFilters) {
+				// 如果是图片文件
+				if (file.isFile() && filter.accept(file) && !currentFiles.contains(file)) {
+					// 把文件加到currentFiles中
+					this.currentFiles.add(file);
+				}
+			}
+		}
+		setImageFile(frame, this.currentFile);
+	}
+
+	public void doPrevious(ViewerFrame frame) {
+		// 如果有打开包含图片的文件夹
+		if (this.currentFiles != null && !this.currentFiles.isEmpty()) {
+			int index = currentFiles.indexOf(this.currentFile);
+
+			this.currentFile = (File) this.currentFiles.get(index == 0 ? currentFiles.size() - 1 : index - 1);
+
+			setImageFile(frame, this.currentFile);
+		}
+	}
+
+	public void doNext(ViewerFrame frame) {
+		// 如果有打开包含图片的文件夹
+		if (this.currentFiles != null && !this.currentFiles.isEmpty()) {
+			int index = currentFiles.indexOf(this.currentFile);
+
+			this.currentFile = this.currentFiles.get(index >= currentFiles.size() - 1 ? 0 : index + 1);
+
+			setImageFile(frame, this.currentFile);
+		}
+	}
+
+	public void menuDo(ViewerFrame frame, String cmd) {
+		// 打开
+		if (cmd.equals(ViewerFrame.MENU_OPENFILE)) {
+			open(frame);
+		}
+		if (currentFile == null)
+			return;
+		// 放大
+		if (cmd.equals(ViewerFrame.MENU_ZOOM_OUT)) {
+			doZoomOut(frame);
+		}
+		// 缩小
+		if (cmd.equals(ViewerFrame.MENU_ZOOM_IN)) {
+			doZoomIn(frame);
+		}
+		// 自适应
+		if (cmd.equals(ViewerFrame.MENU_ZOOM_FIX)) {
+			doZoomFit(frame);
+		}
+		// 上一个
+		if (cmd.equals(ViewerFrame.MENU_PREVIOUS)) {
+			doPrevious(frame);
+		}
+		// 下一个
+		if (cmd.equals(ViewerFrame.MENU_NEXT)) {
+			doNext(frame);
+		}
+		if (cmd.equals(ViewerFrame.MENU_PLAY1_0S)) {
+			doAutoPlay(frame, 1);
+		}
+		if (cmd.equals(ViewerFrame.MENU_PLAY1_5S)) {
+			doAutoPlay(frame, 1.5);
+		}
+		if (cmd.equals(ViewerFrame.MENU_PLAY2_0S)) {
+			doAutoPlay(frame, 2);
+		}
+		// 退出
+		if (cmd.equals("退出(X)")) {
+			System.exit(0);
+		}
+	}
+
+	public void setImageFile(ViewerFrame frame, File imageFile) {
+		frame.setTitle(currentFile.getName() + String.format(" [%s - %s]", currentFiles.size(), currentFiles.indexOf(currentFile) + 1));
+		this.currentFile = imageFile;
+		if (zoomFit) {
+			doZoomFit(frame);
+		} else {
+			onZoom(frame);
+		}
+	}
+
+	public File getImageFile() {
+		return this.currentFile;
+	}
+
+	public void doZoomIn(ViewerFrame frame) {
+		if (this.zoomScale < 1.0D) {
+			this.zoomScale *= ZOOMIN_RATE;
+		} else {
+			this.zoomScale += 0.5D;
+			if (this.zoomScale > 4.0D) {
+				this.zoomScale = 4.0D;
+			}
+		}
+		this.zoomFit = false;
+		onZoom(frame);
+	}
+
+	public void doZoomOut(ViewerFrame frame) {
+		if (this.zoomScale <= 1.0D) {
+			if (this.zoomScale > 0.001D)
+				this.zoomScale *= ZOOMOUT_RATE;
+		} else {
+			this.zoomScale -= 0.5D;
+		}
+		zoomScale = Math.max(zoomScale, 0.2);
+		this.zoomFit = false;
+		onZoom(frame);
+	}
+
+	public void doZoomOriginal(ViewerFrame frame) {
+		this.zoomScale = 1.0D;
+		this.zoomFit = false;
+		onZoom(frame);
+	}
+
+	public void onZoom(ViewerFrame frame) {
+		ImageIcon icon = new ImageIcon(currentFile.getPath());
+		int width = (int) (icon.getIconWidth() * zoomScale);
+		int height = (int) ((icon.getIconHeight()) * zoomScale);
+		// 获取改变大小后的图片
+		ImageIcon newIcon = new ImageIcon(icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
+		// 改变显示的图片
+		frame.getLabel().setIcon(newIcon);
+	}
+
+	/**
+	 * 让图片自适应窗口显示 。
+	 */
+	public void doZoomFit(ViewerFrame frame) {
+		ImageIcon icon = new ImageIcon(currentFile.getPath());
+
+		double bitWidth1 = (double) frame.getLabel().getVisibleRect().getWidth() / icon.getIconWidth();
+		double bitHeight1 = (double) frame.getLabel().getVisibleRect().getHeight() / icon.getIconHeight();
+		if (bitWidth1 > bitHeight1) {
+			zoomScale = bitHeight1;
+		} else {
+			zoomScale = bitWidth1;
+		}
+		if (zoomScale < 0.001D) {
+			zoomScale = 0.001D;
+		}
+		onZoom(frame);
+	}
+
+	public void doAutoPlay(final ViewerFrame frame, double period) {
+		if (timer != null) {
+			timer.cancel();
+			timer = null;
+		}
+		timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				doNext(frame);
+			}
+		}, 2000, (long) (period * 1000));
+	}
+}
