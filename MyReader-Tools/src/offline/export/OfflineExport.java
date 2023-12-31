@@ -300,8 +300,9 @@ public class OfflineExport {
 		});
 
 		qrCodeTable.addMouseListener(new MouseAdapter() {
+
 			public void mousePressed(MouseEvent me) {
-				if (SwingUtilities.isLeftMouseButton(me)) {
+				if (me.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(me)) {
 					final int row = qrCodeTable.rowAtPoint(me.getPoint());
 					final int col = qrCodeTable.columnAtPoint(me.getPoint());
 					String selectedText = (String) qrCodeTableModel.getValueAt(row, col);
@@ -546,7 +547,7 @@ public class OfflineExport {
 		qrCodeTable.setFillsViewportHeight(true);
 		qrCodeTable.setRowHeight(30);
 		qrCodeTable.setFont(new Font("宋体", Font.PLAIN, 12));
-		qrCodeTable.setCellSelectionEnabled(true);
+		qrCodeTable.setCellSelectionEnabled(false);
 
 		JScrollPane uploadscrollPane2 = new JScrollPane(qrCodeTable); // 支持滚动
 		qrCodePanel.add(uploadscrollPane2);
