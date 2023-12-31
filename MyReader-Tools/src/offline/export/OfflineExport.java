@@ -2,12 +2,14 @@ package offline.export;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -37,10 +39,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.BoxLayout;
@@ -88,7 +90,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import java.awt.Component;
 
 public class OfflineExport {
 
@@ -102,6 +103,8 @@ public class OfflineExport {
 	private static final String FOLDER_LIST_MD5 = "/folder/list/md5/";
 	private static final String FOLDER_DOWNLOAD_MD5 = "/folder/download/md5/";
 	private static final String FOLDER_UPLOAD = "/folderUpload";
+
+	private static final String TITLE = "读乐乐备份工具 v3.31";
 
 	private JFrame frame;
 	private JComboBox<String> urlCombo, urlCombo2;
@@ -140,6 +143,11 @@ public class OfflineExport {
 	protected JTable uploadTable;
 	private JButton qrCodeButton;
 	private JPopupMenu popupMenu;
+
+	private AtomicInteger uploadCount = new AtomicInteger(0);
+
+	OkHttpClient uploadOkHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
+			.writeTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).build();
 
 	/**
 	 * Launch the application.
@@ -223,13 +231,8 @@ public class OfflineExport {
 				if (v == JFileChooser.APPROVE_OPTION) {
 					currentUploadFolder = chooser.getSelectedFile();
 					try {
-						doPreUploadFolder(currentUploadFolder);
-
-						OkHttpClient.Builder builder = new OkHttpClient.Builder();
-						builder.connectTimeout(10, TimeUnit.SECONDS);
-						builder.writeTimeout(30, TimeUnit.SECONDS);
-						builder.readTimeout(30, TimeUnit.SECONDS);
-						doUploadFolder(builder.build(), currentUploadFolder);
+						File[] allFiles = doPreUploadFolder(currentUploadFolder);
+						doUploadFolder(allFiles);
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
@@ -403,7 +406,7 @@ public class OfflineExport {
 						}
 						final JFileChooser fileChooser = new JFileChooser();// 文件选择器
 						if (currentDirectory != null)
-							fileChooser.setSelectedFile(new File(currentDirectory, "tmp"));
+							fileChooser.setSelectedFile(currentDirectory);
 						fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);// 设定只能选择到文件夹
 						int state = fileChooser.showOpenDialog(null);// 此句是打开文件选择器界面的触发语句
 						if (state == JFileChooser.APPROVE_OPTION) {
@@ -426,7 +429,7 @@ public class OfflineExport {
 										final JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
 										final File toFile = fileChooser.getSelectedFile();// toFile为选择到的目录
 										glassPane.stop();
-										doSyncFolder(jsonArray, toFile);
+										doSyncFolder(jsonArray, new File(toFile, currentDirectory.getName()));
 										backupBtn.setText("开始备份");
 									} catch (IOException e) {
 										e.printStackTrace();
@@ -453,7 +456,7 @@ public class OfflineExport {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setTitle("读乐乐备份工具 v3.30");
+		frame.setTitle(TITLE);
 		frame.setSize(888, 666);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -518,6 +521,8 @@ public class OfflineExport {
 		for (int i = 0; i < uploadTable.getColumnModel().getColumnCount(); i++) {
 			uploadTable.getColumnModel().getColumn(i).setPreferredWidth(uploadColumnWidths[i]);
 		}
+		uploadTable.setCellEditor(null);
+		uploadTable.setCellSelectionEnabled(true);
 		uploadTable.getTableHeader().setVisible(true);
 		uploadTable.setShowGrid(true);
 
@@ -628,8 +633,8 @@ public class OfflineExport {
 									File file = (File) value;
 									if (file.isDirectory()) {
 										currentUploadFolder = file;
-										doPreUploadFolder(file);
-										doUploadFolder(new okhttp3.OkHttpClient(), file);
+										File[] allFiles = doPreUploadFolder(file);
+										doUploadFolder(allFiles);
 									}
 								}
 							}
@@ -666,8 +671,8 @@ public class OfflineExport {
 									File file = (File) value;
 									if (file.isDirectory()) {
 										currentUploadFolder = file;
-										doPreUploadFolder(file);
-										doUploadFolder(new okhttp3.OkHttpClient(), file);
+										File[] allFiles = doPreUploadFolder(file);
+										doUploadFolder(allFiles);
 									}
 								}
 							}
@@ -714,7 +719,7 @@ public class OfflineExport {
 		});
 	}
 
-	protected void doPreUploadFolder(File file) throws IOException {
+	protected File[] doPreUploadFolder(File file) throws IOException {
 		uploadTableModel.getDataVector().clear();
 		File[] allFiles = FileUtils.listFiles(file).toArray(new File[0]);
 		for (int i = 0; i < allFiles.length; i++) {
@@ -727,6 +732,8 @@ public class OfflineExport {
 					FileUtils.getFileSize(subFile.length()), //
 					new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(subFile.lastModified())) });
 		}
+		uploadCount.set(0);
+		return allFiles;
 	}
 
 	private void initDatas() {
@@ -783,7 +790,7 @@ public class OfflineExport {
 			}
 
 			try {
-				frame.setTitle(String.format("%s (已处理: %s项)", frameTitle, counter.incrementAndGet()));
+				frame.setTitle(String.format("%s (已处理: %s项)", TITLE, counter.incrementAndGet()));
 				String getUrl = downloadFile(id, row, col, destFile);
 				System.out.println(getUrl);
 			} catch (Exception ex) {
@@ -1044,22 +1051,19 @@ public class OfflineExport {
 		}).start();
 	}
 
-	private void doUploadFolder(okhttp3.OkHttpClient mOkHttpClient, File file) throws IOException {
-		File[] subFiles = file.listFiles();
-		if (subFiles == null || subFiles.length == 0)
+	private void doUploadFolder(File[] allFiles) throws IOException {
+		if (allFiles == null || allFiles.length == 0 || currentUploadFolder == null)
 			return;
 
-		String uploadUrl = String.valueOf(urlCombo.getSelectedItem()) + FOLDER_UPLOAD;
+		String uploadUrl = String.valueOf(urlCombo2.getSelectedItem());
+		uploadUrl += uploadUrl.endsWith(FOLDER_UPLOAD) ? "" : FOLDER_UPLOAD;
 
-		for (File subFile : subFiles) {
-			if (subFile.isDirectory()) {
-				doUploadFolder(mOkHttpClient, subFile);
-			} else {
-				String path = file.getCanonicalPath()
-						.substring(currentUploadFolder.getParentFile().getCanonicalPath().length() + 1);
-				uploadFile(path, mOkHttpClient, uploadUrl, subFile);
-			}
+		for (int i = 0; i < allFiles.length; i++) {
+			String path = allFiles[i].getParentFile().getCanonicalPath()
+					.substring(currentUploadFolder.getParentFile().getCanonicalPath().length() + 1);
+			uploadFile(path, uploadOkHttpClient, uploadUrl, allFiles[i], i);
 		}
+
 	}
 
 	private void addPopupMenu(Component component, final JPopupMenu popup) {
@@ -1082,31 +1086,22 @@ public class OfflineExport {
 		});
 	}
 
-	private int findRowByColValue(int col, String value) {
-		for (int i = 0; i < uploadTableModel.getRowCount(); i++) {
-			if (Objects.equals(uploadTableModel.getValueAt(i, col), value))
-				return i;
-		}
-		return -1;
-	}
-
-	private void uploadFile(String path, okhttp3.OkHttpClient mOkHttpClient, String uploadUrl, File subFile)
-			throws IOException {
+	private void uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, File subFile,
+			final int currentRow) throws IOException {
 		MultipartBody.Builder builder = new MultipartBody.Builder();
 		builder.setType(MultipartBody.FORM);
 		builder.addPart(RequestBody.create(MediaType.parse("application/octet-stream"), subFile));
 
 		final int col = 3;
-		final int row = findRowByColValue(col, subFile.getCanonicalPath());
 
 		RequestBody requestBody = new ProgressRequestBody(builder.build(), new ProgressRequestListener() {
 			@Override
 			public void onRequestProgress(long bytesWrite, long contentLength, boolean done) {
 				try {
 					String progress = (100 * bytesWrite) / contentLength + "%";
-					uploadTableModel.setValueAt(progress, row, col - 1);
+					uploadTableModel.setValueAt(progress, currentRow, col - 1);
 				} catch (Exception e) {
-					e.printStackTrace();
+					// e.printStackTrace();
 				}
 			}
 		});
@@ -1115,6 +1110,7 @@ public class OfflineExport {
 				.url(uploadUrl + "?path=" + path + "&fileName=" + subFile.getName())//
 				.post(requestBody).build();
 		Call call = mOkHttpClient.newCall(request);
+
 		call.enqueue(new okhttp3.Callback() {
 			@Override
 			public void onFailure(okhttp3.Call call, final IOException e) {
@@ -1124,11 +1120,16 @@ public class OfflineExport {
 
 			@Override
 			public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
-				uploadTableModel.setValueAt("100%", row, col - 1);
+				uploadTableModel.setValueAt("100%", currentRow, col - 1);
 
-				uploadTable.setRowSelectionInterval(row, row);
-				uploadTable.scrollRectToVisible(uploadTable.getCellRect(0, 0, true));
-				uploadTable.setSelectionBackground(Color.LIGHT_GRAY);// 选中行设置背景色
+//				uploadTable.setRowSelectionInterval(row, row);
+//				uploadTable.scrollRectToVisible(uploadTable.getCellRect(row, 0, true));
+//				uploadTable.setSelectionBackground(Color.LIGHT_GRAY);// 选中行设置背景色
+
+				uploadTable.getSelectionModel().setSelectionInterval(currentRow, currentRow);
+				uploadTable.scrollRectToVisible(new Rectangle(uploadTable.getCellRect(currentRow, 0, true)));
+
+				frame.setTitle(String.format("%s (已处理: %s项)", TITLE, counter.incrementAndGet()));
 			}
 		});
 	}
