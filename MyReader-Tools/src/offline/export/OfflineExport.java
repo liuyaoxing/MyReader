@@ -531,22 +531,27 @@ public class OfflineExport {
 		qrCodePanel.add(qrCodePanel_1, BorderLayout.NORTH);
 		qrCodePanel_1.setLayout(new BoxLayout(qrCodePanel_1, BoxLayout.X_AXIS));
 
+		qrCodeButton = new JButton("菜单栏");
+		qrCodeButton.setHorizontalAlignment(SwingConstants.RIGHT);
+		qrCodePanel_1.add(qrCodeButton);
+
 		qrCodeFileTitle = new JLabel();
 		qrCodeFileTitle.setAlignmentX(0.5f);
 		qrCodeFileTitle.setText("请将文件拖入到下方                              ");
 		qrCodeFileTitle.setFont(new Font("宋体", Font.PLAIN, 12));
 		qrCodePanel_1.add(qrCodeFileTitle);
 
-		qrCodeButton = new JButton("开发工具");
-		qrCodeButton.setHorizontalAlignment(SwingConstants.RIGHT);
-		qrCodePanel_1.add(qrCodeButton);
-
 		qrCodeTableModel = new DefaultTableModel(null, new String[] { "0", "1", "2", "4", "5" });
 		qrCodeTable = new JTable(qrCodeTableModel);
+		qrCodeTable.setFillsViewportHeight(true);
 		qrCodeTable.setRowHeight(30);
 		qrCodeTable.setFont(new Font("宋体", Font.PLAIN, 12));
 		qrCodeTable.setCellSelectionEnabled(true);
-		qrCodePanel.add(qrCodeTable, BorderLayout.CENTER);
+
+		JScrollPane uploadscrollPane2 = new JScrollPane(qrCodeTable); // 支持滚动
+		qrCodePanel.add(uploadscrollPane2);
+
+//		qrCodePanel.add(qrCodeTable, BorderLayout.CENTER);
 
 		initMenus();
 		initDatas();
