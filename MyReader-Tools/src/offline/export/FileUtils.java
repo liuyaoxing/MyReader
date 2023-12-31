@@ -238,9 +238,9 @@ public class FileUtils {
 	 */
 	public static List<String> listPath(String root) {
 		List<String> allDir = new ArrayList<String>();
-		SecurityManager checker = new SecurityManager();
+//		SecurityManager checker = new SecurityManager();
 		File path = new File(root);
-		checker.checkRead(root);
+//		checker.checkRead(root);
 		// 过滤掉以.开始的文件夹
 		if (path.isDirectory()) {
 			for (File f : path.listFiles()) {
@@ -260,15 +260,15 @@ public class FileUtils {
 	 */
 	public static List<File> listPathFiles(String root) {
 		List<File> allDir = new ArrayList<File>();
-		SecurityManager checker = new SecurityManager();
+//		SecurityManager checker = new SecurityManager();
 		File path = new File(root);
-		checker.checkRead(root);
+//		checker.checkRead(root);
 		File[] files = path.listFiles();
 		for (File f : files) {
 			if (f.isFile())
 				allDir.add(f);
 			else
-				listPath(f.getAbsolutePath());
+				allDir.addAll(listPathFiles(f.getAbsolutePath()));
 		}
 		return allDir;
 	}

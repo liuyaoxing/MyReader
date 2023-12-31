@@ -18,7 +18,6 @@ import com.liuyx.common.csv.CsvUtil;
 
 import offline.export.FileUtils;
 import offline.export.config.Configuration;
-import sun.misc.BASE64Decoder;
 
 public class Base64FileUtil {
 
@@ -102,16 +101,18 @@ public class Base64FileUtil {
 			System.out.println(" 不行，oops！ ");
 			return false;
 		}
-		BASE64Decoder decoder = new BASE64Decoder();
-
-		// Base64解码,对字节数组字符串进行Base64解码并生成文件
-		byte[] byt = decoder.decodeBuffer(base64FileStr);
-		for (int i = 0, len = byt.length; i < len; ++i) {
-			// 调整异常数据
-			if (byt[i] < 0) {
-				byt[i] += 256;
-			}
-		}
+		byte[] byt = Base64.decodeBase64(base64FileStr.getBytes());
+		
+//		BASE64Decoder decoder = new BASE64Decoder();
+//
+//		// Base64解码,对字节数组字符串进行Base64解码并生成文件
+//		byte[] byt = decoder.decodeBuffer(base64FileStr);
+//		for (int i = 0, len = byt.length; i < len; ++i) {
+//			// 调整异常数据
+//			if (byt[i] < 0) {
+//				byt[i] += 256;
+//			}
+//		}
 		OutputStream out = null;
 		InputStream input = new ByteArrayInputStream(byt);
 		try {
