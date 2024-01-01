@@ -28,6 +28,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -364,11 +366,14 @@ public class OfflineExport {
 
 		backupBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				backupTableModel.getDataVector().clear();
+				backupTable.setModel(backupTableModel);
+				backupTable.updateUI();
+				counter.set(0);
 				backupBtn.setText(backupBtn.getText().equals("开始备份") ? "停止备份" : "开始备份");
 				final String comboText = getComboText(urlCombo);
 				if (comboText.endsWith(FOLDER_LIST)) {
 					backupBtn.setText("开始备份");
-					backupTableModel.getDataVector().clear();
 					Request request = new Request.Builder().addHeader("x-header", "dll")//
 							.header("sort", "_id")//
 							.url(comboText).build();
@@ -402,7 +407,6 @@ public class OfflineExport {
 						if (startFolderThread != null) {
 							startFolderThread.interrupt();
 							startFolderThread = null;
-							return;
 						}
 						final JFileChooser fileChooser = new JFileChooser();// 文件选择器
 						if (currentDirectory != null)
@@ -1107,7 +1111,8 @@ public class OfflineExport {
 		});
 
 		Request request = new Request.Builder()//
-				.url(uploadUrl + "?path=" + path + "&fileName=" + subFile.getName())//
+				.url(uploadUrl + "?path=" + URLEncoder.encode(path, Charset.forName("utf-8"))//
+						+ "&fileName=" + URLEncoder.encode(subFile.getName(), Charset.forName("utf-8")))//
 				.post(requestBody).build();
 		Call call = mOkHttpClient.newCall(request);
 
@@ -1120,15 +1125,13 @@ public class OfflineExport {
 
 			@Override
 			public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
-				uploadTableModel.setValueAt("100%", currentRow, col - 1);
-
-//				uploadTable.setRowSelectionInterval(row, row);
-//				uploadTable.scrollRectToVisible(uploadTable.getCellRect(row, 0, true));
-//				uploadTable.setSelectionBackground(Color.LIGHT_GRAY);// 选中行设置背景色
-
-				uploadTable.getSelectionModel().setSelectionInterval(currentRow, currentRow);
-				uploadTable.scrollRectToVisible(new Rectangle(uploadTable.getCellRect(currentRow, 0, true)));
-
+				try {
+					uploadTableModel.setValueAt("100%", currentRow, col - 1);
+					uploadTable.getSelectionModel().setSelectionInterval(currentRow, currentRow);
+					uploadTable.scrollRectToVisible(new Rectangle(uploadTable.getCellRect(currentRow, 0, true)));
+				} catch (Exception e) {
+					// donothing
+				}
 				frame.setTitle(String.format("%s (已处理: %s项)", TITLE, counter.incrementAndGet()));
 			}
 		});
