@@ -239,7 +239,6 @@ public class OfflineExport {
 						ex.printStackTrace();
 					}
 				}
-
 			}
 		});
 		backupTable.addMouseListener(new MouseAdapter() {
@@ -253,6 +252,13 @@ public class OfflineExport {
 						final int column = backupTable.columnAtPoint(me.getPoint());
 
 						final JPopupMenu popup = new JPopupMenu();
+						JMenuItem clearItem = new JMenuItem("清空");
+						popup.add(clearItem);
+						clearItem.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								backupTableModel.setRowCount(0);
+							}
+						});
 						JMenuItem copyItem = new JMenuItem("复制");
 						popup.add(copyItem);
 						copyItem.addActionListener(new ActionListener() {
@@ -304,8 +310,48 @@ public class OfflineExport {
 			}
 		});
 
-		qrCodeTable.addMouseListener(new MouseAdapter() {
+		uploadTable.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent me) {
+				if (SwingUtilities.isRightMouseButton(me)) {
+					final int row = uploadTable.rowAtPoint(me.getPoint());
+					uploadTable.setRowSelectionInterval(row, row);
+					if (row != -1) {
+						final int column = uploadTable.columnAtPoint(me.getPoint());
 
+						final JPopupMenu popup = new JPopupMenu();
+						JMenuItem clearItem = new JMenuItem("清空");
+						popup.add(clearItem);
+						clearItem.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								uploadTableModel.setRowCount(0);
+							}
+						});
+						JMenuItem copyItem = new JMenuItem("复制");
+						popup.add(copyItem);
+						copyItem.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								Object value = backupTable.getValueAt(row, column);
+								if (value != null)
+									setSysClipboardText(String.valueOf(value));
+							}
+						});
+
+						JMenuItem calcel = new JMenuItem("取消");
+						calcel.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								popup.setVisible(false);
+							}
+						});
+
+						popup.add(new JSeparator());
+						popup.add(calcel);
+						popup.show(me.getComponent(), me.getX(), me.getY());
+					}
+				}
+			}
+		});
+
+		qrCodeTable.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
 				if (me.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(me)) {
 					final int row = qrCodeTable.rowAtPoint(me.getPoint());
@@ -366,9 +412,7 @@ public class OfflineExport {
 
 		backupBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				backupTableModel.getDataVector().clear();
-				backupTable.setModel(backupTableModel);
-				backupTable.updateUI();
+				backupTableModel.setRowCount(0);
 				counter.set(0);
 				backupBtn.setText(backupBtn.getText().equals("开始备份") ? "停止备份" : "开始备份");
 				final String comboText = getComboText(urlCombo);
@@ -482,6 +526,7 @@ public class OfflineExport {
 		firstPanel_1.setLayout(new BoxLayout(firstPanel_1, BoxLayout.X_AXIS));
 
 		urlCombo = new JComboBox<String>();
+		urlCombo.setFont(new Font("宋体", Font.PLAIN, 16));
 		urlCombo.setEditable(true);
 		urlCombo.setToolTipText("请输入读乐乐服务URL");
 		firstPanel_1.add(urlCombo);
@@ -500,6 +545,15 @@ public class OfflineExport {
 		backupTable.setShowGrid(true);
 
 		JScrollPane backupscrollPane = new JScrollPane(backupTable); // 支持滚动
+
+//		backupTablePopupMenu = new JPopupMenu();
+//		addPopup(backupTable, backupTablePopupMenu);
+//
+//		backupTableCopyMenu = new JMenuItem("复制");
+//		backupTablePopupMenu.add(backupTableCopyMenu);
+//
+//		backupTableClearMenu = new JMenuItem("清空");
+//		backupTablePopupMenu.add(backupTableClearMenu);
 		firstPanel.add(backupscrollPane);
 
 		JPanel secondPanel = new JPanel();
@@ -511,6 +565,7 @@ public class OfflineExport {
 		secondPanel_1.setLayout(new BoxLayout(secondPanel_1, BoxLayout.X_AXIS));
 
 		urlCombo2 = new JComboBox<String>();
+		urlCombo2.setFont(new Font("宋体", Font.PLAIN, 16));
 		urlCombo2.setEditable(true);
 		urlCombo2.setToolTipText("请输入读乐乐服务URL");
 		secondPanel_1.add(urlCombo2);
@@ -531,6 +586,15 @@ public class OfflineExport {
 		uploadTable.setShowGrid(true);
 
 		JScrollPane uploadscrollPane = new JScrollPane(uploadTable); // 支持滚动
+
+//		uploadTablePopupMenu = new JPopupMenu();
+//		addPopup(uploadTable, uploadTablePopupMenu);
+//
+//		updateTableCopyMenu = new JMenuItem("复制");
+//		uploadTablePopupMenu.add(updateTableCopyMenu);
+//
+//		updateTableClearMenu = new JMenuItem("清空");
+//		uploadTablePopupMenu.add(updateTableClearMenu);
 		secondPanel.add(uploadscrollPane);
 
 		JPanel qrCodePanel = new JPanel();
@@ -770,7 +834,7 @@ public class OfflineExport {
 			JOptionPane.showMessageDialog(null, "请输入正确的服务器地址！");
 			return;
 		}
-		backupTableModel.getDataVector().clear();
+		backupTableModel.setRowCount(0);
 		for (int i = 0; i < jsonArray.size(); i++) {
 			JsonObject element = jsonArray.get(i).getAsJsonObject();
 			final String id = element.get(FILESERVER_MD5).getAsString();
@@ -945,7 +1009,7 @@ public class OfflineExport {
 			});
 
 			if (backupTableModel.getDataVector().size() > 5000) {
-				backupTableModel.getDataVector().clear();
+				backupTableModel.setRowCount(0);
 			}
 
 		}
@@ -1133,6 +1197,26 @@ public class OfflineExport {
 					// donothing
 				}
 				frame.setTitle(String.format("%s (已处理: %s项)", TITLE, counter.incrementAndGet()));
+			}
+		});
+	}
+
+	protected static void addPopup(Component component, final JPopupMenu popup) {
+		component.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+
+			private void showMenu(MouseEvent e) {
+				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		});
 	}
