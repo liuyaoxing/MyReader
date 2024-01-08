@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -106,6 +105,8 @@ public class OfflineExport {
 	private static final String FOLDER_DOWNLOAD_MD5 = "/folder/download/md5/";
 	private static final String FOLDER_UPLOAD = "/folderUpload";
 
+	private static final String FLAG_DELETE_ON_SUCCESS = "#--delete-on-success";
+
 	private static final String TITLE = "读乐乐备份工具 v3.31";
 
 	private JFrame frame;
@@ -116,7 +117,9 @@ public class OfflineExport {
 	private String[] columnNames = new String[] { "ID", "标题", "URL", "大小", "状态", "保存路径" };
 	private int[] columnWidths = new int[] { 50, 250, 50, 50, 50, 250 };
 
-	private String[] uploadColumnNames = new String[] { "ID", "文件名", "进度", "路径", "大小", "修改时间" };
+	private static final String COL_PROGRESS = "进度";
+
+	private String[] uploadColumnNames = new String[] { "ID", "文件名", COL_PROGRESS, "路径", "大小", "修改时间" };
 	private int[] uploadColumnWidths = new int[] { 6, 100, 6, 360, 10, 88 };
 
 	protected BackupTask backupTask;
@@ -395,6 +398,38 @@ public class OfflineExport {
 
 			@Override
 			public void popupMenuCanceled(PopupMenuEvent e) {
+			}
+		});
+
+		urlCombo2.addPopupMenuListener(new PopupMenuListener() {
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				String newItem = String.valueOf(urlCombo2.getEditor().getItem());
+
+				Set<String> itemSet = new HashSet<String>();
+				DefaultComboBoxModel<String> d = (DefaultComboBoxModel<String>) urlCombo2.getModel();
+				d.removeAllElements();
+				try {
+					itemSet.add(String.valueOf(newItem));
+					URL url = new URL(newItem);
+					String newUrl = "http://" + String.format("%s:%s", url.getHost(), url.getPort());
+					itemSet.add(String.valueOf(newUrl + FOLDER_UPLOAD + FLAG_DELETE_ON_SUCCESS));
+					itemSet.add(String.valueOf(newUrl + FOLDER_UPLOAD));
+				} catch (MalformedURLException e1) {
+					e1.printStackTrace();
+				}
+				addItemsToCombo(urlCombo2, itemSet.toArray(new String[0]), 0);
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+
+			}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {
+
 			}
 		});
 
@@ -1123,13 +1158,18 @@ public class OfflineExport {
 		if (allFiles == null || allFiles.length == 0 || currentUploadFolder == null)
 			return;
 
-		String uploadUrl = String.valueOf(urlCombo2.getSelectedItem());
+		String uploadUrl = getComboText(urlCombo2);
+		boolean deleteOnSuccess = uploadUrl.endsWith(FLAG_DELETE_ON_SUCCESS);
+
+		uploadUrl = uploadUrl.contains("#--") ? uploadUrl.substring(0, uploadUrl.indexOf("#--")) : uploadUrl;
 		uploadUrl += uploadUrl.endsWith(FOLDER_UPLOAD) ? "" : FOLDER_UPLOAD;
+
+		int updateColumn = Arrays.asList(uploadColumnNames).indexOf(COL_PROGRESS);
 
 		for (int i = 0; i < allFiles.length; i++) {
 			String path = allFiles[i].getParentFile().getCanonicalPath()
 					.substring(currentUploadFolder.getParentFile().getCanonicalPath().length() + 1);
-			uploadFile(path, uploadOkHttpClient, uploadUrl, allFiles[i], i);
+			uploadFile(path, uploadOkHttpClient, uploadUrl, allFiles[i], updateColumn, i, deleteOnSuccess);
 		}
 
 	}
@@ -1154,20 +1194,23 @@ public class OfflineExport {
 		});
 	}
 
-	private void uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, File subFile,
-			final int currentRow) throws IOException {
+	protected void uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, File subFile,
+			final int updateCol, final int currentRow) throws IOException {
+		uploadFile(path, mOkHttpClient, uploadUrl, subFile, updateCol, currentRow, false);
+	}
+
+	protected void uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, final File subFile,
+			final int updateCol, final int currentRow, final boolean deleteOnSuccess) throws IOException {
 		MultipartBody.Builder builder = new MultipartBody.Builder();
 		builder.setType(MultipartBody.FORM);
 		builder.addPart(RequestBody.create(MediaType.parse("application/octet-stream"), subFile));
-
-		final int col = 3;
 
 		RequestBody requestBody = new ProgressRequestBody(builder.build(), new ProgressRequestListener() {
 			@Override
 			public void onRequestProgress(long bytesWrite, long contentLength, boolean done) {
 				try {
 					String progress = (100 * bytesWrite) / contentLength + "%";
-					uploadTableModel.setValueAt(progress, currentRow, col - 1);
+					uploadTableModel.setValueAt(progress, currentRow, updateCol);
 				} catch (Exception e) {
 					// e.printStackTrace();
 				}
@@ -1175,24 +1218,29 @@ public class OfflineExport {
 		});
 
 		Request request = new Request.Builder()//
-				.url(uploadUrl + "?path=" + URLEncoder.encode(path, Charset.forName("utf-8"))//
-						+ "&fileName=" + URLEncoder.encode(subFile.getName(), Charset.forName("utf-8")))//
+				.url(uploadUrl + "?path=" + URLEncoder.encode(path, "utf-8")//
+						+ "&fileName=" + URLEncoder.encode(subFile.getName(), "utf-8"))//
 				.post(requestBody).build();
 		Call call = mOkHttpClient.newCall(request);
 
 		call.enqueue(new okhttp3.Callback() {
 			@Override
 			public void onFailure(okhttp3.Call call, final IOException e) {
-//				uploadTableModel.setValueAt("上传失败", row, col - 1);
 				System.err.println("上传失败:" + e.getMessage());
 			}
 
 			@Override
 			public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
 				try {
-					uploadTableModel.setValueAt("100%", currentRow, col - 1);
+					uploadTableModel.setValueAt(response.isSuccessful() ? "100%" : response.message(), currentRow,
+							updateCol);
 					uploadTable.getSelectionModel().setSelectionInterval(currentRow, currentRow);
 					uploadTable.scrollRectToVisible(new Rectangle(uploadTable.getCellRect(currentRow, 0, true)));
+					uploadTable.updateUI();
+
+					if (response.isSuccessful() && deleteOnSuccess) {
+						subFile.delete();
+					}
 				} catch (Exception e) {
 					// donothing
 				}
