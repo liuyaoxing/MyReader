@@ -710,44 +710,6 @@ public class OfflineExport {
 	}
 
 	private void initDnd() {
-		new DropTarget(urlCombo, DnDConstants.ACTION_COPY_OR_MOVE, new DropTargetAdapter() {
-			@Override
-			public void dragEnter(DropTargetDragEvent evt) {
-				Transferable t = evt.getTransferable();
-				if (!t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-					evt.rejectDrag(); // 没有需要的类型，拒绝进入
-				}
-//				evt.acceptDrag(DnDConstants.ACTION_COPY);
-			}
-
-			@Override
-			public void drop(DropTargetDropEvent dtde) {
-				// 检测拖放进来的数据类型
-				Transferable transfer = dtde.getTransferable();
-				if (transfer.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-					// 必须先调用acceptDrop
-					dtde.acceptDrop(DnDConstants.ACTION_COPY);
-
-					try {
-						Object td = transfer.getTransferData(DataFlavor.javaFileListFlavor);
-						if (td instanceof List) {
-							for (Object value : ((List<?>) td)) {
-								if (value instanceof File) {
-									File file = (File) value;
-									if (file.isDirectory()) {
-										currentUploadFolder = file;
-										File[] allFiles = doPreUploadFolder(file);
-										doUploadFolder(allFiles);
-									}
-								}
-							}
-						}
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-				}
-			}
-		});
 		new DropTarget(uploadTable, DnDConstants.ACTION_COPY_OR_MOVE, new DropTargetAdapter() {
 			@Override
 			public void dragEnter(DropTargetDragEvent evt) {
@@ -774,6 +736,7 @@ public class OfflineExport {
 									File file = (File) value;
 									if (file.isDirectory()) {
 										currentUploadFolder = file;
+										System.out.println("开始上传文件夹: " + currentDirectory);
 										File[] allFiles = doPreUploadFolder(file);
 										doUploadFolder(allFiles);
 									}
