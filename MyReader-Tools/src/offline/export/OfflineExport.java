@@ -235,12 +235,17 @@ public class OfflineExport {
 				int v = chooser.showOpenDialog(null);
 				if (v == JFileChooser.APPROVE_OPTION) {
 					currentUploadFolder = chooser.getSelectedFile();
-					try {
-						File[] allFiles = doPreUploadFolder(currentUploadFolder);
-						doUploadFolder(allFiles);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								File[] allFiles = doPreUploadFolder(currentUploadFolder);
+								doUploadFolder(allFiles);
+							} catch (Exception ex) {
+								ex.printStackTrace();
+							}
+						}
+					}).start();
 				}
 			}
 		});
@@ -737,8 +742,17 @@ public class OfflineExport {
 									if (file.isDirectory()) {
 										currentUploadFolder = file;
 										System.out.println("开始上传文件夹: " + currentDirectory);
-										File[] allFiles = doPreUploadFolder(file);
-										doUploadFolder(allFiles);
+										new Thread(new Runnable() {
+											@Override
+											public void run() {
+												try {
+													File[] allFiles = doPreUploadFolder(currentUploadFolder);
+													doUploadFolder(allFiles);
+												} catch (Exception ex) {
+													ex.printStackTrace();
+												}
+											}
+										}).start();
 									}
 								}
 							}
