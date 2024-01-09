@@ -338,7 +338,7 @@ public class OfflineExport {
 						popup.add(copyItem);
 						copyItem.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
-								Object value = backupTable.getValueAt(row, column);
+								Object value = uploadTable.getValueAt(row, column);
 								if (value != null)
 									setSysClipboardText(String.valueOf(value));
 							}
@@ -621,7 +621,7 @@ public class OfflineExport {
 			uploadTable.getColumnModel().getColumn(i).setPreferredWidth(uploadColumnWidths[i]);
 		}
 		uploadTable.setCellEditor(null);
-		uploadTable.setCellSelectionEnabled(true);
+		uploadTable.setCellSelectionEnabled(false);
 		uploadTable.getTableHeader().setVisible(true);
 		uploadTable.setShowGrid(true);
 
@@ -1209,15 +1209,14 @@ public class OfflineExport {
 			@Override
 			public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
 				try {
+					if (response.isSuccessful() && deleteOnSuccess)
+						subFile.delete();
+
 					uploadTableModel.setValueAt(response.isSuccessful() ? "100%" : response.message(), currentRow,
 							updateCol);
 					uploadTable.getSelectionModel().setSelectionInterval(currentRow, currentRow);
-					uploadTable.scrollRectToVisible(new Rectangle(uploadTable.getCellRect(currentRow, 0, true)));
+					uploadTable.scrollRectToVisible(new Rectangle(uploadTable.getCellRect(currentRow + 10, 0, true)));
 					uploadTable.updateUI();
-
-					if (response.isSuccessful() && deleteOnSuccess) {
-						subFile.delete();
-					}
 				} catch (Exception e) {
 					// donothing
 				}
