@@ -26,36 +26,36 @@ public class PatternUtils {
 	}
 
 	/**
-	 * Ìæ»»ËùÓĞ±êµã·ûºÅ
+	 * æ›¿æ¢æ‰€æœ‰æ ‡ç‚¹ç¬¦å·
 	 * 
 	 * @param str
 	 * @return
 	 */
 	public static String replaceInvalidPath(String srcStr, String symbol) {
-		String str = srcStr.replaceAll("[\"'`^=|<>¡¤|£ü¡¶¡·/\\\\:%#!£¡~&*?$@]", symbol);
+		String str = srcStr.replaceAll("[\"'`^=|<>Â·|ï½œã€Šã€‹/\\\\:%#!ï¼~&*?$@]", symbol);
 		return str.replaceAll("[^(\\u4e00-\\u9fa5)(0-9)(a-z)(A-Z)]", symbol);
 
 	}
 
 	/**
-	 * Ìæ»»ËùÓĞ±êµã·ûºÅ
+	 * æ›¿æ¢æ‰€æœ‰æ ‡ç‚¹ç¬¦å·
 	 * 
 	 * @param str
 	 * @return
 	 */
 	public static String replacePunctuation(String srcStr, String symbol) {
-		return srcStr.replaceAll("[\\p{P}+~$`^=|<>¡¤|£ü¡¶¡·]", symbol);
+		return srcStr.replaceAll("[\\p{P}+~$`^=|<>Â·|ï½œã€Šã€‹]", symbol);
 	}
 
 	/**
-	 * ÊÇ²»ÊÇ www.zhangzisi.com£¬www.zhangzis.cc
+	 * æ˜¯ä¸æ˜¯ www.zhangzisi.comï¼Œwww.zhangzis.cc
 	 * 
 	 * @param url
 	 * @return
 	 */
 
 	/**
-	 * ÊÇ·ñÊÇÎ¢ĞÅÎÄÕÂ¡£
+	 * æ˜¯å¦æ˜¯å¾®ä¿¡æ–‡ç« ã€‚
 	 * 
 	 * @param url
 	 * @return
@@ -65,7 +65,7 @@ public class PatternUtils {
 	}
 
 	/**
-	 * ±È½ÏÁ½¸öURLÊÇ·ñÒ»Ñù¡£
+	 * æ¯”è¾ƒä¸¤ä¸ªURLæ˜¯å¦ä¸€æ ·ã€‚
 	 * 
 	 * @param url1
 	 * @param url2
@@ -78,7 +78,7 @@ public class PatternUtils {
 	}
 
 	/**
-	 * ÊÇ·ñ±»´óÀ¨ºÅ°üº¬,"{123}":true, "{456":false
+	 * æ˜¯å¦è¢«å¤§æ‹¬å·åŒ…å«,"{123}":true, "{456":false
 	 * 
 	 * @param str
 	 * @return
@@ -88,7 +88,7 @@ public class PatternUtils {
 	}
 
 	/**
-	 * ÌáÈ¡´óÀ¨ºÅÄÚÈİ,extractBraces("{123}")="123"
+	 * æå–å¤§æ‹¬å·å†…å®¹,extractBraces("{123}")="123"
 	 * 
 	 * @param str
 	 * @return
@@ -104,7 +104,7 @@ public class PatternUtils {
 	}
 
 	/**
-	 * »ñµÃÒ³Ãæ×Ö·û
+	 * è·å¾—é¡µé¢å­—ç¬¦
 	 */
 	public static String matchHtmlCharset(String content) {
 		String chs = "";
@@ -116,7 +116,7 @@ public class PatternUtils {
 	}
 
 	/**
-	 * »ñµÃÒ³Ãæ×Ö·û
+	 * è·å¾—é¡µé¢å­—ç¬¦
 	 */
 	public static String replaceHtmlCharset(String content, String charset) {
 		String regex = "(?<=charset=)(.+)(?=\")";

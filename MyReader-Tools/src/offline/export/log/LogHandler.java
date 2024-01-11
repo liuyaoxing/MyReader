@@ -14,7 +14,7 @@ import java.util.Locale;
 
 /**
  *
- * @author ÁõÒ¢ĞË (https://github.com/liuyaoxing)
+ * @author åˆ˜å°§å…´ (https://github.com/liuyaoxing)
  *
  */
 public class LogHandler {
@@ -58,10 +58,10 @@ public class LogHandler {
 	}
 
 	/**
-	 * ±£´æ´íÎóĞÅÏ¢µ½ÎÄ¼şÖĞ
+	 * ä¿å­˜é”™è¯¯ä¿¡æ¯åˆ°æ–‡ä»¶ä¸­
 	 * 
 	 * @param message
-	 * @return ·µ»ØÎÄ¼şÃû³Æ,±ãÓÚ½«ÎÄ¼ş´«ËÍµ½·şÎñÆ÷
+	 * @return è¿”å›æ–‡ä»¶åç§°,ä¾¿äºå°†æ–‡ä»¶ä¼ é€åˆ°æœåŠ¡å™¨
 	 * @throws Exception
 	 */
 	public static void error(Throwable throwable) {
@@ -69,10 +69,10 @@ public class LogHandler {
 	}
 
 	/**
-	 * ±£´æ´íÎóĞÅÏ¢µ½ÎÄ¼şÖĞ
+	 * ä¿å­˜é”™è¯¯ä¿¡æ¯åˆ°æ–‡ä»¶ä¸­
 	 * 
 	 * @param message
-	 * @return ·µ»ØÎÄ¼şÃû³Æ,±ãÓÚ½«ÎÄ¼ş´«ËÍµ½·şÎñÆ÷
+	 * @return è¿”å›æ–‡ä»¶åç§°,ä¾¿äºå°†æ–‡ä»¶ä¼ é€åˆ°æœåŠ¡å™¨
 	 * @throws Exception
 	 */
 	public static void debug(String message) {

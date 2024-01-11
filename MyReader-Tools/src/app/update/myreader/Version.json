@@ -1,10 +1,10 @@
 {
 	"title": "读乐乐v3.30",
-	"fileName": "MyReader-release-3.30.apk",
-	"url": "https://github.com/liuyaoxing/MyReader/releases/download/v3.30/MyReader-release-3.30.apk",
-	"changelog": "01、增加epub电子书阅读功能",
+	"fileName": "MyReader-release-3.30.v20240111.apk",
+	"url": "https://github.com/liuyaoxing/MyReader/releases/download/v3.30/MyReader-release-3.30.v20240111.apk",
+	"changelog": "01、增加文件夹上传功能; 02、修复保存长图片失败; 03、修复一些已知的问题",
 	"vcode": 76,
-	"version": 202310111200,
-	"fileSize": 16540095,
+	"version": 202401110900,
+	"fileSize": 16584499,
 	"forceUpdate": true
 }

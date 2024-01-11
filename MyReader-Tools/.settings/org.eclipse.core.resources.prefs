@@ -1,5 +1,4 @@
 eclipse.preferences.version=1
-encoding//src/offline/export/OfflineExport.java=UTF-8
-encoding//src/offline/export/pictureViewer/ViewerFrame.java=UTF-8
-encoding//src/offline/export/pictureViewer/ViewerService.java=UTF-8
+encoding//src/app/update/myblechat/Version.json=UTF-8
+encoding//src/app/update/myreader/Version.json=UTF-8
 encoding/<project>=UTF-8

@@ -13,6 +13,11 @@ import offline.export.utils.Base64FileUtil;
 
 public class QrCodeFileFrame extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private JPanel contentPane;
 
 	/**

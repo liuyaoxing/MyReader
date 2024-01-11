@@ -17,7 +17,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * ÎÄ¼şÏÂÔØ¹¤¾ßÀà£¨µ¥ÀıÄ£Ê½£©
+ * æ–‡ä»¶ä¸‹è½½å·¥å…·ç±»ï¼ˆå•ä¾‹æ¨¡å¼ï¼‰
  */
 
 public class DownloadUtil {
@@ -38,10 +38,10 @@ public class DownloadUtil {
 		okHttpClient = new OkHttpClient.Builder()//
 				.dispatcher(dispatcher)//
 				.retryOnConnectionFailure(true)//
-				.connectTimeout(620, TimeUnit.SECONDS) // Á¬½Ó³¬Ê±
-				.readTimeout(620, TimeUnit.SECONDS) // ¶ÁÈ¡³¬Ê±
-				.writeTimeout(60, TimeUnit.SECONDS) // Ğ´³¬Ê±
-				.writeTimeout(60, TimeUnit.SECONDS) // Ğ´³¬Ê±
+				.connectTimeout(620, TimeUnit.SECONDS) // è¿æ¥è¶…æ—¶
+				.readTimeout(620, TimeUnit.SECONDS) // è¯»å–è¶…æ—¶
+				.writeTimeout(60, TimeUnit.SECONDS) // å†™è¶…æ—¶
+				.writeTimeout(60, TimeUnit.SECONDS) // å†™è¶…æ—¶
 //                .addInterceptor(new CommonHeaderInterceptor())
 //                .addInterceptor(new CacheInterceptor())
 //                .addInterceptor(new HttpLoggerInterceptor())
@@ -54,10 +54,10 @@ public class DownloadUtil {
 	}
 
 	/**
-	 * @param url          ÏÂÔØÁ¬½Ó
-	 * @param destFileDir  ÏÂÔØµÄÎÄ¼ş´¢´æÄ¿Â¼
-	 * @param destFileName ÏÂÔØÎÄ¼şÃû³Æ£¬ºóÃæ¼ÇµÃÆ´½Óºó×º£¬·ñÔòÊÖ»úÃ»·¨Ê¶±ğÎÄ¼şÀàĞÍ
-	 * @param listener     ÏÂÔØ¼àÌı
+	 * @param url          ä¸‹è½½è¿æ¥
+	 * @param destFileDir  ä¸‹è½½çš„æ–‡ä»¶å‚¨å­˜ç›®å½•
+	 * @param destFileName ä¸‹è½½æ–‡ä»¶åç§°ï¼Œåé¢è®°å¾—æ‹¼æ¥åç¼€ï¼Œå¦åˆ™æ‰‹æœºæ²¡æ³•è¯†åˆ«æ–‡ä»¶ç±»å‹
+	 * @param listener     ä¸‹è½½ç›‘å¬
 	 * @throws IOException
 	 */
 
@@ -67,10 +67,10 @@ public class DownloadUtil {
 	}
 
 	/**
-	 * @param url          ÏÂÔØÁ¬½Ó
-	 * @param destFileDir  ÏÂÔØµÄÎÄ¼ş´¢´æÄ¿Â¼
-	 * @param destFileName ÏÂÔØÎÄ¼şÃû³Æ£¬ºóÃæ¼ÇµÃÆ´½Óºó×º£¬·ñÔòÊÖ»úÃ»·¨Ê¶±ğÎÄ¼şÀàĞÍ
-	 * @param listener     ÏÂÔØ¼àÌı
+	 * @param url          ä¸‹è½½è¿æ¥
+	 * @param destFileDir  ä¸‹è½½çš„æ–‡ä»¶å‚¨å­˜ç›®å½•
+	 * @param destFileName ä¸‹è½½æ–‡ä»¶åç§°ï¼Œåé¢è®°å¾—æ‹¼æ¥åç¼€ï¼Œå¦åˆ™æ‰‹æœºæ²¡æ³•è¯†åˆ«æ–‡ä»¶ç±»å‹
+	 * @param listener     ä¸‹è½½ç›‘å¬
 	 * @throws IOException
 	 */
 
@@ -82,20 +82,20 @@ public class DownloadUtil {
 	}
 
 	/**
-	 * @param url          ÏÂÔØÁ¬½Ó
-	 * @param destFileDir  ÏÂÔØµÄÎÄ¼ş´¢´æÄ¿Â¼
-	 * @param destFileName ÏÂÔØÎÄ¼şÃû³Æ£¬ºóÃæ¼ÇµÃÆ´½Óºó×º£¬·ñÔòÊÖ»úÃ»·¨Ê¶±ğÎÄ¼şÀàĞÍ
-	 * @param listener     ÏÂÔØ¼àÌı
+	 * @param url          ä¸‹è½½è¿æ¥
+	 * @param destFileDir  ä¸‹è½½çš„æ–‡ä»¶å‚¨å­˜ç›®å½•
+	 * @param destFileName ä¸‹è½½æ–‡ä»¶åç§°ï¼Œåé¢è®°å¾—æ‹¼æ¥åç¼€ï¼Œå¦åˆ™æ‰‹æœºæ²¡æ³•è¯†åˆ«æ–‡ä»¶ç±»å‹
+	 * @param listener     ä¸‹è½½ç›‘å¬
 	 */
 
 	public void asyncDownload(final String url, final String destFileDir, final String destFileName,
 			final OnDownloadListener listener) {
 		Request request = new Request.Builder().url(url).build();
-		// Òì²½ÇëÇó
+		// å¼‚æ­¥è¯·æ±‚
 		okHttpClient.newCall(request).enqueue(new Callback() {
 			@Override
 			public void onFailure(Call call, IOException e) {
-				// ÏÂÔØÊ§°Ü¼àÌı»Øµ÷
+				// ä¸‹è½½å¤±è´¥ç›‘å¬å›è°ƒ
 				listener.onDownloadFailed(e);
 			}
 
@@ -108,7 +108,7 @@ public class DownloadUtil {
 
 	protected void processResponse(File toFile, final OnDownloadListener listener, Response response) {
 		if (response.code() == 404) {
-			listener.onDownloadFailed(new FileNotFoundException("ÎÄ¼ş²»´æÔÚ!"));
+			listener.onDownloadFailed(new FileNotFoundException("æ–‡ä»¶ä¸å­˜åœ¨!"));
 			return;
 		}
 		InputStream is = null;
@@ -116,7 +116,7 @@ public class DownloadUtil {
 		int len = 0;
 		FileOutputStream fos = null;
 
-		// ´¢´æÏÂÔØÎÄ¼şµÄÄ¿Â¼
+		// å‚¨å­˜ä¸‹è½½æ–‡ä»¶çš„ç›®å½•
 		if (toFile.isDirectory()) {
 			if (!toFile.exists()) {
 				toFile.mkdirs();
@@ -142,12 +142,12 @@ public class DownloadUtil {
 				fos.write(buf, 0, len);
 				sum += len;
 				int progress = (int) (sum * 1.0f / total * 100);
-				// ÏÂÔØÖĞ¸üĞÂ½ø¶ÈÌõ
+				// ä¸‹è½½ä¸­æ›´æ–°è¿›åº¦æ¡
 				listener.onDownloading(progress);
 			}
 			fos.flush();
 			IOUtils.closeQuietly(fos);
-			// ÏÂÔØÍê³É
+			// ä¸‹è½½å®Œæˆ
 			tmpFile.renameTo(toFile);
 			listener.onDownloadSuccess(toFile);
 		} catch (Exception ex) {
@@ -167,29 +167,29 @@ public class DownloadUtil {
 		boolean isFileExists(File srcFile);
 
 		/**
-		 * ÏÂÔØ³É¹¦Ö®ºóµÄÎÄ¼ş
+		 * ä¸‹è½½æˆåŠŸä¹‹åçš„æ–‡ä»¶
 		 */
 		void onDownloadSuccess(File file);
 
 		/**
-		 * ÏÂÔØ½ø¶È
+		 * ä¸‹è½½è¿›åº¦
 		 */
 		void onDownloading(int progress);
 
 		/**
-		 * ÏÂÔØÒì³£ĞÅÏ¢
+		 * ä¸‹è½½å¼‚å¸¸ä¿¡æ¯
 		 */
 
 		void onDownloadFailed(Exception e);
 
 		/**
-		 * ÎÄ¼şÒÑ´æÔÚ
+		 * æ–‡ä»¶å·²å­˜åœ¨
 		 */
 		void onFileExists(File file);
 	}
 
 	/**
-	 * ½âÎöÎÄ¼şÍ· Content-Disposition:attachment;filename=FileName.txt
+	 * è§£ææ–‡ä»¶å¤´ Content-Disposition:attachment;filename=FileName.txt
 	 * Content-Disposition: attachment;
 	 * filename*="UTF-8''%E6%9B%BF%E6%8D%A2%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A.pdf"
 	 */

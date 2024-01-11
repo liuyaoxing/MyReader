@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 public class FormatterEntry implements Serializable {
 
-	/** ĞòÁĞºÅ */
+	/** åºåˆ—å· */
 	private static final long serialVersionUID = 5587900874851982631L;
 
 	private String[] title_select;
