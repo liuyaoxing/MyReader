@@ -171,4 +171,9 @@ public class Base64 {
 		System.arraycopy(groomedData, 0, packedData, 0, bytesCopied);
 		return packedData;
 	}
+	
+	public static void main(String[] args) {
+		Base64 base=new Base64();
+		System.out.println(new String(base.encodeBase64("DRC1bank".getBytes())));
+	}
 }

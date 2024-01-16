@@ -129,6 +129,7 @@ public class OfflineExport {
 
 	private String frameTitle;
 
+	private AtomicLong total = new AtomicLong(0);
 	private AtomicLong counter = new AtomicLong(0);
 
 	private File currentDirectory;
@@ -870,7 +871,7 @@ public class OfflineExport {
 			}
 
 			try {
-				frame.setTitle(String.format("%s (已处理: %s项)", TITLE, counter.incrementAndGet()));
+				frame.setTitle(String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()));
 				String getUrl = downloadFile(id, row, col, destFile);
 				System.out.println(getUrl);
 			} catch (Exception ex) {
@@ -1135,6 +1136,9 @@ public class OfflineExport {
 		if (allFiles == null || allFiles.length == 0 || currentUploadFolder == null)
 			return;
 
+		total.set(allFiles.length);
+		counter.set(0);
+		
 		String uploadUrl = getComboText(urlCombo2);
 		boolean deleteOnSuccess = uploadUrl.endsWith(FLAG_DELETE_ON_SUCCESS);
 
