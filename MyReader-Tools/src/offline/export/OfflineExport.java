@@ -42,6 +42,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -82,6 +84,7 @@ import offline.export.log.LogHandler;
 import offline.export.pictureViewer.ViewerFrame;
 import offline.export.utils.Base64FileUtil;
 import offline.export.utils.ComparatorFactory;
+import offline.export.utils.NetworkUtils;
 import offline.export.utils.ProgressRequestBody;
 import offline.export.utils.ProgressRequestListener;
 import okhttp3.Call;
@@ -126,8 +129,6 @@ public class OfflineExport {
 	protected DataBaseProxy database;
 
 	protected Thread startThread, startFolderThread;
-
-	private String frameTitle;
 
 	private AtomicLong total = new AtomicLong(0);
 	private AtomicLong counter = new AtomicLong(0);
@@ -252,7 +253,7 @@ public class OfflineExport {
 		});
 		backupTable.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
-				frameTitle = frame.getTitle();
+				frame.getTitle();
 				if (SwingUtilities.isRightMouseButton(me)) {
 					final int row = backupTable.rowAtPoint(me.getPoint());
 					backupTable.setRowSelectionInterval(row, row);
@@ -957,7 +958,6 @@ public class OfflineExport {
 
 		Map<String, String> whereMap = new HashMap<String, String>();
 		for (int i = 0; i < jsonArray.size(); i++) {
-			frame.setTitle(String.format("%s (已处理: %s项)", frameTitle, counter.incrementAndGet()));
 			JsonObject element = jsonArray.get(i).getAsJsonObject();
 			System.out.println("开始执行:" + element);
 			final String id = element.get("_id").getAsString();
@@ -1034,7 +1034,7 @@ public class OfflineExport {
 		backupTask = new BackupTask();
 		try {
 			database = new DataBaseProxy();
-			frameTitle = frame.getTitle();
+			frame.getTitle();
 			int res = database.dbCreate(backupTask);
 			System.out.println(res);
 
@@ -1132,27 +1132,49 @@ public class OfflineExport {
 		}).start();
 	}
 
-	private void doUploadFolder(File[] allFiles) throws IOException {
+	private void doUploadFolder(final File[] allFiles) throws IOException, InterruptedException {
 		if (allFiles == null || allFiles.length == 0 || currentUploadFolder == null)
 			return;
 
-		total.set(allFiles.length);
-		counter.set(0);
-		
 		String uploadUrl = getComboText(urlCombo2);
-		boolean deleteOnSuccess = uploadUrl.endsWith(FLAG_DELETE_ON_SUCCESS);
+		final boolean deleteOnSuccess = uploadUrl.endsWith(FLAG_DELETE_ON_SUCCESS);
 
 		uploadUrl = uploadUrl.contains("#--") ? uploadUrl.substring(0, uploadUrl.indexOf("#--")) : uploadUrl;
 		uploadUrl += uploadUrl.endsWith(FOLDER_UPLOAD) ? "" : FOLDER_UPLOAD;
 
-		int updateColumn = Arrays.asList(uploadColumnNames).indexOf(COL_PROGRESS);
-
-		for (int i = 0; i < allFiles.length; i++) {
-			String path = allFiles[i].getParentFile().getCanonicalPath()
-					.substring(currentUploadFolder.getParentFile().getCanonicalPath().length() + 1);
-			uploadFile(path, uploadOkHttpClient, uploadUrl, allFiles[i], updateColumn, i, deleteOnSuccess);
+		if (!NetworkUtils.isNetworkAvailable(uploadUrl)) {
+			JOptionPane.showMessageDialog(null, "无法连接到服务地址: " + uploadUrl);
+			Thread.sleep(15000);
+			doUploadFolder(allFiles);
+			return;
 		}
 
+		total.set(allFiles.length);
+		counter.set(0);
+
+		final int updateColumn = Arrays.asList(uploadColumnNames).indexOf(COL_PROGRESS);
+
+		final ExecutorService es = Executors.newFixedThreadPool(1);
+
+		for (int i = 0; i < allFiles.length; i++) {
+			final String uploadUrl0 = uploadUrl;
+			final String path = allFiles[i].getParentFile().getCanonicalPath()
+					.substring(currentUploadFolder.getParentFile().getCanonicalPath().length() + 1);
+			final int index = i;
+			es.submit(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						boolean result = uploadFile(path, uploadOkHttpClient, uploadUrl0, allFiles[index], updateColumn,
+								index, deleteOnSuccess);
+						if (!result)
+							es.submit(this);
+					} catch (Exception e) {
+						es.submit(this);
+					}
+				}
+			});
+		}
 	}
 
 	private void addPopupMenu(Component component, final JPopupMenu popup) {
@@ -1175,13 +1197,19 @@ public class OfflineExport {
 		});
 	}
 
-	protected void uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, File subFile,
+	protected boolean uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, File subFile,
 			final int updateCol, final int currentRow) throws IOException {
-		uploadFile(path, mOkHttpClient, uploadUrl, subFile, updateCol, currentRow, false);
+		return uploadFile(path, mOkHttpClient, uploadUrl, subFile, updateCol, currentRow, false);
 	}
 
-	protected void uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, final File subFile,
+	protected boolean uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, final File subFile,
 			final int updateCol, final int currentRow, final boolean deleteOnSuccess) throws IOException {
+		return uploadFile(path, mOkHttpClient, uploadUrl, subFile, updateCol, currentRow, deleteOnSuccess, false);
+	}
+
+	protected boolean uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, final File subFile,
+			final int updateCol, final int currentRow, final boolean deleteOnSuccess, boolean isAsync)
+			throws IOException {
 		MultipartBody.Builder builder = new MultipartBody.Builder();
 		builder.setType(MultipartBody.FORM);
 		builder.addPart(RequestBody.create(MediaType.parse("application/octet-stream"), subFile));
@@ -1204,29 +1232,43 @@ public class OfflineExport {
 				.post(requestBody).build();
 		Call call = mOkHttpClient.newCall(request);
 
-		call.enqueue(new okhttp3.Callback() {
-			@Override
-			public void onFailure(okhttp3.Call call, final IOException e) {
-				System.err.println("上传失败:" + e.getMessage());
-			}
-
-			@Override
-			public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
-				try {
-					if (response.isSuccessful() && deleteOnSuccess)
-						subFile.delete();
-
-					uploadTableModel.setValueAt(response.isSuccessful() ? "100%" : response.message(), currentRow,
-							updateCol);
-					uploadTable.getSelectionModel().setSelectionInterval(currentRow, currentRow);
-					uploadTable.scrollRectToVisible(new Rectangle(uploadTable.getCellRect(currentRow + 10, 0, true)));
-					uploadTable.updateUI();
-				} catch (Exception e) {
-					// donothing
+		if (!isAsync) {
+			Response response = call.execute();
+			if (response.isSuccessful() && deleteOnSuccess)
+				subFile.delete();
+			frame.setTitle(String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()));
+			uploadTableModel.setValueAt(response.isSuccessful() ? "100%" : response.message(), currentRow, updateCol);
+			uploadTable.getSelectionModel().setSelectionInterval(currentRow, currentRow);
+			uploadTable.scrollRectToVisible(new Rectangle(uploadTable.getCellRect(currentRow + 10, 0, true)));
+			uploadTable.updateUI();
+			return response.isSuccessful();
+		} else {
+			call.enqueue(new okhttp3.Callback() {
+				@Override
+				public void onFailure(okhttp3.Call call, final IOException e) {
+					System.err.println("上传失败:" + e.getMessage());
 				}
-				frame.setTitle(String.format("%s (已处理: %s项)", TITLE, counter.incrementAndGet()));
-			}
-		});
+
+				@Override
+				public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
+					try {
+						if (response.isSuccessful() && deleteOnSuccess)
+							subFile.delete();
+
+						uploadTableModel.setValueAt(response.isSuccessful() ? "100%" : response.message(), currentRow,
+								updateCol);
+						uploadTable.getSelectionModel().setSelectionInterval(currentRow, currentRow);
+						uploadTable
+								.scrollRectToVisible(new Rectangle(uploadTable.getCellRect(currentRow + 10, 0, true)));
+						uploadTable.updateUI();
+					} catch (Exception e) {
+						// donothing
+					}
+					frame.setTitle(String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()));
+				}
+			});
+		}
+		return true;
 	}
 
 	protected static void addPopup(Component component, final JPopupMenu popup) {

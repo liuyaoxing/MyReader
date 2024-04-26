@@ -1,6 +1,5 @@
 package gson.formatterentry;
 
-
 import java.io.Serializable;
 
 public class FormatterEntry implements Serializable {
