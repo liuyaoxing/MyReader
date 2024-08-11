@@ -314,6 +314,8 @@ public class FileUtils {
 		if (files == null)
 			return;
 		for (int i = 0; i < files.length; i++) {
+			if(files[i].isHidden())
+				continue;
 			if (files[i].isDirectory())
 				listFiles(files[i], fileSet);
 			else

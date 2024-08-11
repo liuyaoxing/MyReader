@@ -1157,6 +1157,8 @@ public class OfflineExport {
 		final ExecutorService es = Executors.newFixedThreadPool(1);
 
 		for (int i = 0; i < allFiles.length; i++) {
+			if (allFiles[i].isHidden())
+				continue;
 			final String uploadUrl0 = uploadUrl;
 			final String path = allFiles[i].getParentFile().getCanonicalPath()
 					.substring(currentUploadFolder.getParentFile().getCanonicalPath().length() + 1);

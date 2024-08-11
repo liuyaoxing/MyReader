@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.concurrent.TimeUnit;
 
 import offline.export.log.LogHandler;
@@ -201,6 +203,11 @@ public class DownloadUtil {
 			String[] strings = dispositionHeader.split(";");
 			if (strings.length > 1) {
 				dispositionHeader = strings[1].replace("filename=", "");
+				try {
+					dispositionHeader = URLDecoder.decode(dispositionHeader, "utf-8");
+				} catch (UnsupportedEncodingException e1) {
+					e1.printStackTrace();
+				}
 				dispositionHeader = dispositionHeader.replace("\"", "");
 				if (dispositionHeader.length() > 128) {
 					boolean endsWith = dispositionHeader.endsWith(".dll.zip");

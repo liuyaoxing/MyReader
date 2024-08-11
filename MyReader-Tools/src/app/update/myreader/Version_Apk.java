@@ -1,8 +1,6 @@
 package app.update.myreader;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import com.google.gson.Gson;
 
@@ -18,15 +16,15 @@ public class Version_Apk {
 	private boolean forceUpdate;
 
 	public static void main(String[] args) {
-		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyReaderv33\\app\\release\\MyReader-release-3.30.v20240111.apk");
+		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyReaderv33\\app\\release\\MyReader-release-3.31.v202407281500.apk");
 		Version_Apk version = new Version_Apk();
-		version.setTitle("读乐乐v3.30");
+		version.setTitle("读乐乐v3.31");
 		version.setFileName(srcFile.getName());
-		version.setChangeLog("01、增加文件夹上传功能; 02、修复保存长图片失败; 03、修复一些已知的问题");
-		version.setUrl("https://github.com/liuyaoxing/MyReader/releases/download/v3.30/MyReader-release-3.30.v20240420.apk");
+		version.setChangeLog("01、阅读时双击可以自动滚屏; 02、浏览网页双击可以自动滚屏; 03、修复一些已知的问题");
+		version.setUrl("https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202408111500.apk");
 		version.setFileSize(srcFile.length());
-		version.setVcode(76);
-		version.setVersion(202404200900L);
+		version.setVcode(77);
+		version.setVersion(202408111500L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();
