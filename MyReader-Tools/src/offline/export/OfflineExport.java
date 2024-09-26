@@ -3,6 +3,7 @@ package offline.export;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FileDialog;
@@ -39,9 +40,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -97,8 +98,15 @@ import okhttp3.Response;
 
 public class OfflineExport {
 
+	private static final String KEY_ID = "ID";
+	private static final String KEY_FILENAME = "文件名";
+	private static final String KEY_URL = "URL";
+	private static final String KEY_LENGTH = "大小";
+	private static final String KEY_FILEPATH = "保存路径";
+
 	public static final String FILESERVER_NAME = "name";
 	public static final String FILESERVER_SIZE = "size";
+	public static final String FILESERVER_FILELIST = "fileList";
 	public static final String FILESERVER_PATH = "path";
 	public static final String FILESERVER_LENGTH = "length";
 	public static final String FILESERVER_MD5 = "md5";
@@ -117,12 +125,13 @@ public class OfflineExport {
 	private JTable backupTable;
 	private DefaultTableModel backupTableModel;
 
-	private String[] columnNames = new String[] { "ID", "标题", "URL", "大小", "状态", "保存路径" };
-	private int[] columnWidths = new int[] { 50, 250, 50, 50, 50, 250 };
+	private String[] columnNames = new String[] { KEY_ID, "标题", KEY_URL, KEY_LENGTH, "状态", KEY_FILEPATH, "个 数" };
+	private int[] columnWidths = new int[] { 50, 250, 50, 50, 50, 250, 50 };
 
 	private static final String COL_PROGRESS = "进度";
 
-	private String[] uploadColumnNames = new String[] { "ID", "文件名", COL_PROGRESS, "路径", "大小", "修改时间" };
+	private String[] uploadColumnNames = new String[] { KEY_ID, KEY_FILENAME, COL_PROGRESS, KEY_FILEPATH, KEY_LENGTH,
+			"修改时间" };
 	private int[] uploadColumnWidths = new int[] { 6, 100, 6, 360, 10, 88 };
 
 	protected BackupTask backupTask;
@@ -137,9 +146,14 @@ public class OfflineExport {
 
 	private InfiniteProgressPanel glassPane;
 	private JButton backupBtn;
+	private JButton folderListBtn;
 	private JTable qrCodeTable;
 	private DefaultTableModel qrCodeTableModel;
 	private JLabel qrCodeFileTitle;
+
+	private JTable taskListTable;
+	private DefaultTableModel taskListTableModel;
+	private JLabel taskListTitle;
 
 	protected File[] qrCodeFiles;
 	protected ViewerFrame viewerFrame;
@@ -155,6 +169,9 @@ public class OfflineExport {
 
 	OkHttpClient uploadOkHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
 			.writeTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).build();
+
+	private JTabbedPane tabbedPane;
+	private JPanel taskContailerPanel;
 
 	/**
 	 * Launch the application.
@@ -231,7 +248,6 @@ public class OfflineExport {
 		uploadFolderBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
 				JFileChooser chooser = new JFileChooser();
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				int v = chooser.showOpenDialog(null);
@@ -253,7 +269,6 @@ public class OfflineExport {
 		});
 		backupTable.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
-				frame.getTitle();
 				if (SwingUtilities.isRightMouseButton(me)) {
 					final int row = backupTable.rowAtPoint(me.getPoint());
 					backupTable.setRowSelectionInterval(row, row);
@@ -279,31 +294,30 @@ public class OfflineExport {
 							}
 						});
 
-						if (getComboText(urlCombo).contains(FOLDER_LIST)) {
-							JMenuItem syncFolderItem = new JMenuItem("下载文件夹");
-							popup.add(syncFolderItem);
-							syncFolderItem.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-									Object title = backupTable.getValueAt(row, 1);
-									if (title != null) {
-										try {
-											currentDirectory = new File(title.toString().replace("[文件夹]", ""))
-													.getCanonicalFile();
-										} catch (IOException e1) {
-											e1.printStackTrace();
-										}
+						JMenuItem syncFolderItem = new JMenuItem("下载文件夹");
+						popup.add(syncFolderItem);
+						syncFolderItem.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								Object title = backupTable.getValueAt(row, 1);
+								if (title != null) {
+									try {
+										currentDirectory = new File(title.toString().replace("[文件夹]", ""))
+												.getCanonicalFile();
+									} catch (IOException e1) {
+										e1.printStackTrace();
 									}
-
-									Object value = backupTable.getValueAt(row, 0);
-									if (value != null) {
-										String newUrl = getInputHostUrl() + FOLDER_LIST_MD5 + value;
-										setComboBox(urlCombo, newUrl);
-										backupBtn.doClick();
-									}
-									setSysClipboardText(String.valueOf(value));
 								}
-							});
-						}
+
+								Object value = backupTable.getValueAt(row, 0);
+								Object folderName = backupTable.getValueAt(row, 1);
+								if (value != null) {
+									String newUrl = getInputHostUrl() + FOLDER_LIST_MD5 + value;
+									setComboBox(urlCombo, newUrl);
+									doDownloadFolder(newUrl, String.valueOf(folderName));
+								}
+								setSysClipboardText(String.valueOf(value));
+							}
+						});
 
 						JMenuItem calcel = new JMenuItem("取消");
 						calcel.addActionListener(new ActionListener() {
@@ -346,6 +360,22 @@ public class OfflineExport {
 							}
 						});
 
+						JMenuItem openFolderItem = new JMenuItem("打开文件夹");
+						popup.add(openFolderItem);
+						openFolderItem.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								int column = uploadTable.getColumnModel().getColumnIndex(KEY_FILEPATH);
+								Object value = uploadTable.getValueAt(row, column);
+								if (value != null && new File(value.toString()).exists()) {
+									try {
+										Desktop.getDesktop().open(new File(value.toString()).getParentFile());
+									} catch (Exception ex) {
+										LogHandler.debug("打开文件夹失败：" + ex.getMessage());
+									}
+								}
+							}
+						});
+
 						JMenuItem calcel = new JMenuItem("取消");
 						calcel.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
@@ -355,6 +385,54 @@ public class OfflineExport {
 
 						popup.add(new JSeparator());
 						popup.add(calcel);
+						popup.show(me.getComponent(), me.getX(), me.getY());
+					}
+				}
+			}
+		});
+
+		taskListTable.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent me) {
+				if (SwingUtilities.isRightMouseButton(me)) {
+					final int row = taskListTable.rowAtPoint(me.getPoint());
+					taskListTable.setRowSelectionInterval(row, row);
+					int column = taskListTable.getColumnModel().getColumnIndex(KEY_FILEPATH);
+					final File srcFile = new File(String.valueOf(taskListTable.getValueAt(row, column)));
+					if (row != -1) {
+						final JPopupMenu popup = new JPopupMenu();
+						JMenuItem clearItem = new JMenuItem("清空");
+						popup.add(clearItem);
+						clearItem.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								taskListTableModel.setRowCount(0);
+							}
+						});
+						if (srcFile.exists()) {
+							JMenuItem openFile = new JMenuItem("打开文件");
+							popup.add(openFile);
+							openFile.addActionListener(new ActionListener() {
+								public void actionPerformed(ActionEvent e) {
+
+									try {
+										Desktop.getDesktop().open(srcFile);
+									} catch (IOException e1) {
+										e1.printStackTrace();
+									}
+								}
+							});
+							JMenuItem openDirFile = new JMenuItem("打开本地目录");
+							popup.add(openDirFile);
+							openDirFile.addActionListener(new ActionListener() {
+								public void actionPerformed(ActionEvent e) {
+									try {
+										Desktop.getDesktop().open(srcFile.getParentFile());
+									} catch (IOException e1) {
+										e1.printStackTrace();
+									}
+								}
+							});
+						}
+
 						popup.show(me.getComponent(), me.getX(), me.getY());
 					}
 				}
@@ -381,22 +459,7 @@ public class OfflineExport {
 		urlCombo.addPopupMenuListener(new PopupMenuListener() {
 			@Override
 			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-				String newItem = String.valueOf(urlCombo.getEditor().getItem());
-
-				Set<String> itemSet = new HashSet<String>();
-				DefaultComboBoxModel<String> d = (DefaultComboBoxModel<String>) urlCombo.getModel();
-				d.removeAllElements();
-				try {
-					itemSet.add(String.valueOf(newItem));
-					URL url = new URL(newItem);
-					String newUrl = "http://" + String.format("%s:%s", url.getHost(), url.getPort());
-					itemSet.add(newUrl);
-					itemSet.add(String.valueOf(newUrl + FOLDER_LIST));
-					itemSet.add(String.valueOf(newUrl + FOLDER_LIST_MD5));
-				} catch (MalformedURLException e1) {
-					e1.printStackTrace();
-				}
-				addItemsToCombo(urlCombo, itemSet.toArray(new String[0]), 0);
+				refreshServerIp();
 			}
 
 			@Override
@@ -452,94 +515,60 @@ public class OfflineExport {
 			}
 		});
 
+		folderListBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				refreshServerIp();
+
+				String comboText = getComboText(urlCombo);
+				String folderList = comboText + (comboText.endsWith(FOLDER_LIST) ? "" : FOLDER_LIST);
+
+				addItemsToCombo(urlCombo, new String[] { comboText, folderList }, 1);
+
+				Request request = new Request.Builder().addHeader("x-header", "dll")//
+						.header("sort", "_id")//
+						.url(folderList).build();
+				try {
+					Response response = DownloadUtil.get().newCall(request);
+					if (!response.isSuccessful()) {
+						JOptionPane.showMessageDialog(null, response.message());
+						return;
+					}
+					String body = response.body().string();
+
+					Map<String, JsonObject> toMap = new Gson().fromJson(body, new TypeToken<Map<String, JsonObject>>() {
+					}.getType());
+					Iterator<Entry<String, JsonObject>> iter = toMap.entrySet().iterator();
+					while (iter.hasNext()) {
+						Entry<String, JsonObject> entry = iter.next();
+						JsonObject element = entry.getValue();
+						JsonObject jsonObject = element.get("nameValuePairs").getAsJsonObject();
+						final String id = jsonObject.get(FILESERVER_MD5).getAsString();
+						final String title = jsonObject.get(FILESERVER_NAME).getAsString();
+						final String url = jsonObject.get(FILESERVER_PATH).getAsString();
+						final String size = jsonObject.get(FILESERVER_SIZE).getAsString();
+						final int fileList = jsonObject.get(FILESERVER_FILELIST).getAsInt();
+						backupTableModel.insertRow(0, new Object[] { id, title, url, size, "", "", fileList });
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+
 		backupBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				backupTableModel.setRowCount(0);
 				counter.set(0);
-				backupBtn.setText(backupBtn.getText().equals("开始备份") ? "停止备份" : "开始备份");
-				final String comboText = getComboText(urlCombo);
-				if (comboText.endsWith(FOLDER_LIST)) {
-					backupBtn.setText("开始备份");
-					Request request = new Request.Builder().addHeader("x-header", "dll")//
-							.header("sort", "_id")//
-							.url(comboText).build();
-					try {
-						Response response = DownloadUtil.get().newCall(request);
-						if (!response.isSuccessful()) {
-							JOptionPane.showMessageDialog(null, response.message());
-							return;
-						}
-						String body = response.body().string();
-
-						Map<String, JsonObject> toMap = new Gson().fromJson(body,
-								new TypeToken<Map<String, JsonObject>>() {
-								}.getType());
-						Iterator<Entry<String, JsonObject>> iter = toMap.entrySet().iterator();
-						while (iter.hasNext()) {
-							Entry<String, JsonObject> entry = iter.next();
-							JsonObject element = entry.getValue();
-							JsonObject jsonObject = element.get("nameValuePairs").getAsJsonObject();
-							final String id = jsonObject.get(FILESERVER_MD5).getAsString();
-							final String title = jsonObject.get(FILESERVER_NAME).getAsString();
-							final String url = jsonObject.get(FILESERVER_PATH).getAsString();
-							final String size = jsonObject.get(FILESERVER_SIZE).getAsString();
-							backupTableModel.insertRow(0, new Object[] { id, title, url, size, "", "" });
-						}
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-				} else if (comboText.contains(FOLDER_LIST_MD5)) {
-					try {
-						if (startFolderThread != null) {
-							startFolderThread.interrupt();
-							startFolderThread = null;
-						}
-						final JFileChooser fileChooser = new JFileChooser();// 文件选择器
-						if (currentDirectory != null)
-							fileChooser.setSelectedFile(currentDirectory);
-						fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);// 设定只能选择到文件夹
-						int state = fileChooser.showOpenDialog(null);// 此句是打开文件选择器界面的触发语句
-						if (state == JFileChooser.APPROVE_OPTION) {
-							glassPane.start();// 开始动画加载效果
-							frame.setVisible(true);
-
-							startFolderThread = new Thread(new Runnable() {
-								@Override
-								public void run() {
-									try {
-										Request request = new Request.Builder().addHeader("x-header", "dll")//
-												.header("sort", "_id")//
-												.url(comboText).build();
-										Response response = DownloadUtil.get().newCall(request);
-										if (!response.isSuccessful()) {
-											JOptionPane.showMessageDialog(null, response.message());
-											throw new IOException("Unexpected code " + response);
-										}
-										String body = response.body().string();
-										final JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
-										final File toFile = fileChooser.getSelectedFile();// toFile为选择到的目录
-										glassPane.stop();
-										doSyncFolder(jsonArray, new File(toFile, currentDirectory.getName()));
-										backupBtn.setText("开始备份");
-									} catch (IOException e) {
-										e.printStackTrace();
-									}
-								}
-							});
-							startFolderThread.start();
-						}
-					} catch (Exception ex) {
-						LogHandler.error(ex);
-					}
-				} else {
-					doStartBackup(backupBtn);
-				}
+				doStartBackup(backupBtn);
 			}
 		});
 	}
 
 	/**
 	 * Initialize the contents of the frame.
+	 * 
+	 * @param tabbedPane
 	 * 
 	 * @param uploadTableModel
 	 * @param uploadTable
@@ -556,9 +585,23 @@ public class OfflineExport {
 		glassPane.setBounds(100, 100, (dimension.width) / 2, (dimension.height) / 2);
 		frame.setGlassPane(glassPane);
 
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
+		createBackupPanel(tabbedPane);
+
+		createUploadPanel(tabbedPane);
+
+		createQrCodePanel(tabbedPane);
+
+		createTasklistPanel(tabbedPane);
+
+		initMenus();
+		initDatas();
+		initDnd();
+	}
+
+	private void createBackupPanel(JTabbedPane tabbedPane) {
 		JPanel firstPanel = new JPanel();
 		tabbedPane.addTab("文件备份", firstPanel);
 		firstPanel.setLayout(new BorderLayout(0, 0));
@@ -576,6 +619,10 @@ public class OfflineExport {
 		backupBtn = new JButton("开始备份");
 		backupBtn.setHorizontalAlignment(SwingConstants.RIGHT);
 		firstPanel_1.add(backupBtn);
+
+		folderListBtn = new JButton("刷新文件夹");
+		folderListBtn.setHorizontalAlignment(SwingConstants.RIGHT);
+		firstPanel_1.add(folderListBtn);
 
 		backupTableModel = new DefaultTableModel(null, columnNames);
 		backupTable = new JTable(backupTableModel);
@@ -597,7 +644,9 @@ public class OfflineExport {
 //		backupTableClearMenu = new JMenuItem("清空");
 //		backupTablePopupMenu.add(backupTableClearMenu);
 		firstPanel.add(backupscrollPane);
+	}
 
+	private void createUploadPanel(JTabbedPane tabbedPane) {
 		JPanel secondPanel = new JPanel();
 		tabbedPane.addTab("文件上传", secondPanel);
 		secondPanel.setLayout(new BorderLayout(0, 0));
@@ -638,7 +687,9 @@ public class OfflineExport {
 //		updateTableClearMenu = new JMenuItem("清空");
 //		uploadTablePopupMenu.add(updateTableClearMenu);
 		secondPanel.add(uploadscrollPane);
+	}
 
+	private void createQrCodePanel(JTabbedPane tabbedPane) {
 		JPanel qrCodePanel = new JPanel();
 		tabbedPane.addTab("码云传", qrCodePanel);
 		qrCodePanel.setLayout(new BorderLayout(0, 0));
@@ -664,14 +715,36 @@ public class OfflineExport {
 		qrCodeTable.setFont(new Font("宋体", Font.PLAIN, 12));
 		qrCodeTable.setCellSelectionEnabled(false);
 
-		JScrollPane uploadscrollPane2 = new JScrollPane(qrCodeTable); // 支持滚动
-		qrCodePanel.add(uploadscrollPane2);
+		JScrollPane tableScrollPanel = new JScrollPane(qrCodeTable); // 支持滚动
+		qrCodePanel.add(tableScrollPanel);
+	}
 
-//		qrCodePanel.add(qrCodeTable, BorderLayout.CENTER);
+	private void createTasklistPanel(JTabbedPane tabbedPane) {
+		taskContailerPanel = new JPanel();
+		tabbedPane.addTab("任务列表", taskContailerPanel);
+		taskContailerPanel.setLayout(new BorderLayout(0, 0));
 
-		initMenus();
-		initDatas();
-		initDnd();
+		JPanel titlePanel = new JPanel();
+		taskContailerPanel.add(titlePanel, BorderLayout.NORTH);
+		titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.X_AXIS));
+
+		taskListTitle = new JLabel();
+		taskListTitle.setAlignmentX(0.5f);
+		taskListTitle.setText("                              ");
+		taskListTitle.setFont(new Font("宋体", Font.PLAIN, 12));
+		titlePanel.add(taskListTitle);
+
+		taskListTableModel = new DefaultTableModel(null, columnNames);
+		taskListTable = new JTable(taskListTableModel);
+		taskListTable.setFillsViewportHeight(true);
+		for (int i = 0; i < taskListTable.getColumnModel().getColumnCount(); i++) {
+			taskListTable.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
+		}
+		taskListTable.setFont(new Font("宋体", Font.PLAIN, 12));
+		taskListTable.setCellSelectionEnabled(false);
+
+		JScrollPane tableScrollPanel = new JScrollPane(taskListTable); // 支持滚动
+		taskContailerPanel.add(tableScrollPanel);
 	}
 
 	private void initMenus() {
@@ -734,7 +807,7 @@ public class OfflineExport {
 				if (transfer.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 					// 必须先调用acceptDrop
 					dtde.acceptDrop(DnDConstants.ACTION_COPY);
-
+					uploadTableModel.setRowCount(0);
 					try {
 						Object td = transfer.getTransferData(DataFlavor.javaFileListFlavor);
 						if (td instanceof List) {
@@ -782,7 +855,7 @@ public class OfflineExport {
 				if (transfer.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 					// 必须先调用acceptDrop
 					dtde.acceptDrop(DnDConstants.ACTION_COPY);
-
+					qrCodeTableModel.setRowCount(0);
 					try {
 						Object td = transfer.getTransferData(DataFlavor.javaFileListFlavor);
 						if (td instanceof List) {
@@ -842,13 +915,14 @@ public class OfflineExport {
 		}
 	}
 
-	protected void doSyncFolder(JsonArray jsonArray, File toFile) throws IOException {
+	protected void doSyncFolder(JsonArray jsonArray, File toFile, final String selectedFolder) throws IOException {
 		String inputHostUrl = getInputHostUrl();
 		if (inputHostUrl == null || inputHostUrl.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "请输入正确的服务器地址！");
 			return;
 		}
-		backupTableModel.setRowCount(0);
+		tabbedPane.setSelectedComponent(taskContailerPanel);
+		taskListTableModel.setRowCount(0);
 		for (int i = 0; i < jsonArray.size(); i++) {
 			JsonObject element = jsonArray.get(i).getAsJsonObject();
 			final String id = element.get(FILESERVER_MD5).getAsString();
@@ -859,15 +933,22 @@ public class OfflineExport {
 			if (title.startsWith(".") || (title.contains("[文件夹]")) || "0B".equals(size))
 				continue;
 
-			backupTableModel.insertRow(0, new Object[] { id, title, url, size, "", "" });
-			backupTable.setRowSelectionInterval(0, 0);
+			taskListTableModel.insertRow(0, new Object[] { id, title, url, size, "", "" });
+			taskListTable.setRowSelectionInterval(0, 0);
 
-			final int row = 0, col = backupTableModel.getColumnCount() - 1;
+			final int row = 0, col = taskListTableModel.getColumnCount() - 1;
 
-			File destFile = new File(toFile, title);
+			String newFileName = title;
+			int firstIndexOf = url.indexOf("/" + toFile.getName() + "/");
+			if (firstIndexOf != -1)
+				newFileName = url.substring(firstIndexOf + 1);
+			if (newFileName.startsWith(toFile.getName() + "/"))
+				newFileName = newFileName.substring((toFile.getName() + "/").length());
+
+			File destFile = new File(toFile, newFileName);
 			if (destFile.exists() && toSizeStr(destFile.length()).equals(size)) {
-				backupTableModel.setValueAt("文件已存在!", row, col - 1);
-				backupTableModel.setValueAt(destFile.getCanonicalFile(), row, col);
+				taskListTableModel.setValueAt("文件已存在!" + destFile.getCanonicalPath(), row, col - 1);
+				taskListTableModel.setValueAt(destFile.getCanonicalFile(), row, col);
 				continue;
 			}
 
@@ -913,8 +994,12 @@ public class OfflineExport {
 
 			@Override
 			public void onFileExists(File file) {
-				backupTableModel.setValueAt("文件已存在:", row, col - 1);
-				backupTableModel.setValueAt(file.getPath(), row, col);
+				try {
+					backupTableModel.setValueAt("文件已存在!" + file.getCanonicalPath(), row, col - 1);
+					backupTableModel.setValueAt(file.getPath(), row, col);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 		return getUrl;
@@ -1271,6 +1356,75 @@ public class OfflineExport {
 			});
 		}
 		return true;
+	}
+
+	private void refreshServerIp() {
+		String newItem = String.valueOf(urlCombo.getEditor().getItem());
+		if (!newItem.startsWith("http://"))
+			newItem = "http://" + newItem;
+		if (!newItem.contains(":61666") && !newItem.contains(":61667"))
+			newItem = newItem + ":61666";
+
+		Set<String> itemSet = new HashSet<String>();
+		DefaultComboBoxModel<String> d = (DefaultComboBoxModel<String>) urlCombo.getModel();
+		d.removeAllElements();
+		try {
+			itemSet.add(String.valueOf(newItem));
+			URL url = new URL(newItem);
+			String newUrl = "http://" + String.format("%s:%s", url.getHost(), url.getPort());
+			itemSet.add(newUrl);
+//			itemSet.add(String.valueOf(newUrl + FOLDER_LIST));
+		} catch (MalformedURLException e1) {
+			e1.printStackTrace();
+		}
+		addItemsToCombo(urlCombo, itemSet.toArray(new String[0]), 0);
+	}
+
+	private void doDownloadFolder(final String fileUrl, final String selectedFolder) {
+		try {
+			if (startFolderThread != null) {
+				startFolderThread.interrupt();
+				startFolderThread = null;
+			}
+			final JFileChooser fileChooser = new JFileChooser();// 文件选择器
+			if (currentDirectory != null)
+				fileChooser.setSelectedFile(currentDirectory);
+			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);// 设定只能选择到文件夹
+			int state = fileChooser.showOpenDialog(null);// 此句是打开文件选择器界面的触发语句
+			if (state == JFileChooser.APPROVE_OPTION) {
+				glassPane.start();// 开始动画加载效果
+				frame.setVisible(true);
+
+				startFolderThread = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Request request = new Request.Builder().addHeader("x-header", "dll")//
+									.header("sort", "_id")//
+									.url(fileUrl).build();
+							Response response = DownloadUtil.get().newCall(request);
+							if (!response.isSuccessful()) {
+								JOptionPane.showMessageDialog(null, response.message());
+								throw new IOException("无法连接到服务器: " + response);
+							}
+							String body = response.body().string();
+							final JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
+							final File toFile = fileChooser.getSelectedFile();// toFile为选择到的目录
+							glassPane.stop();
+//										total.set(newValue);
+							total.set(jsonArray.size());
+							doSyncFolder(jsonArray, new File(toFile, currentDirectory.getName()), selectedFolder);
+							backupBtn.setText("开始备份");
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				startFolderThread.start();
+			}
+		} catch (Exception ex) {
+			LogHandler.error(ex);
+		}
 	}
 
 	protected static void addPopup(Component component, final JPopupMenu popup) {
