@@ -28,8 +28,11 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.SocketException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -85,6 +88,8 @@ import offline.export.log.LogHandler;
 import offline.export.pictureViewer.ViewerFrame;
 import offline.export.utils.Base64FileUtil;
 import offline.export.utils.ComparatorFactory;
+import offline.export.utils.LanPortScanner;
+import offline.export.utils.LanPortScanner.ScannerResultCallback;
 import offline.export.utils.NetworkUtils;
 import offline.export.utils.ProgressRequestBody;
 import offline.export.utils.ProgressRequestListener;
@@ -106,6 +111,7 @@ public class OfflineExport {
 
 	public static final String FILESERVER_NAME = "name";
 	public static final String FILESERVER_SIZE = "size";
+	public static final String FILESERVER_ABSPATH = "absPath";
 	public static final String FILESERVER_FILELIST = "fileList";
 	public static final String FILESERVER_PATH = "path";
 	public static final String FILESERVER_LENGTH = "length";
@@ -242,6 +248,27 @@ public class OfflineExport {
 	public OfflineExport() {
 		initialize();
 		addListeners();
+		startScanPorts();
+	}
+
+	private void startScanPorts() {
+		Set<String> itemSet = new HashSet<String>();
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					LanPortScanner.scan(new ScannerResultCallback() {
+						@Override
+						public void onSuccess(String ip) {
+							itemSet.add("http://" + ip);
+							addItemsToCombo(urlCombo, itemSet.toArray(new String[0]), 0);
+							addItemsToCombo(urlCombo2, itemSet.toArray(new String[0]), 0);
+						}
+					});
+				} catch (SocketException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}
 
 	private void addListeners() {
@@ -420,6 +447,8 @@ public class OfflineExport {
 									}
 								}
 							});
+						}
+						if (srcFile.getParentFile().exists()) {
 							JMenuItem openDirFile = new JMenuItem("打开本地目录");
 							popup.add(openDirFile);
 							openDirFile.addActionListener(new ActionListener() {
@@ -440,6 +469,7 @@ public class OfflineExport {
 		});
 
 		qrCodeTable.addMouseListener(new MouseAdapter() {
+
 			public void mousePressed(MouseEvent me) {
 				if (me.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(me)) {
 					final int row = qrCodeTable.rowAtPoint(me.getPoint());
@@ -929,6 +959,7 @@ public class OfflineExport {
 			final String title = element.get(FILESERVER_NAME).getAsString();
 			final String url = element.get(FILESERVER_PATH).getAsString();
 			final String size = element.get(FILESERVER_SIZE).getAsString();
+			final String absPath = element.get(FILESERVER_ABSPATH).getAsString();
 
 			if (title.startsWith(".") || (title.contains("[文件夹]")) || "0B".equals(size))
 				continue;
@@ -936,14 +967,18 @@ public class OfflineExport {
 			taskListTableModel.insertRow(0, new Object[] { id, title, url, size, "", "" });
 			taskListTable.setRowSelectionInterval(0, 0);
 
-			final int row = 0, col = taskListTableModel.getColumnCount() - 1;
+			final int row = 0, col = taskListTableModel.getColumnCount() - 2;
 
 			String newFileName = title;
-			int firstIndexOf = url.indexOf("/" + toFile.getName() + "/");
-			if (firstIndexOf != -1)
-				newFileName = url.substring(firstIndexOf + 1);
-			if (newFileName.startsWith(toFile.getName() + "/"))
-				newFileName = newFileName.substring((toFile.getName() + "/").length());
+			if (absPath != null && absPath.length() > 0) {
+				newFileName = absPath;
+			} else {
+				int firstIndexOf = url.indexOf("/" + toFile.getName() + "/");
+				if (firstIndexOf != -1)
+					newFileName = url.substring(firstIndexOf + 1);
+				if (newFileName.startsWith(toFile.getName() + "/"))
+					newFileName = newFileName.substring((toFile.getName() + "/").length());
+			}
 
 			File destFile = new File(toFile, newFileName);
 			if (destFile.exists() && toSizeStr(destFile.length()).equals(size)) {
@@ -964,12 +999,14 @@ public class OfflineExport {
 
 	protected String downloadFile(final String id, final int row, final int col, File destFile) throws IOException {
 		String getUrl = getInputHostUrl() + FOLDER_DOWNLOAD_MD5 + id;
-		DownloadUtil.get().download(getUrl, id, destFile, new OnDownloadListener() {
+		File tmpFile = new File(destFile.getParent(), destFile.getName() + ".dulele");
+		DownloadUtil.get().download(getUrl, id, tmpFile, new OnDownloadListener() {
 			@Override
 			public void onDownloadSuccess(File file) {
 				try {
-					backupTableModel.setValueAt("100%", row, col - 1);
-					backupTableModel.setValueAt(file.getCanonicalFile(), row, col);
+					taskListTableModel.setValueAt("100%", row, col - 1);
+					taskListTableModel.setValueAt(destFile.getCanonicalFile(), row, col);
+					Files.move(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				} catch (Exception ex) {
 					LogHandler.error(ex);
 					ex.printStackTrace();
@@ -978,13 +1015,13 @@ public class OfflineExport {
 
 			@Override
 			public void onDownloading(int progress) {
-				backupTableModel.setValueAt(progress + "%", row, col - 1);
+				taskListTableModel.setValueAt(progress + "%", row, col - 1);
 			}
 
 			@Override
 			public void onDownloadFailed(Exception e) {
-				backupTableModel.setValueAt("0%", row, col - 1);
-				backupTableModel.setValueAt("下载失败" + e.getMessage(), row, col);
+				taskListTableModel.setValueAt("0%", row, col - 1);
+				taskListTableModel.setValueAt("下载失败" + e.getMessage(), row, col);
 			}
 
 			@Override
@@ -995,8 +1032,8 @@ public class OfflineExport {
 			@Override
 			public void onFileExists(File file) {
 				try {
-					backupTableModel.setValueAt("文件已存在!" + file.getCanonicalPath(), row, col - 1);
-					backupTableModel.setValueAt(file.getPath(), row, col);
+					taskListTableModel.setValueAt("文件已存在!" + file.getCanonicalPath(), row, col - 1);
+					taskListTableModel.setValueAt(file.getPath(), row, col);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
