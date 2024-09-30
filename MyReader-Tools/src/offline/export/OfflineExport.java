@@ -16,6 +16,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
@@ -29,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.SocketException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Files;
@@ -41,11 +43,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
-import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -67,6 +70,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -94,6 +98,7 @@ import offline.export.utils.NetworkUtils;
 import offline.export.utils.ProgressRequestBody;
 import offline.export.utils.ProgressRequestListener;
 import okhttp3.Call;
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -136,8 +141,7 @@ public class OfflineExport {
 
 	private static final String COL_PROGRESS = "进度";
 
-	private String[] uploadColumnNames = new String[] { KEY_ID, KEY_FILENAME, COL_PROGRESS, KEY_FILEPATH, KEY_LENGTH,
-			"修改时间" };
+	private String[] uploadColumnNames = new String[] { KEY_ID, KEY_FILENAME, COL_PROGRESS, KEY_FILEPATH, KEY_LENGTH, "修改时间" };
 	private int[] uploadColumnWidths = new int[] { 6, 100, 6, 360, 10, 88 };
 
 	protected BackupTask backupTask;
@@ -173,8 +177,8 @@ public class OfflineExport {
 
 	private AtomicInteger uploadCount = new AtomicInteger(0);
 
-	OkHttpClient uploadOkHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
-			.writeTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).build();
+	OkHttpClient uploadOkHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS)
+			.readTimeout(30, TimeUnit.SECONDS).build();
 
 	private JTabbedPane tabbedPane;
 	private JPanel taskContailerPanel;
@@ -253,6 +257,7 @@ public class OfflineExport {
 
 	private void startScanPorts() {
 		Set<String> itemSet = new HashSet<String>();
+		Set<String> itemSet2 = new HashSet<String>();
 		new Thread(new Runnable() {
 			public void run() {
 				try {
@@ -260,8 +265,9 @@ public class OfflineExport {
 						@Override
 						public void onSuccess(String ip) {
 							itemSet.add("http://" + ip);
+							itemSet2.add("http://" + ip + FOLDER_UPLOAD);
 							addItemsToCombo(urlCombo, itemSet.toArray(new String[0]), 0);
-							addItemsToCombo(urlCombo2, itemSet.toArray(new String[0]), 0);
+							addItemsToCombo(urlCombo2, itemSet2.toArray(new String[0]), 0);
 						}
 					});
 				} catch (SocketException e) {
@@ -328,8 +334,7 @@ public class OfflineExport {
 								Object title = backupTable.getValueAt(row, 1);
 								if (title != null) {
 									try {
-										currentDirectory = new File(title.toString().replace("[文件夹]", ""))
-												.getCanonicalFile();
+										currentDirectory = new File(title.toString().replace("[文件夹]", "")).getCanonicalFile();
 									} catch (IOException e1) {
 										e1.printStackTrace();
 									}
@@ -343,6 +348,33 @@ public class OfflineExport {
 									doDownloadFolder(newUrl, String.valueOf(folderName));
 								}
 								setSysClipboardText(String.valueOf(value));
+							}
+						});
+
+						JMenuItem cleanFolderItem = new JMenuItem("清空文件夹");
+						popup.add(cleanFolderItem);
+						cleanFolderItem.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								Object id = backupTable.getValueAt(row, 0);
+								Object fileName = backupTable.getValueAt(row, 1);
+								if (id != null) {
+									String msg = String.format("确认是否要删除文件服务器上的%s?", fileName);
+									int opt = JOptionPane.showConfirmDialog(null, msg, "确认删除", JOptionPane.YES_NO_OPTION);
+									if (opt == JOptionPane.YES_OPTION) {
+										// 确认继续操作
+//										http://192.168.133.65:61666/files/ad60dc86d022c92f66715899686753e2
+										String hostUrl = getInputHostUrl(urlCombo);
+										String deleteUrl = hostUrl + "/files/" + id;
+										try {
+											LinkedHashMap<String, String> urlParams = new LinkedHashMap<>();
+											urlParams.put("_method", "delete");
+											boolean isSuccess = doPostFormData(deleteUrl, urlParams);
+											JOptionPane.showMessageDialog(null, fileName + (isSuccess ? "删除成功!" : "删除失败!"));
+										} catch (Exception e1) {
+											e1.printStackTrace();
+										}
+									}
+								}
 							}
 						});
 
@@ -416,6 +448,16 @@ public class OfflineExport {
 					}
 				}
 			}
+
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					// 双击事件的处理逻辑
+					int row = uploadTable.rowAtPoint(e.getPoint());
+					int column = uploadTable.columnAtPoint(e.getPoint());
+					// 可以在这里添加你的代码，例如显示所选单元格的数据
+					System.out.println("Double clicked on row " + row + ", column " + column);
+				}
+			}
 		});
 
 		taskListTable.addMouseListener(new MouseAdapter() {
@@ -439,7 +481,6 @@ public class OfflineExport {
 							popup.add(openFile);
 							openFile.addActionListener(new ActionListener() {
 								public void actionPerformed(ActionEvent e) {
-
 									try {
 										Desktop.getDesktop().open(srcFile);
 									} catch (IOException e1) {
@@ -463,6 +504,19 @@ public class OfflineExport {
 						}
 
 						popup.show(me.getComponent(), me.getX(), me.getY());
+					}
+				}
+			}
+
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					int row = taskListTable.rowAtPoint(e.getPoint());
+					int column = taskListTable.getColumnModel().getColumnIndex(KEY_FILEPATH);
+					final File srcFile = new File(String.valueOf(taskListTable.getValueAt(row, column)));
+					try {
+						Desktop.getDesktop().open(srcFile);
+					} catch (IOException e1) {
+						e1.printStackTrace();
 					}
 				}
 			}
@@ -565,7 +619,7 @@ public class OfflineExport {
 						return;
 					}
 					String body = response.body().string();
-
+					backupTableModel.setRowCount(0);
 					Map<String, JsonObject> toMap = new Gson().fromJson(body, new TypeToken<Map<String, JsonObject>>() {
 					}.getType());
 					Iterator<Entry<String, JsonObject>> iter = toMap.entrySet().iterator();
@@ -771,7 +825,7 @@ public class OfflineExport {
 			taskListTable.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
 		}
 		taskListTable.setFont(new Font("宋体", Font.PLAIN, 12));
-		taskListTable.setCellSelectionEnabled(false);
+		taskListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		JScrollPane tableScrollPanel = new JScrollPane(taskListTable); // 支持滚动
 		taskContailerPanel.add(tableScrollPanel);
@@ -817,6 +871,82 @@ public class OfflineExport {
 			}
 		});
 		popupMenu.add(photoViewerMenuItem);
+
+		{
+			// 创建右键菜单
+			JPopupMenu popupMenu = new JPopupMenu();
+			JMenuItem copyItem = new JMenuItem("复制");
+			popupMenu.add(copyItem);
+			copyItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String selectedItem = (String) urlCombo.getSelectedItem();
+					if (selectedItem != null) {
+						setSysClipboardText(selectedItem);
+					}
+				}
+			});
+			JMenuItem pasteItem = new JMenuItem("粘贴");
+			popupMenu.add(pasteItem);
+			pasteItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					pasteToCombo(urlCombo);
+				}
+			});
+			JMenuItem openUrlItem = new JMenuItem("打开网址");
+			popupMenu.add(openUrlItem);
+			openUrlItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String hostUrl = getInputHostUrl(urlCombo);
+					try {
+						Desktop.getDesktop().browse(URI.create(hostUrl));
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+			});
+			urlCombo.setComponentPopupMenu(popupMenu);
+		}
+
+		{
+			// 创建右键菜单
+			JPopupMenu popupMenu = new JPopupMenu();
+			JMenuItem copyItem = new JMenuItem("复制");
+			popupMenu.add(copyItem);
+			copyItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String selectedItem = (String) urlCombo2.getSelectedItem();
+					if (selectedItem != null) {
+						setSysClipboardText(selectedItem);
+					}
+				}
+			});
+			JMenuItem pasteItem = new JMenuItem("粘贴");
+			popupMenu.add(pasteItem);
+			pasteItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					pasteToCombo(urlCombo2);
+				}
+			});
+			JMenuItem openUrlItem = new JMenuItem("打开网址");
+			popupMenu.add(openUrlItem);
+			openUrlItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String hostUrl = getInputHostUrl(urlCombo2);
+					try {
+						Desktop.getDesktop().browse(URI.create(hostUrl));
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+			});
+			urlCombo2.setComponentPopupMenu(popupMenu);
+		}
 	}
 
 	private void initDnd() {
@@ -827,7 +957,7 @@ public class OfflineExport {
 				if (!t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 					evt.rejectDrag(); // 没有需要的类型，拒绝进入
 				}
-				evt.acceptDrag(DnDConstants.ACTION_COPY);
+//				evt.acceptDrag(DnDConstants.ACTION_COPY);
 			}
 
 			@Override
@@ -858,6 +988,10 @@ public class OfflineExport {
 												}
 											}
 										}).start();
+									} else {
+										currentUploadFolder = file.getParentFile();
+										addToUploadTable(file);
+										doUploadFolder(new File[] { file }, true);
 									}
 								}
 							}
@@ -910,15 +1044,19 @@ public class OfflineExport {
 		for (int i = 0; i < allFiles.length; i++) {
 			File subFile = allFiles[i];
 			// new String[] { "文件名", "路径", "大小", "修改时间" };
-			uploadTableModel.addRow(new String[] { String.valueOf(uploadTableModel.getRowCount() + 1), //
-					subFile.getName(), //
-					"0%", //
-					subFile.getCanonicalPath(), //
-					FileUtils.getFileSize(subFile.length()), //
-					new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(subFile.lastModified())) });
+			addToUploadTable(subFile);
 		}
 		uploadCount.set(0);
 		return allFiles;
+	}
+
+	private void addToUploadTable(File srcFile) throws IOException {
+		uploadTableModel.addRow(new String[] { String.valueOf(uploadTableModel.getRowCount() + 1), //
+				srcFile.getName(), //
+				"0%", //
+				srcFile.getCanonicalPath(), //
+				FileUtils.getFileSize(srcFile.length()), //
+				new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(srcFile.lastModified())) });
 	}
 
 	private void initDatas() {
@@ -936,6 +1074,10 @@ public class OfflineExport {
 	}
 
 	private String getInputHostUrl() {
+		return getInputHostUrl(urlCombo);
+	}
+
+	private String getInputHostUrl(JComboBox<String> urlCombo) {
 		try {
 			String newItem = String.valueOf(urlCombo.getEditor().getItem());
 			URL url = new URL(newItem);
@@ -980,19 +1122,22 @@ public class OfflineExport {
 					newFileName = newFileName.substring((toFile.getName() + "/").length());
 			}
 
-			File destFile = new File(toFile, newFileName);
-			if (destFile.exists() && toSizeStr(destFile.length()).equals(size)) {
-				taskListTableModel.setValueAt("文件已存在!" + destFile.getCanonicalPath(), row, col - 1);
-				taskListTableModel.setValueAt(destFile.getCanonicalFile(), row, col);
-				continue;
-			}
-
 			try {
+				File destFile = new File(toFile, newFileName);
+				if (destFile.exists() && toSizeStr(destFile.length()).equals(size)) {
+					taskListTableModel.setValueAt("文件已存在!" + destFile.getCanonicalPath(), row, col - 1);
+					taskListTableModel.setValueAt(destFile.getCanonicalFile(), row, col);
+					continue;
+				}
+
+				try {
+					String getUrl = downloadFile(id, row, col, destFile);
+					System.out.println(getUrl);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			} finally {
 				frame.setTitle(String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()));
-				String getUrl = downloadFile(id, row, col, destFile);
-				System.out.println(getUrl);
-			} catch (Exception ex) {
-				ex.printStackTrace();
 			}
 		}
 	}
@@ -1058,7 +1203,7 @@ public class OfflineExport {
 	}
 
 	private void setComboBox(JComboBox<String> comboBox, String newItem) {
-		DefaultComboBoxModel<String> d = (DefaultComboBoxModel<String>) urlCombo.getModel();
+		DefaultComboBoxModel<String> d = (DefaultComboBoxModel<String>) comboBox.getModel();
 		d.addElement(newItem);
 		d.setSelectedItem(newItem);
 	}
@@ -1209,8 +1354,7 @@ public class OfflineExport {
 
 	private void parseFile2QrCodes(final File getFile) {
 		if (getFile.length() > FileUtils.ONE_MB) {
-			JOptionPane.showMessageDialog(null, getFile.getPath(),
-					String.format("文件大小[%s]超过1M！不允许使用!", FileUtils.getFileSize(getFile.length())),
+			JOptionPane.showMessageDialog(null, getFile.getPath(), String.format("文件大小[%s]超过1M！不允许使用!", FileUtils.getFileSize(getFile.length())),
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
@@ -1255,6 +1399,10 @@ public class OfflineExport {
 	}
 
 	private void doUploadFolder(final File[] allFiles) throws IOException, InterruptedException {
+		doUploadFolder(allFiles, false);
+	}
+
+	private void doUploadFolder(final File[] allFiles, boolean onlyFile) throws IOException, InterruptedException {
 		if (allFiles == null || allFiles.length == 0 || currentUploadFolder == null)
 			return;
 
@@ -1274,7 +1422,7 @@ public class OfflineExport {
 		total.set(allFiles.length);
 		counter.set(0);
 
-		final int updateColumn = Arrays.asList(uploadColumnNames).indexOf(COL_PROGRESS);
+		final int updateColumn = uploadTable.getColumnModel().getColumnIndex(COL_PROGRESS);
 
 		final ExecutorService es = Executors.newFixedThreadPool(1);
 
@@ -1289,8 +1437,7 @@ public class OfflineExport {
 				@Override
 				public void run() {
 					try {
-						boolean result = uploadFile(path, uploadOkHttpClient, uploadUrl0, allFiles[index], updateColumn,
-								index, deleteOnSuccess);
+						boolean result = uploadFile(path, uploadOkHttpClient, uploadUrl0, allFiles[index], updateColumn, index, deleteOnSuccess);
 						if (!result)
 							es.submit(this);
 					} catch (Exception e) {
@@ -1321,19 +1468,18 @@ public class OfflineExport {
 		});
 	}
 
-	protected boolean uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, File subFile,
-			final int updateCol, final int currentRow) throws IOException {
+	protected boolean uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, File subFile, final int updateCol, final int currentRow)
+			throws IOException {
 		return uploadFile(path, mOkHttpClient, uploadUrl, subFile, updateCol, currentRow, false);
 	}
 
-	protected boolean uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, final File subFile,
-			final int updateCol, final int currentRow, final boolean deleteOnSuccess) throws IOException {
+	protected boolean uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, final File subFile, final int updateCol, final int currentRow,
+			final boolean deleteOnSuccess) throws IOException {
 		return uploadFile(path, mOkHttpClient, uploadUrl, subFile, updateCol, currentRow, deleteOnSuccess, false);
 	}
 
-	protected boolean uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, final File subFile,
-			final int updateCol, final int currentRow, final boolean deleteOnSuccess, boolean isAsync)
-			throws IOException {
+	protected boolean uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, final File subFile, final int updateCol, final int currentRow,
+			final boolean deleteOnSuccess, boolean isAsync) throws IOException {
 		MultipartBody.Builder builder = new MultipartBody.Builder();
 		builder.setType(MultipartBody.FORM);
 		builder.addPart(RequestBody.create(MediaType.parse("application/octet-stream"), subFile));
@@ -1379,11 +1525,9 @@ public class OfflineExport {
 						if (response.isSuccessful() && deleteOnSuccess)
 							subFile.delete();
 
-						uploadTableModel.setValueAt(response.isSuccessful() ? "100%" : response.message(), currentRow,
-								updateCol);
+						uploadTableModel.setValueAt(response.isSuccessful() ? "100%" : response.message(), currentRow, updateCol);
 						uploadTable.getSelectionModel().setSelectionInterval(currentRow, currentRow);
-						uploadTable
-								.scrollRectToVisible(new Rectangle(uploadTable.getCellRect(currentRow + 10, 0, true)));
+						uploadTable.scrollRectToVisible(new Rectangle(uploadTable.getCellRect(currentRow + 10, 0, true)));
 						uploadTable.updateUI();
 					} catch (Exception e) {
 						// donothing
@@ -1393,6 +1537,25 @@ public class OfflineExport {
 			});
 		}
 		return true;
+	}
+
+	public boolean doPostFormData(String urlStr, LinkedHashMap<String, String> urlParams) throws Exception {
+		FormBody.Builder builder = new FormBody.Builder();
+		Iterator<Entry<String, String>> iter = urlParams.entrySet().iterator();
+		while (iter.hasNext()) {
+			Entry<String, String> entry = iter.next();
+			builder.add(entry.getKey(), entry.getValue());
+		}
+		FormBody formBody = builder.build();
+		Request request = new Request.Builder().url(urlStr)//
+				.post(formBody)//
+				.addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")//
+				.build();
+
+		OkHttpClient client = new OkHttpClient();
+
+		Response response = client.newCall(request).execute();
+		return response.isSuccessful();
 	}
 
 	private void refreshServerIp() {
@@ -1461,6 +1624,27 @@ public class OfflineExport {
 			}
 		} catch (Exception ex) {
 			LogHandler.error(ex);
+		}
+	}
+
+	private void pasteToCombo(JComboBox<String> combo) {
+		// 取得系统剪贴板里可传输的数据构造的Java对象
+		Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+		try {
+			if (t != null && t.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+				// 因为原系的剪贴板里有多种信息, 如文字, 图片, 文件等
+				// 先判断开始取得的可传输的数据是不是文字, 如果是, 取得这些文字
+				System.out.println((String) t.getTransferData(DataFlavor.stringFlavor));
+				// 同样, 因为Transferable中的DataFlavor是多种类型的,
+				// 所以传入DataFlavor这个参数, 指定要取得哪种类型的Data.
+				setComboBox(combo, (String) t.getTransferData(DataFlavor.stringFlavor));
+			} else if (t != null && t.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+				System.out.println(t.getTransferData(DataFlavor.imageFlavor));
+			}
+		} catch (UnsupportedFlavorException ex) {
+			ex.printStackTrace();
+		} catch (IOException ex) {
+			ex.printStackTrace();
 		}
 	}
 
