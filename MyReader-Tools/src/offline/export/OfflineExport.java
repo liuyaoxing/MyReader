@@ -76,6 +76,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import com.google.gson.Gson;
@@ -326,7 +327,7 @@ public class OfflineExport {
 									setSysClipboardText(String.valueOf(value));
 							}
 						});
-
+						popup.add(new JSeparator());
 						JMenuItem syncFolderItem = new JMenuItem("下载文件夹");
 						popup.add(syncFolderItem);
 						syncFolderItem.addActionListener(new ActionListener() {
@@ -344,13 +345,14 @@ public class OfflineExport {
 								Object folderName = backupTable.getValueAt(row, 1);
 								if (value != null) {
 									String newUrl = getInputHostUrl() + FOLDER_LIST_MD5 + value;
-									setComboBox(urlCombo, newUrl);
+//									setComboBox(urlCombo, newUrl);
+									taskListTitle.setText(newUrl);
 									doDownloadFolder(newUrl, String.valueOf(folderName));
 								}
 								setSysClipboardText(String.valueOf(value));
 							}
 						});
-
+						popup.add(new JSeparator());
 						JMenuItem cleanFolderItem = new JMenuItem("清空文件夹");
 						popup.add(cleanFolderItem);
 						cleanFolderItem.addActionListener(new ActionListener() {
@@ -716,6 +718,17 @@ public class OfflineExport {
 		}
 		backupTable.getTableHeader().setVisible(true);
 		backupTable.setShowGrid(true);
+		backupTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			/*** 序列号 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+				JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				label.setToolTipText(String.valueOf(table.getValueAt(row, column)));
+				return label;
+			}
+		});
 
 		JScrollPane backupscrollPane = new JScrollPane(backupTable); // 支持滚动
 
@@ -759,8 +772,20 @@ public class OfflineExport {
 		uploadTable.setCellSelectionEnabled(false);
 		uploadTable.getTableHeader().setVisible(true);
 		uploadTable.setShowGrid(true);
+		uploadTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			/*** 序列号 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+				JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				label.setToolTipText(String.valueOf(table.getValueAt(row, column)));
+				return label;
+			}
+		});
 
 		JScrollPane uploadscrollPane = new JScrollPane(uploadTable); // 支持滚动
+		uploadscrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 //		uploadTablePopupMenu = new JPopupMenu();
 //		addPopup(uploadTable, uploadTablePopupMenu);
@@ -798,6 +823,17 @@ public class OfflineExport {
 		qrCodeTable.setRowHeight(30);
 		qrCodeTable.setFont(new Font("宋体", Font.PLAIN, 12));
 		qrCodeTable.setCellSelectionEnabled(false);
+		qrCodeTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			/*** 序列号 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+				JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				label.setToolTipText(String.valueOf(table.getValueAt(row, column)));
+				return label;
+			}
+		});
 
 		JScrollPane tableScrollPanel = new JScrollPane(qrCodeTable); // 支持滚动
 		qrCodePanel.add(tableScrollPanel);
@@ -824,6 +860,17 @@ public class OfflineExport {
 		for (int i = 0; i < taskListTable.getColumnModel().getColumnCount(); i++) {
 			taskListTable.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
 		}
+		taskListTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			/*** 序列号 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+				JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				label.setToolTipText(String.valueOf(table.getValueAt(row, column)));
+				return label;
+			}
+		});
 		taskListTable.setFont(new Font("宋体", Font.PLAIN, 12));
 		taskListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -1087,7 +1134,7 @@ public class OfflineExport {
 		}
 	}
 
-	protected void doSyncFolder(JsonArray jsonArray, File toFile, final String selectedFolder) throws IOException {
+	protected void doSyncFolder(List<Map<String, Object>> jsonArray, File toFile, final String selectedFolder) throws IOException {
 		String inputHostUrl = getInputHostUrl();
 		if (inputHostUrl == null || inputHostUrl.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "请输入正确的服务器地址！");
@@ -1095,21 +1142,34 @@ public class OfflineExport {
 		}
 		tabbedPane.setSelectedComponent(taskContailerPanel);
 		taskListTableModel.setRowCount(0);
-		for (int i = 0; i < jsonArray.size(); i++) {
-			JsonObject element = jsonArray.get(i).getAsJsonObject();
-			final String id = element.get(FILESERVER_MD5).getAsString();
-			final String title = element.get(FILESERVER_NAME).getAsString();
-			final String url = element.get(FILESERVER_PATH).getAsString();
-			final String size = element.get(FILESERVER_SIZE).getAsString();
-			final String absPath = element.get(FILESERVER_ABSPATH).getAsString();
 
-			if (title.startsWith(".") || (title.contains("[文件夹]")) || "0B".equals(size))
+		for (int row = 0; row < jsonArray.size(); row++) {
+			Map<String, Object> element = jsonArray.get(row);
+			final String id = (String) element.get(FILESERVER_MD5);
+			final String title = (String) element.get(FILESERVER_NAME);
+			final String url = (String) element.get(FILESERVER_PATH);
+			final String size = (String) element.get(FILESERVER_SIZE);
+			final String absPath = (String) element.get(FILESERVER_ABSPATH);
+
+			if (title.startsWith(".") || (title.contains("[文件夹]")))
 				continue;
 
-			taskListTableModel.insertRow(0, new Object[] { id, title, url, size, "", "" });
-			taskListTable.setRowSelectionInterval(0, 0);
+			taskListTableModel.addRow(new Object[] { id, title, url, size, "", absPath });
+		}
 
-			final int row = 0, col = taskListTableModel.getColumnCount() - 2;
+		total.set(taskListTableModel.getRowCount());
+
+		for (int row = 0; row < taskListTableModel.getRowCount(); row++) {
+			final String id = (String) taskListTableModel.getValueAt(row, 0);
+			final String title = (String) taskListTableModel.getValueAt(row, 1);
+			final String url = (String) taskListTableModel.getValueAt(row, 2);
+			final String size = (String) taskListTableModel.getValueAt(row, 3);
+			final String absPath = (String) taskListTableModel.getValueAt(row, 5);
+
+			taskListTable.setRowSelectionInterval(row, row);
+			taskListTable.scrollRectToVisible(new Rectangle(taskListTable.getCellRect(row + 10, 0, true)));
+
+			final int col = taskListTableModel.getColumnCount() - 2;
 
 			String newFileName = title;
 			if (absPath != null && absPath.length() > 0) {
@@ -1136,6 +1196,8 @@ public class OfflineExport {
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			} finally {
 				frame.setTitle(String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()));
 			}
@@ -1608,7 +1670,8 @@ public class OfflineExport {
 								throw new IOException("无法连接到服务器: " + response);
 							}
 							String body = response.body().string();
-							final JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
+							List<Map<String, Object>> jsonArray = new Gson().fromJson(body, new TypeToken<List<Map<String, Object>>>() {
+							}.getType());
 							final File toFile = fileChooser.getSelectedFile();// toFile为选择到的目录
 							glassPane.stop();
 //										total.set(newValue);
