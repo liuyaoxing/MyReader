@@ -1,13 +1,7 @@
 package db;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.codec.ext.StringUtils;
 
 public class Test {
 	public static void main(String[] args) {
