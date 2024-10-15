@@ -271,7 +271,7 @@ public class OfflineExport {
 							addItemsToCombo(urlCombo2, itemSet2.toArray(new String[0]), 0);
 						}
 					});
-				} catch (SocketException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
