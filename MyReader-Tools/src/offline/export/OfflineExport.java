@@ -37,6 +37,7 @@ import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,6 +51,8 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -179,6 +182,8 @@ public class OfflineExport {
 
 	OkHttpClient uploadOkHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS)
 			.readTimeout(30, TimeUnit.SECONDS).build();
+
+	ThreadPoolExecutor tastListExecutor = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>());
 
 	private JTabbedPane tabbedPane;
 	private JPanel taskContailerPanel;
@@ -331,24 +336,29 @@ public class OfflineExport {
 						popup.add(syncFolderItem);
 						syncFolderItem.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
-								Object title = backupTable.getValueAt(row, 1);
-								if (title != null) {
-									try {
-										currentDirectory = new File(title.toString().replace("[文件夹]", "")).getCanonicalFile();
-									} catch (IOException e1) {
-										e1.printStackTrace();
-									}
-								}
+								tastListExecutor.submit(new Runnable() {
+									@Override
+									public void run() {
+										Object title = backupTable.getValueAt(row, 1);
+										if (title != null) {
+											try {
+												currentDirectory = new File(title.toString().replace("[文件夹]", "")).getCanonicalFile();
+											} catch (IOException e1) {
+												e1.printStackTrace();
+											}
+										}
 
-								Object value = backupTable.getValueAt(row, 0);
-								Object folderName = backupTable.getValueAt(row, 1);
-								if (value != null) {
-									String newUrl = getInputHostUrl() + FOLDER_LIST_MD5 + value;
-//									setComboBox(urlCombo, newUrl);
-									taskListTitle.setText(newUrl);
-									doDownloadFolder(newUrl, String.valueOf(folderName));
-								}
-								setSysClipboardText(String.valueOf(value));
+										Object value = backupTable.getValueAt(row, 0);
+										Object folderName = backupTable.getValueAt(row, 1);
+										if (value != null) {
+											String newUrl = getInputHostUrl() + FOLDER_LIST_MD5 + value;
+											taskListTitle.setText(newUrl);
+											doDownloadFolder(newUrl, String.valueOf(folderName));
+										}
+										setSysClipboardText(String.valueOf(value));
+									}
+								});
+
 							}
 						});
 						popup.add(new JSeparator());
@@ -436,6 +446,31 @@ public class OfflineExport {
 							}
 						});
 
+						JMenuItem deleteFileItem = new JMenuItem("删除本地文件");
+						popup.add(deleteFileItem);
+						deleteFileItem.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								int column = uploadTable.getColumnModel().getColumnIndex(KEY_FILEPATH);
+								Object value = uploadTable.getValueAt(row, column);
+								if (value != null && new File(value.toString()).exists()) {
+									String msg = String.format("确认是否要删除本地文件: %s?", value);
+									int opt = JOptionPane.showConfirmDialog(null, msg, "确认删除", JOptionPane.YES_NO_OPTION);
+									if (opt == JOptionPane.YES_OPTION) {
+										if (new File(value.toString()).delete()) {
+											JOptionPane.showMessageDialog(null, "删除成功:" + value);
+										} else {
+											JOptionPane.showMessageDialog(null, "删除失败:" + value);
+										}
+									}
+									try {
+										Desktop.getDesktop().open(new File(value.toString()).getParentFile());
+									} catch (Exception ex) {
+										LogHandler.debug("打开文件夹失败：" + ex.getMessage());
+									}
+								}
+							}
+						});
+
 						JMenuItem calcel = new JMenuItem("取消");
 						calcel.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
@@ -490,19 +525,21 @@ public class OfflineExport {
 								}
 							});
 						}
-						if (srcFile.getParentFile().exists()) {
-							JMenuItem openDirFile = new JMenuItem("打开本地目录");
-							popup.add(openDirFile);
-							openDirFile.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-									try {
+						JMenuItem openDirFile = new JMenuItem("打开本地目录");
+						popup.add(openDirFile);
+						openDirFile.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								try {
+									if (srcFile.getParentFile().exists()) {
 										Desktop.getDesktop().open(srcFile.getParentFile());
-									} catch (IOException e1) {
-										e1.printStackTrace();
+									} else if (currentDirectory != null && currentDirectory.exists()) {
+										Desktop.getDesktop().open(currentDirectory);
 									}
+								} catch (IOException e1) {
+									e1.printStackTrace();
 								}
-							});
-						}
+							}
+						});
 
 						popup.show(me.getComponent(), me.getX(), me.getY());
 					}
@@ -1013,37 +1050,44 @@ public class OfflineExport {
 				if (transfer.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 					// 必须先调用acceptDrop
 					dtde.acceptDrop(DnDConstants.ACTION_COPY);
-					uploadTableModel.setRowCount(0);
 					try {
 						Object td = transfer.getTransferData(DataFlavor.javaFileListFlavor);
-						if (td instanceof List) {
-							for (Object value : ((List<?>) td)) {
-								if (value instanceof File) {
-									File file = (File) value;
-									if (file.isDirectory()) {
-										currentUploadFolder = file;
-										System.out.println("开始上传文件夹: " + currentDirectory);
+						tastListExecutor.submit(new Runnable() {
+							@Override
+							public void run() {
+								uploadTableModel.setRowCount(0);
+								try {
+									if (td instanceof List) {
+										List<File> fileList = new ArrayList<>();
+										for (Object value : ((List<?>) td)) {
+											if (!(value instanceof File))
+												continue;
+											File srcFile = (File) value;
+											if (srcFile.isDirectory()) {
+												fileList.addAll(Arrays.asList(doPreUploadFolder((File) value)));
+											} else {
+												fileList.add(srcFile);
+											}
+											currentUploadFolder = srcFile.isDirectory() ? srcFile : srcFile.getParentFile();
+										}
 										new Thread(new Runnable() {
 											@Override
 											public void run() {
 												try {
-													File[] allFiles = doPreUploadFolder(currentUploadFolder);
-													doUploadFolder(allFiles);
+													doUploadFolder(fileList.toArray(new File[0]));
 												} catch (Exception ex) {
 													ex.printStackTrace();
 												}
 											}
 										}).start();
-									} else {
-										currentUploadFolder = file.getParentFile();
-										addToUploadTable(file);
-										doUploadFolder(new File[] { file }, true);
 									}
+								} catch (Exception ex) {
+									ex.printStackTrace();
 								}
 							}
-						}
-					} catch (Exception ex) {
-						ex.printStackTrace();
+						});
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
 				}
 			}
