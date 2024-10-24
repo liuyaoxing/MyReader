@@ -308,103 +308,113 @@ public class OfflineExport {
 		backupTable.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
 				if (SwingUtilities.isRightMouseButton(me)) {
-					final int row = backupTable.rowAtPoint(me.getPoint());
-					backupTable.setRowSelectionInterval(row, row);
-					System.out.println("row:" + row);
-					if (row != -1) {
-						final int column = backupTable.columnAtPoint(me.getPoint());
+					final JPopupMenu popup = new JPopupMenu();
+					JMenuItem clearItem = new JMenuItem("清空");
+					popup.add(clearItem);
+					clearItem.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							backupTableModel.setRowCount(0);
+						}
+					});
+					JMenuItem copyItem = new JMenuItem("复制");
+					popup.add(copyItem);
+					copyItem.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							int row = backupTable.rowAtPoint(me.getPoint());
+							int column = backupTable.columnAtPoint(me.getPoint());
+							Object value = backupTable.getValueAt(row, column);
+							if (value != null)
+								setSysClipboardText(String.valueOf(value));
+						}
+					});
+					popup.add(new JSeparator());
+					JMenuItem syncFolderItem = new JMenuItem("下载文件夹");
+					popup.add(syncFolderItem);
+					syncFolderItem.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							int[] getSelectedRows = backupTable.getSelectedRows();
+							if (getSelectedRows == null || getSelectedRows.length == 1) {
+								final int row = backupTable.rowAtPoint(me.getPoint());
+								backupTable.setRowSelectionInterval(row, row);
+								getSelectedRows = new int[] { row };
+							}
 
-						final JPopupMenu popup = new JPopupMenu();
-						JMenuItem clearItem = new JMenuItem("清空");
-						popup.add(clearItem);
-						clearItem.addActionListener(new ActionListener() {
-							public void actionPerformed(ActionEvent e) {
-								backupTableModel.setRowCount(0);
-							}
-						});
-						JMenuItem copyItem = new JMenuItem("复制");
-						popup.add(copyItem);
-						copyItem.addActionListener(new ActionListener() {
-							public void actionPerformed(ActionEvent e) {
-								Object value = backupTable.getValueAt(row, column);
-								if (value != null)
-									setSysClipboardText(String.valueOf(value));
-							}
-						});
-						popup.add(new JSeparator());
-						JMenuItem syncFolderItem = new JMenuItem("下载文件夹");
-						popup.add(syncFolderItem);
-						syncFolderItem.addActionListener(new ActionListener() {
-							public void actionPerformed(ActionEvent e) {
+							if (getSelectedRows == null || getSelectedRows.length == 0)
+								return;
+
+							final JFileChooser fileChooser = new JFileChooser();// 文件选择器
+							fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);// 设定只能选择到文件夹
+							if (currentDirectory != null)
+								fileChooser.setCurrentDirectory(currentDirectory);
+							int state = fileChooser.showOpenDialog(null);// 此句是打开文件选择器界面的触发语句
+							if (state != JFileChooser.APPROVE_OPTION)
+								return;
+							currentDirectory = fileChooser.getSelectedFile();// toFile为选择到的目录
+							System.out.println("CurrentDirectory:" + currentDirectory);
+
+							for (int row : getSelectedRows) {
 								tastListExecutor.submit(new Runnable() {
 									@Override
 									public void run() {
-										Object title = backupTable.getValueAt(row, 1);
-										if (title != null) {
-											try {
-												currentDirectory = new File(title.toString().replace("[文件夹]", "")).getCanonicalFile();
-											} catch (IOException e1) {
-												e1.printStackTrace();
-											}
-										}
-
 										Object value = backupTable.getValueAt(row, 0);
 										Object folderName = backupTable.getValueAt(row, 1);
-										if (value != null) {
+										if (value != null && folderName != null) {
 											String newUrl = getInputHostUrl() + FOLDER_LIST_MD5 + value;
-											taskListTitle.setText(newUrl);
-											doDownloadFolder(newUrl, String.valueOf(folderName));
+											taskListTitle.setText(folderName + ": " + newUrl);
+											String newFolderName = folderName.toString().replace("[文件夹]", "");
+											doDownloadFolder(newUrl, new File(currentDirectory, newFolderName));
 										}
-										setSysClipboardText(String.valueOf(value));
 									}
 								});
-
 							}
-						});
-						popup.add(new JSeparator());
-						JMenuItem cleanFolderItem = new JMenuItem("清空文件夹");
-						popup.add(cleanFolderItem);
-						cleanFolderItem.addActionListener(new ActionListener() {
-							public void actionPerformed(ActionEvent e) {
-								Object id = backupTable.getValueAt(row, 0);
-								Object fileName = backupTable.getValueAt(row, 1);
-								if (id != null) {
-									String msg = String.format("确认是否要删除文件服务器上的%s?", fileName);
-									int opt = JOptionPane.showConfirmDialog(null, msg, "确认删除", JOptionPane.YES_NO_OPTION);
-									if (opt == JOptionPane.YES_OPTION) {
-										// 确认继续操作
+						}
+					});
+					popup.add(new JSeparator());
+					JMenuItem cleanFolderItem = new JMenuItem("清空文件夹");
+					popup.add(cleanFolderItem);
+					cleanFolderItem.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							int row = backupTable.rowAtPoint(me.getPoint());
+//								int column = backupTable.columnAtPoint(me.getPoint());
+							Object id = backupTable.getValueAt(row, 0);
+							Object fileName = backupTable.getValueAt(row, 1);
+							if (id != null) {
+								String msg = String.format("确认是否要删除文件服务器上的%s?", fileName);
+								int opt = JOptionPane.showConfirmDialog(null, msg, "确认删除", JOptionPane.YES_NO_OPTION);
+								if (opt == JOptionPane.YES_OPTION) {
+									// 确认继续操作
 //										http://192.168.133.65:61666/files/ad60dc86d022c92f66715899686753e2
-										String hostUrl = getInputHostUrl(urlCombo);
-										String deleteUrl = hostUrl + "/files/" + id;
-										try {
-											LinkedHashMap<String, String> urlParams = new LinkedHashMap<>();
-											urlParams.put("_method", "delete");
-											boolean isSuccess = doPostFormData(deleteUrl, urlParams);
-											JOptionPane.showMessageDialog(null, fileName + (isSuccess ? "删除成功!" : "删除失败!"));
-										} catch (Exception e1) {
-											e1.printStackTrace();
-										}
+									String hostUrl = getInputHostUrl(urlCombo);
+									String deleteUrl = hostUrl + "/files/" + id;
+									try {
+										LinkedHashMap<String, String> urlParams = new LinkedHashMap<>();
+										urlParams.put("_method", "delete");
+										boolean isSuccess = doPostFormData(deleteUrl, urlParams);
+										JOptionPane.showMessageDialog(null, fileName + (isSuccess ? "删除成功!" : "删除失败!"));
+									} catch (Exception e1) {
+										e1.printStackTrace();
 									}
 								}
 							}
-						});
+						}
+					});
 
-						JMenuItem calcel = new JMenuItem("取消");
-						calcel.addActionListener(new ActionListener() {
-							public void actionPerformed(ActionEvent e) {
-								popup.setVisible(false);
-							}
-						});
+					JMenuItem calcel = new JMenuItem("取消");
+					calcel.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							popup.setVisible(false);
+						}
+					});
 
-						popup.add(new JSeparator());
-						popup.add(calcel);
-						popup.show(me.getComponent(), me.getX(), me.getY());
-					}
+					popup.add(new JSeparator());
+					popup.add(calcel);
+					popup.show(me.getComponent(), me.getX(), me.getY());
 				}
 			}
 		});
 
 		uploadTable.addMouseListener(new MouseAdapter() {
+
 			public void mousePressed(MouseEvent me) {
 				if (SwingUtilities.isRightMouseButton(me)) {
 					final int row = uploadTable.rowAtPoint(me.getPoint());
@@ -990,6 +1000,14 @@ public class OfflineExport {
 					}
 				}
 			});
+			JMenuItem refreshItem = new JMenuItem("刷新网址");
+			popupMenu.add(refreshItem);
+			refreshItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					startScanPorts();
+				}
+			});
 			urlCombo.setComponentPopupMenu(popupMenu);
 		}
 
@@ -1066,20 +1084,12 @@ public class OfflineExport {
 											if (srcFile.isDirectory()) {
 												fileList.addAll(Arrays.asList(doPreUploadFolder((File) value)));
 											} else {
+												addToUploadTable(srcFile);
 												fileList.add(srcFile);
 											}
 											currentUploadFolder = srcFile.isDirectory() ? srcFile : srcFile.getParentFile();
 										}
-										new Thread(new Runnable() {
-											@Override
-											public void run() {
-												try {
-													doUploadFolder(fileList.toArray(new File[0]));
-												} catch (Exception ex) {
-													ex.printStackTrace();
-												}
-											}
-										}).start();
+										doUploadFolder(fileList.toArray(new File[0]));
 									}
 								} catch (Exception ex) {
 									ex.printStackTrace();
@@ -1129,7 +1139,7 @@ public class OfflineExport {
 	}
 
 	protected File[] doPreUploadFolder(File file) throws IOException {
-		uploadTableModel.getDataVector().clear();
+		uploadTableModel.setRowCount(0);
 		File[] allFiles = FileUtils.listFiles(file).toArray(new File[0]);
 		for (int i = 0; i < allFiles.length; i++) {
 			File subFile = allFiles[i];
@@ -1177,7 +1187,7 @@ public class OfflineExport {
 		}
 	}
 
-	protected void doSyncFolder(List<Map<String, Object>> jsonArray, File toFile, final String selectedFolder) throws IOException {
+	protected void doSyncFolder(List<Map<String, Object>> jsonArray, File toFile) throws IOException {
 		String inputHostUrl = getInputHostUrl();
 		if (inputHostUrl == null || inputHostUrl.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "请输入正确的服务器地址！");
@@ -1685,49 +1695,26 @@ public class OfflineExport {
 		addItemsToCombo(urlCombo, itemSet.toArray(new String[0]), 0);
 	}
 
-	private void doDownloadFolder(final String fileUrl, final String selectedFolder) {
+	private void doDownloadFolder(final String fileUrl, final File toFile) {
 		try {
-			if (startFolderThread != null) {
-				startFolderThread.interrupt();
-				startFolderThread = null;
-			}
-			final JFileChooser fileChooser = new JFileChooser();// 文件选择器
-			if (currentDirectory != null)
-				fileChooser.setSelectedFile(currentDirectory);
-			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);// 设定只能选择到文件夹
-			int state = fileChooser.showOpenDialog(null);// 此句是打开文件选择器界面的触发语句
-			if (state == JFileChooser.APPROVE_OPTION) {
-				glassPane.start();// 开始动画加载效果
-				frame.setVisible(true);
+			glassPane.start();// 开始动画加载效果
+			frame.setVisible(true);
 
-				startFolderThread = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							Request request = new Request.Builder().addHeader("x-header", "dll")//
-									.header("sort", "_id")//
-									.url(fileUrl).build();
-							Response response = DownloadUtil.get().newCall(request);
-							if (!response.isSuccessful()) {
-								JOptionPane.showMessageDialog(null, response.message());
-								throw new IOException("无法连接到服务器: " + response);
-							}
-							String body = response.body().string();
-							List<Map<String, Object>> jsonArray = new Gson().fromJson(body, new TypeToken<List<Map<String, Object>>>() {
-							}.getType());
-							final File toFile = fileChooser.getSelectedFile();// toFile为选择到的目录
-							glassPane.stop();
-//										total.set(newValue);
-							total.set(jsonArray.size());
-							doSyncFolder(jsonArray, new File(toFile, currentDirectory.getName()), selectedFolder);
-							backupBtn.setText("开始备份");
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				});
-				startFolderThread.start();
+			Request request = new Request.Builder().addHeader("x-header", "dll")//
+					.header("sort", "_id")//
+					.url(fileUrl).build();
+			Response response = DownloadUtil.get().newCall(request);
+			if (!response.isSuccessful()) {
+				JOptionPane.showMessageDialog(null, response.message());
+				throw new IOException("无法连接到服务器: " + response);
 			}
+			String body = response.body().string();
+			List<Map<String, Object>> jsonArray = new Gson().fromJson(body, new TypeToken<List<Map<String, Object>>>() {
+			}.getType());
+			glassPane.stop();
+			counter.set(0);
+			total.set(jsonArray.size());
+			doSyncFolder(jsonArray, toFile);
 		} catch (Exception ex) {
 			LogHandler.error(ex);
 		}
