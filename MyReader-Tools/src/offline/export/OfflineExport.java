@@ -171,7 +171,6 @@ public class OfflineExport {
 	protected File[] qrCodeFiles;
 	protected ViewerFrame viewerFrame;
 	private JButton uploadFolderBtn;
-	protected File currentUploadFolder;
 
 	protected DefaultTableModel uploadTableModel;
 	protected JTable uploadTable;
@@ -290,13 +289,13 @@ public class OfflineExport {
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				int v = chooser.showOpenDialog(null);
 				if (v == JFileChooser.APPROVE_OPTION) {
-					currentUploadFolder = chooser.getSelectedFile();
+					File currentUploadFolder = chooser.getSelectedFile();
 					new Thread(new Runnable() {
 						@Override
 						public void run() {
 							try {
 								File[] allFiles = doPreUploadFolder(currentUploadFolder);
-								doUploadFolder(allFiles);
+								doUploadFolder(currentUploadFolder, allFiles);
 							} catch (Exception ex) {
 								ex.printStackTrace();
 							}
@@ -346,7 +345,7 @@ public class OfflineExport {
 							fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);// 设定只能选择到文件夹
 							if (currentDirectory != null)
 								fileChooser.setCurrentDirectory(currentDirectory);
-							int state = fileChooser.showOpenDialog(null);// 此句是打开文件选择器界面的触发语句
+							int state = fileChooser.showSaveDialog(null);// 此句是打开文件选择器界面的触发语句
 							if (state != JFileChooser.APPROVE_OPTION)
 								return;
 							currentDirectory = fileChooser.getSelectedFile();// toFile为选择到的目录
@@ -1076,6 +1075,7 @@ public class OfflineExport {
 								uploadTableModel.setRowCount(0);
 								try {
 									if (td instanceof List) {
+										File currentUploadFolder = null;
 										List<File> fileList = new ArrayList<>();
 										for (Object value : ((List<?>) td)) {
 											if (!(value instanceof File))
@@ -1089,7 +1089,7 @@ public class OfflineExport {
 											}
 											currentUploadFolder = srcFile.isDirectory() ? srcFile : srcFile.getParentFile();
 										}
-										doUploadFolder(fileList.toArray(new File[0]));
+										doUploadFolder(currentUploadFolder, fileList.toArray(new File[0]));
 									}
 								} catch (Exception ex) {
 									ex.printStackTrace();
@@ -1282,6 +1282,13 @@ public class OfflineExport {
 			public void onDownloadFailed(Exception e) {
 				taskListTableModel.setValueAt("0%", row, col - 1);
 				taskListTableModel.setValueAt("下载失败" + e.getMessage(), row, col);
+				try {
+					Thread.sleep(6666);
+					downloadFile(id, row, col, destFile);
+				} catch (Exception ex) {
+					LogHandler.debug("下载失败:" + ex.getMessage());
+					ex.printStackTrace();
+				}
 			}
 
 			@Override
@@ -1513,12 +1520,12 @@ public class OfflineExport {
 		}).start();
 	}
 
-	private void doUploadFolder(final File[] allFiles) throws IOException, InterruptedException {
-		doUploadFolder(allFiles, false);
+	private void doUploadFolder(File currentFile, final File[] allFiles) throws IOException, InterruptedException {
+		doUploadFolder(currentFile, allFiles, false);
 	}
 
-	private void doUploadFolder(final File[] allFiles, boolean onlyFile) throws IOException, InterruptedException {
-		if (allFiles == null || allFiles.length == 0 || currentUploadFolder == null)
+	private void doUploadFolder(File baseDir, final File[] allFiles, boolean onlyFile) throws IOException, InterruptedException {
+		if (allFiles == null || allFiles.length == 0 || baseDir == null)
 			return;
 
 		String uploadUrl = getComboText(urlCombo2);
@@ -1530,7 +1537,7 @@ public class OfflineExport {
 		if (!NetworkUtils.isNetworkAvailable(uploadUrl)) {
 			JOptionPane.showMessageDialog(null, "无法连接到服务地址: " + uploadUrl);
 			Thread.sleep(15000);
-			doUploadFolder(allFiles);
+			doUploadFolder(baseDir, allFiles);
 			return;
 		}
 
@@ -1545,8 +1552,7 @@ public class OfflineExport {
 			if (allFiles[i].isHidden())
 				continue;
 			final String uploadUrl0 = uploadUrl;
-			final String path = allFiles[i].getParentFile().getCanonicalPath()
-					.substring(currentUploadFolder.getParentFile().getCanonicalPath().length() + 1);
+			final String path = allFiles[i].getParentFile().getCanonicalPath().substring(baseDir.getCanonicalPath().length() + 1);
 			final int index = i;
 			es.submit(new Runnable() {
 				@Override
