@@ -130,7 +130,8 @@ public class OfflineExport {
 	private static final String FOLDER_DOWNLOAD_MD5 = "/folder/download/md5/";
 	private static final String FOLDER_UPLOAD = "/folderUpload";
 
-	private static final String FLAG_DELETE_ON_SUCCESS = "#--delete-on-success";
+//	private static final String FLAG_DELETE_ON_SUCCESS = "#--delete-on-success";
+	private static final String FLAG_DELETE_ON_SUCCESS = "#上传成功后删除本地文件";
 
 	private static final String TITLE = "读乐乐备份工具 v3.31";
 
@@ -734,7 +735,7 @@ public class OfflineExport {
 
 	private void createBackupPanel(JTabbedPane tabbedPane) {
 		JPanel firstPanel = new JPanel();
-		tabbedPane.addTab("文件备份", firstPanel);
+		tabbedPane.addTab("手机备份", firstPanel);
 		firstPanel.setLayout(new BorderLayout(0, 0));
 
 		JPanel firstPanel_1 = new JPanel();
@@ -790,7 +791,7 @@ public class OfflineExport {
 
 	private void createUploadPanel(JTabbedPane tabbedPane) {
 		JPanel secondPanel = new JPanel();
-		tabbedPane.addTab("文件上传", secondPanel);
+		tabbedPane.addTab("上传到手机", secondPanel);
 		secondPanel.setLayout(new BorderLayout(0, 0));
 
 		JPanel secondPanel_1 = new JPanel();
@@ -1073,23 +1074,33 @@ public class OfflineExport {
 							@Override
 							public void run() {
 								uploadTableModel.setRowCount(0);
+								uploadCount.set(0);
 								try {
 									if (td instanceof List) {
-										File currentUploadFolder = null;
+										List<?> tdFileList = (List<?>) td;
+										File baseDir = null;
 										List<File> fileList = new ArrayList<>();
-										for (Object value : ((List<?>) td)) {
+										for (Object value : tdFileList) {
 											if (!(value instanceof File))
 												continue;
 											File srcFile = (File) value;
 											if (srcFile.isDirectory()) {
-												fileList.addAll(Arrays.asList(doPreUploadFolder((File) value)));
+												File[] allFiles = FileUtils.listFiles(srcFile).toArray(new File[0]);
+												for (int i = 0; i < allFiles.length; i++) {
+													addToUploadTable(allFiles[i]);
+													fileList.add(allFiles[i]);
+												}
 											} else {
 												addToUploadTable(srcFile);
 												fileList.add(srcFile);
 											}
-											currentUploadFolder = srcFile.isDirectory() ? srcFile : srcFile.getParentFile();
+											baseDir = srcFile.getParentFile();
 										}
-										doUploadFolder(currentUploadFolder, fileList.toArray(new File[0]));
+
+										if (tdFileList.size() == 1 && tdFileList.get(0) instanceof File && ((File) tdFileList.get(0)).isDirectory())
+											baseDir = (File) tdFileList.get(0);
+
+										doUploadFolder(baseDir, fileList.toArray(new File[0]));
 									}
 								} catch (Exception ex) {
 									ex.printStackTrace();
@@ -1520,8 +1531,8 @@ public class OfflineExport {
 		}).start();
 	}
 
-	private void doUploadFolder(File currentFile, final File[] allFiles) throws IOException, InterruptedException {
-		doUploadFolder(currentFile, allFiles, false);
+	private void doUploadFolder(File baseDir, final File[] allFiles) throws IOException, InterruptedException {
+		doUploadFolder(baseDir, allFiles, false);
 	}
 
 	private void doUploadFolder(File baseDir, final File[] allFiles, boolean onlyFile) throws IOException, InterruptedException {
@@ -1552,16 +1563,20 @@ public class OfflineExport {
 			if (allFiles[i].isHidden())
 				continue;
 			final String uploadUrl0 = uploadUrl;
-			final String path = allFiles[i].getParentFile().getCanonicalPath().substring(baseDir.getCanonicalPath().length() + 1);
+			String folderPath = allFiles[i].getParentFile().getCanonicalPath().substring(baseDir.getParentFile().getCanonicalPath().length());
+			if (folderPath.startsWith(File.separator))
+				folderPath = folderPath.substring(File.separator.length());
 			final int index = i;
+			final String finalFolderPath = folderPath;
 			es.submit(new Runnable() {
 				@Override
 				public void run() {
 					try {
-						boolean result = uploadFile(path, uploadOkHttpClient, uploadUrl0, allFiles[index], updateColumn, index, deleteOnSuccess);
+						boolean result = uploadFile(finalFolderPath, uploadOkHttpClient, uploadUrl0, allFiles[index], updateColumn, index, deleteOnSuccess);
 						if (!result)
 							es.submit(this);
 					} catch (Exception e) {
+						e.printStackTrace();
 						es.submit(this);
 					}
 				}
@@ -1594,13 +1609,13 @@ public class OfflineExport {
 		return uploadFile(path, mOkHttpClient, uploadUrl, subFile, updateCol, currentRow, false);
 	}
 
-	protected boolean uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, final File subFile, final int updateCol, final int currentRow,
-			final boolean deleteOnSuccess) throws IOException {
-		return uploadFile(path, mOkHttpClient, uploadUrl, subFile, updateCol, currentRow, deleteOnSuccess, false);
+	protected boolean uploadFile(String folderPath, OkHttpClient mOkHttpClient, String uploadUrl, final File subFile, final int updateCol,
+			final int currentRow, final boolean deleteOnSuccess) throws IOException {
+		return uploadFile(folderPath, mOkHttpClient, uploadUrl, subFile, updateCol, currentRow, deleteOnSuccess, false);
 	}
 
-	protected boolean uploadFile(String path, OkHttpClient mOkHttpClient, String uploadUrl, final File subFile, final int updateCol, final int currentRow,
-			final boolean deleteOnSuccess, boolean isAsync) throws IOException {
+	protected boolean uploadFile(String folderPath, OkHttpClient mOkHttpClient, String uploadUrl, final File subFile, final int updateCol,
+			final int currentRow, final boolean deleteOnSuccess, boolean isAsync) throws IOException {
 		MultipartBody.Builder builder = new MultipartBody.Builder();
 		builder.setType(MultipartBody.FORM);
 		builder.addPart(RequestBody.create(MediaType.parse("application/octet-stream"), subFile));
@@ -1618,7 +1633,7 @@ public class OfflineExport {
 		});
 
 		Request request = new Request.Builder()//
-				.url(uploadUrl + "?path=" + URLEncoder.encode(path, "utf-8")//
+				.url(uploadUrl + "?path=" + URLEncoder.encode(folderPath, "utf-8")//
 						+ "&fileName=" + URLEncoder.encode(subFile.getName(), "utf-8"))//
 				.post(requestBody).build();
 		Call call = mOkHttpClient.newCall(request);
