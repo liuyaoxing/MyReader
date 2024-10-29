@@ -1,10 +1,10 @@
 {
 	"title": "读乐乐v3.31",
-	"fileName": "MyReader-release-3.31.v202409290900.apk",
-	"url": "https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202409290900.apk",
-	"changelog": "01、优化文件传输文件夹界面；02、增加收藏网站功能；",
+	"fileName": "MyReader-release-3.31.v202410290900.apk",
+	"url": "https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202410290900.apk",
+	"changelog": "01、修复上传文件夹到手机偶尔失败；\n02、重新设计读乐乐备份工具；\n03、增加快速发现附近手机功能",
 	"vcode": 77,
-	"version": 202409290900,
-	"fileSize": 16866245,
+	"version": 202410290900,
+	"fileSize": 16891652,
 	"forceUpdate": true
 }
