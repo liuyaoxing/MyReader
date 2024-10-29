@@ -24,6 +24,8 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -60,6 +62,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -131,12 +134,13 @@ public class OfflineExport {
 	private static final String FOLDER_UPLOAD = "/folderUpload";
 
 //	private static final String FLAG_DELETE_ON_SUCCESS = "#--delete-on-success";
-	private static final String FLAG_DELETE_ON_SUCCESS = "##上传成功后删除本地文件";
+//	private static final String FLAG_DELETE_ON_SUCCESS = "##上传成功后删除本地文件";
 
 	private static final String TITLE = "读乐乐备份工具 v3.31";
 
 	private JFrame frame;
 	private JComboBox<String> urlCombo, urlCombo2;
+	private JCheckBox deleteFileAfterUploadBtn;
 	private JTable backupTable;
 	private DefaultTableModel backupTableModel;
 
@@ -616,7 +620,7 @@ public class OfflineExport {
 					itemSet.add(String.valueOf(newItem));
 					URL url = new URL(newItem);
 					String newUrl = "http://" + String.format("%s:%s", url.getHost(), url.getPort());
-					itemSet.add(String.valueOf(newUrl + FOLDER_UPLOAD + FLAG_DELETE_ON_SUCCESS));
+//					itemSet.add(String.valueOf(newUrl + FOLDER_UPLOAD + FLAG_DELETE_ON_SUCCESS));
 					itemSet.add(String.valueOf(newUrl + FOLDER_UPLOAD));
 				} catch (MalformedURLException e1) {
 					e1.printStackTrace();
@@ -803,6 +807,21 @@ public class OfflineExport {
 		urlCombo2.setEditable(true);
 		urlCombo2.setToolTipText("请输入读乐乐服务URL");
 		secondPanel_1.add(urlCombo2);
+
+		deleteFileAfterUploadBtn = new JCheckBox("上传完成删除本地文件");
+		deleteFileAfterUploadBtn.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					deleteFileAfterUploadBtn.setForeground(Color.RED);
+					deleteFileAfterUploadBtn.setFont(new Font("宋体", Font.BOLD, 12));
+				} else if (e.getStateChange() == ItemEvent.DESELECTED) {
+					deleteFileAfterUploadBtn.setForeground(Color.BLACK);
+					deleteFileAfterUploadBtn.setFont(new Font("宋体", Font.PLAIN, 12));
+				}
+			}
+		});
+		secondPanel_1.add(deleteFileAfterUploadBtn);
 
 		uploadFolderBtn = new JButton("上传文件夹");
 		uploadFolderBtn.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -1540,9 +1559,7 @@ public class OfflineExport {
 			return;
 
 		String uploadUrl = getComboText(urlCombo2);
-		final boolean deleteOnSuccess = uploadUrl.endsWith(FLAG_DELETE_ON_SUCCESS);
 
-		uploadUrl = uploadUrl.contains(FLAG_DELETE_ON_SUCCESS) ? uploadUrl.substring(0, uploadUrl.indexOf(FLAG_DELETE_ON_SUCCESS)) : uploadUrl;
 		uploadUrl += uploadUrl.endsWith(FOLDER_UPLOAD) ? "" : FOLDER_UPLOAD;
 
 		if (!NetworkUtils.isNetworkAvailable(uploadUrl)) {
@@ -1562,6 +1579,7 @@ public class OfflineExport {
 		for (int i = 0; i < allFiles.length; i++) {
 			if (allFiles[i].isHidden())
 				continue;
+			boolean deleteOnSuccess = deleteFileAfterUploadBtn.isSelected();
 			final String uploadUrl0 = uploadUrl;
 			String folderPath = allFiles[i].getParentFile().getCanonicalPath().substring(baseDir.getParentFile().getCanonicalPath().length());
 			if (folderPath.startsWith(File.separator))
