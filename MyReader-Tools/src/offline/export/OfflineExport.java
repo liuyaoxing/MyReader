@@ -131,7 +131,7 @@ public class OfflineExport {
 	private static final String FOLDER_UPLOAD = "/folderUpload";
 
 //	private static final String FLAG_DELETE_ON_SUCCESS = "#--delete-on-success";
-	private static final String FLAG_DELETE_ON_SUCCESS = "#上传成功后删除本地文件";
+	private static final String FLAG_DELETE_ON_SUCCESS = "##上传成功后删除本地文件";
 
 	private static final String TITLE = "读乐乐备份工具 v3.31";
 
@@ -1542,7 +1542,7 @@ public class OfflineExport {
 		String uploadUrl = getComboText(urlCombo2);
 		final boolean deleteOnSuccess = uploadUrl.endsWith(FLAG_DELETE_ON_SUCCESS);
 
-		uploadUrl = uploadUrl.contains("#--") ? uploadUrl.substring(0, uploadUrl.indexOf("#--")) : uploadUrl;
+		uploadUrl = uploadUrl.contains(FLAG_DELETE_ON_SUCCESS) ? uploadUrl.substring(0, uploadUrl.indexOf(FLAG_DELETE_ON_SUCCESS)) : uploadUrl;
 		uploadUrl += uploadUrl.endsWith(FOLDER_UPLOAD) ? "" : FOLDER_UPLOAD;
 
 		if (!NetworkUtils.isNetworkAvailable(uploadUrl)) {
