@@ -63,8 +63,7 @@ public class DownloadUtil {
 	 * @throws IOException
 	 */
 
-	public void download(final String url, String id, final String destFileDir, final OnDownloadListener listener)
-			throws IOException {
+	public void download(final String url, String id, final String destFileDir, final OnDownloadListener listener) throws IOException {
 		download(url, id, new File(destFileDir).getCanonicalFile(), listener);
 	}
 
@@ -76,8 +75,7 @@ public class DownloadUtil {
 	 * @throws IOException
 	 */
 
-	public void download(final String url, String id, final File toFile, final OnDownloadListener listener)
-			throws IOException {
+	public void download(final String url, String id, final File toFile, final OnDownloadListener listener) throws IOException {
 		Request request = new Request.Builder().url(url).build();
 		Response response = okHttpClient.newCall(request).execute();
 		processResponse(toFile, listener, response);
@@ -90,8 +88,7 @@ public class DownloadUtil {
 	 * @param listener     下载监听
 	 */
 
-	public void asyncDownload(final String url, final String destFileDir, final String destFileName,
-			final OnDownloadListener listener) {
+	public void asyncDownload(final String url, final String destFileDir, final String destFileName, final OnDownloadListener listener) {
 		Request request = new Request.Builder().url(url).build();
 		// 异步请求
 		okHttpClient.newCall(request).enqueue(new Callback() {
@@ -109,46 +106,46 @@ public class DownloadUtil {
 	}
 
 	protected void processResponse(File toFile, final OnDownloadListener listener, Response response) {
-		if (response.code() == 404) {
-			listener.onDownloadFailed(new FileNotFoundException("文件不存在!"));
-			return;
-		}
-		InputStream is = null;
-		byte[] buf = new byte[2048];
-		int len = 0;
-		FileOutputStream fos = null;
-
-		// 储存下载文件的目录
-		if (toFile.isDirectory()) {
-			if (!toFile.exists()) {
-				toFile.mkdirs();
-			}
-			toFile = new File(toFile, getHeaderFileName(response));
-		}
-		if (toFile.getParentFile() != null && !toFile.getParentFile().exists()) {
-			toFile.getParentFile().mkdirs();
-		}
-
-		if (listener.isFileExists(toFile)) {
-			listener.onFileExists(toFile);
-			return;
-		}
-
 		try {
-			File tmpFile = new File(toFile.getParentFile(), toFile.getName() + ".td");
-			is = response.body().byteStream();
-			long total = response.body().contentLength();
-			fos = new FileOutputStream(tmpFile);
-			long sum = 0;
-			while ((len = is.read(buf)) != -1) {
-				fos.write(buf, 0, len);
-				sum += len;
-				int progress = (int) (sum * 1.0f / total * 100);
-				// 下载中更新进度条
-				listener.onDownloading(progress);
+			if (response.code() == 404) {
+				listener.onDownloadFailed(new FileNotFoundException("文件不存在!"));
+				return;
 			}
-			fos.flush();
-			IOUtils.closeQuietly(fos);
+
+			byte[] buf = new byte[2048];
+			int len = 0;
+
+			// 储存下载文件的目录
+			if (toFile.isDirectory()) {
+				if (!toFile.exists()) {
+					toFile.mkdirs();
+				}
+				toFile = new File(toFile, getHeaderFileName(response));
+			}
+			if (toFile.getParentFile() != null && !toFile.getParentFile().exists()) {
+				toFile.getParentFile().mkdirs();
+			}
+
+			if (listener.isFileExists(toFile)) {
+				listener.onFileExists(toFile);
+				return;
+			}
+
+			File tmpFile = new File(toFile.getParentFile(), toFile.getName() + ".td");
+
+			long total = response.body().contentLength();
+			long sum = 0;
+			try (InputStream is = response.body().byteStream(); FileOutputStream fos = new FileOutputStream(tmpFile);) {
+				while ((len = is.read(buf)) != -1) {
+					fos.write(buf, 0, len);
+					sum += len;
+					int progress = (int) (sum * 1.0f / total * 100);
+					// 下载中更新进度条
+					listener.onDownloading(progress);
+				}
+				fos.flush();
+			}
+
 			// 下载完成
 			tmpFile.renameTo(toFile);
 			listener.onDownloadSuccess(toFile);
@@ -156,8 +153,6 @@ public class DownloadUtil {
 			LogHandler.error(ex);
 			listener.onDownloadFailed(ex);
 		} finally {
-			IOUtils.closeQuietly(is);
-			IOUtils.closeQuietly(fos);
 			if (response != null && response.body() != null) {
 				IOUtils.closeQuietly(response.body());
 			}
@@ -209,7 +204,7 @@ public class DownloadUtil {
 					e1.printStackTrace();
 				}
 				dispositionHeader = dispositionHeader.replace("\"", "");
-				if (dispositionHeader.length() > 128) {
+				if (dispositionHeader.length() > 100) {
 					boolean endsWith = dispositionHeader.endsWith(".dll.zip");
 					String newName = dispositionHeader.trim().substring(0, 128);
 					if (endsWith && !newName.endsWith(".dll.zip"))

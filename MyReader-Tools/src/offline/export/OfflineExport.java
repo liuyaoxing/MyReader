@@ -115,10 +115,12 @@ import okhttp3.Response;
 public class OfflineExport {
 
 	private static final String KEY_ID = "ID";
+	private static final String KEY_FILEID = "FILE_ID";
 	private static final String KEY_FILENAME = "文件名";
 	private static final String KEY_URL = "URL";
 	private static final String KEY_LENGTH = "大小";
 	private static final String KEY_FILEPATH = "保存路径";
+	private static final String KEY_STATUS = "状态";
 
 	public static final String FILESERVER_NAME = "name";
 	public static final String FILESERVER_SIZE = "size";
@@ -144,8 +146,11 @@ public class OfflineExport {
 	private JTable backupTable;
 	private DefaultTableModel backupTableModel;
 
-	private String[] columnNames = new String[] { KEY_ID, "标题", KEY_URL, KEY_LENGTH, "状态", KEY_FILEPATH, "个 数" };
+	private String[] columnNames = new String[] { KEY_ID, KEY_FILENAME, KEY_URL, KEY_LENGTH, KEY_STATUS, KEY_FILEPATH, "个 数" };
 	private int[] columnWidths = new int[] { 50, 250, 50, 50, 50, 250, 50 };
+
+	private String[] taskListColumnNames = new String[] { KEY_ID, KEY_FILEID, KEY_FILENAME, KEY_URL, KEY_LENGTH, KEY_STATUS, KEY_FILEPATH, "个 数" };
+	private int[] taskListcolumnWidths = new int[] { 10, 50, 250, 50, 50, 50, 250, 50 };
 
 	private static final String COL_PROGRESS = "进度";
 
@@ -919,11 +924,11 @@ public class OfflineExport {
 		taskListTitle.setFont(new Font("宋体", Font.PLAIN, 12));
 		titlePanel.add(taskListTitle);
 
-		taskListTableModel = new DefaultTableModel(null, columnNames);
+		taskListTableModel = new DefaultTableModel(null, taskListColumnNames);
 		taskListTable = new JTable(taskListTableModel);
 		taskListTable.setFillsViewportHeight(true);
 		for (int i = 0; i < taskListTable.getColumnModel().getColumnCount(); i++) {
-			taskListTable.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
+			taskListTable.getColumnModel().getColumn(i).setPreferredWidth(taskListcolumnWidths[i]);
 		}
 		taskListTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			/*** 序列号 */
@@ -1237,22 +1242,24 @@ public class OfflineExport {
 			if (title.startsWith(".") || (title.contains("[文件夹]")))
 				continue;
 
-			taskListTableModel.addRow(new Object[] { id, title, url, size, "", absPath });
+			taskListTableModel.addRow(new Object[] { taskListTableModel.getRowCount() + 1, id, title, url, size, "", absPath });
 		}
 
 		total.set(taskListTableModel.getRowCount());
 
 		for (int row = 0; row < taskListTableModel.getRowCount(); row++) {
-			final String id = (String) taskListTableModel.getValueAt(row, 0);
-			final String title = (String) taskListTableModel.getValueAt(row, 1);
-			final String url = (String) taskListTableModel.getValueAt(row, 2);
-			final String size = (String) taskListTableModel.getValueAt(row, 3);
-			final String absPath = (String) taskListTableModel.getValueAt(row, 5);
+			final String id = (String) taskListTableModel.getValueAt(row, taskListTable.getColumnModel().getColumnIndex(KEY_FILEID));
+			final String title = (String) taskListTableModel.getValueAt(row, taskListTable.getColumnModel().getColumnIndex(KEY_FILENAME));
+			final String url = (String) taskListTableModel.getValueAt(row, taskListTable.getColumnModel().getColumnIndex(KEY_URL));
+			final String size = (String) taskListTableModel.getValueAt(row, taskListTable.getColumnModel().getColumnIndex(KEY_LENGTH));
+			final String absPath = (String) taskListTableModel.getValueAt(row, taskListTable.getColumnModel().getColumnIndex(KEY_FILEPATH));
 
 			taskListTable.setRowSelectionInterval(row, row);
 			taskListTable.scrollRectToVisible(new Rectangle(taskListTable.getCellRect(row + 10, 0, true)));
 
-			final int col = taskListTableModel.getColumnCount() - 2;
+//			final int col = taskListTableModel.getColumnCount() - 2;
+
+			int col = taskListTable.getColumnModel().getColumnIndex(KEY_STATUS);
 
 			String newFileName = title;
 			if (absPath != null && absPath.length() > 0) {
@@ -1268,8 +1275,8 @@ public class OfflineExport {
 			try {
 				File destFile = new File(toFile, newFileName);
 				if (destFile.exists() && toSizeStr(destFile.length()).equals(size)) {
-					taskListTableModel.setValueAt("文件已存在!" + destFile.getCanonicalPath(), row, col - 1);
-					taskListTableModel.setValueAt(destFile.getCanonicalFile(), row, col);
+					taskListTableModel.setValueAt("文件已存在!" + destFile.getCanonicalPath(), row, taskListTable.getColumnModel().getColumnIndex(KEY_STATUS));
+					taskListTableModel.setValueAt(destFile.getCanonicalFile(), row, taskListTable.getColumnModel().getColumnIndex(KEY_FILEPATH));
 					continue;
 				}
 
@@ -1294,8 +1301,8 @@ public class OfflineExport {
 			@Override
 			public void onDownloadSuccess(File file) {
 				try {
-					taskListTableModel.setValueAt("100%", row, col - 1);
-					taskListTableModel.setValueAt(destFile.getCanonicalFile(), row, col);
+					taskListTableModel.setValueAt("100%", row, taskListTable.getColumnModel().getColumnIndex(KEY_STATUS));
+					taskListTableModel.setValueAt(destFile.getCanonicalFile(), row, taskListTable.getColumnModel().getColumnIndex(KEY_FILEPATH));
 					Files.move(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				} catch (Exception ex) {
 					LogHandler.error(ex);
@@ -1305,13 +1312,13 @@ public class OfflineExport {
 
 			@Override
 			public void onDownloading(int progress) {
-				taskListTableModel.setValueAt(progress + "%", row, col - 1);
+				taskListTableModel.setValueAt(progress + "%", row, taskListTable.getColumnModel().getColumnIndex(KEY_STATUS));
 			}
 
 			@Override
 			public void onDownloadFailed(Exception e) {
-				taskListTableModel.setValueAt("0%", row, col - 1);
-				taskListTableModel.setValueAt("下载失败" + e.getMessage(), row, col);
+				taskListTableModel.setValueAt("0%", row, taskListTable.getColumnModel().getColumnIndex(KEY_STATUS));
+				taskListTableModel.setValueAt("下载失败" + e.getMessage(), row, taskListTable.getColumnModel().getColumnIndex(KEY_FILEPATH));
 				try {
 					Thread.sleep(6666);
 					downloadFile(id, row, col, destFile);
@@ -1329,8 +1336,8 @@ public class OfflineExport {
 			@Override
 			public void onFileExists(File file) {
 				try {
-					taskListTableModel.setValueAt("文件已存在!" + file.getCanonicalPath(), row, col - 1);
-					taskListTableModel.setValueAt(file.getPath(), row, col);
+					taskListTableModel.setValueAt("文件已存在!" + file.getCanonicalPath(), row, taskListTable.getColumnModel().getColumnIndex(KEY_STATUS));
+					taskListTableModel.setValueAt(file.getPath(), row, taskListTable.getColumnModel().getColumnIndex(KEY_FILEPATH));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -1397,7 +1404,9 @@ public class OfflineExport {
 			backupTable.setRowSelectionInterval(0, 0);
 			backupTable.setSelectionBackground(Color.LIGHT_GRAY);// 选中行设置背景色
 
-			final int row = 0, col = backupTableModel.getColumnCount() - 1;
+			final int row = 0;
+			int statusCol = backupTable.getColumnModel().getColumnIndex(KEY_STATUS);
+			int pathCol = backupTable.getColumnModel().getColumnIndex(KEY_FILEPATH);
 			final String getUrl = String.format("%s/dll/export/%s", getComboText(urlCombo), id);
 
 			DownloadUtil.get().download(getUrl, id, "backup", new OnDownloadListener() {
@@ -1409,8 +1418,8 @@ public class OfflineExport {
 				@Override
 				public void onDownloadSuccess(File file) {
 					try {
-						backupTableModel.setValueAt("100%", row, col - 1);
-						backupTableModel.setValueAt(file.getCanonicalFile(), row, col);
+						backupTableModel.setValueAt("100%", row, statusCol);
+						backupTableModel.setValueAt(file.getCanonicalFile(), row, pathCol);
 						backupTask.setId(id);
 						backupTask.setTitle(title);
 						backupTask.setUrl(url);
@@ -1424,26 +1433,26 @@ public class OfflineExport {
 
 				@Override
 				public void onDownloading(int progress) {
-					backupTableModel.setValueAt(progress + "%", row, col - 1);
+					backupTableModel.setValueAt(progress + "%", row, statusCol);
 				}
 
 				@Override
 				public void onDownloadFailed(Exception e) {
-					backupTableModel.setValueAt("0%", row, col - 1);
-					backupTableModel.setValueAt("下载失败" + e.getMessage(), row, col);
+					backupTableModel.setValueAt("0%", row, statusCol);
+					backupTableModel.setValueAt("下载失败" + e.getMessage(), row, pathCol);
 				}
 
 				@Override
 				public void onFileExists(File file) {
-					backupTableModel.setValueAt("文件已存在:", row, col - 1);
-					backupTableModel.setValueAt(file.getPath(), row, col);
+					backupTableModel.setValueAt("文件已存在:", row, statusCol);
+					backupTableModel.setValueAt(file.getPath(), row, pathCol);
 				}
 			});
 
 			if (backupTableModel.getDataVector().size() > 5000) {
 				backupTableModel.setRowCount(0);
 			}
-
+			frame.setTitle(String.format("%s (已处理: %s项)", TITLE, counter.incrementAndGet()));
 		}
 		return jsonArray.size() > 0;
 	}
@@ -1468,6 +1477,8 @@ public class OfflineExport {
 				startThread = new Thread(new Runnable() {
 					@Override
 					public void run() {
+						counter.set(0);
+						total.set(0);
 						for (int i = 0; i < Integer.MAX_VALUE; i++) {
 							try {
 								if (startThread == null || startThread.isInterrupted())
