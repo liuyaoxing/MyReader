@@ -206,7 +206,7 @@ public class DownloadUtil {
 				dispositionHeader = dispositionHeader.replace("\"", "");
 				if (dispositionHeader.length() > 100) {
 					boolean endsWith = dispositionHeader.endsWith(".dll.zip");
-					String newName = dispositionHeader.trim().substring(0, 128);
+					String newName = dispositionHeader.trim().substring(0, 100);
 					if (endsWith && !newName.endsWith(".dll.zip"))
 						return newName + ".dll.zip";
 					return newName;
