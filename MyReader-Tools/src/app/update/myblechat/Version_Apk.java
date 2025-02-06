@@ -81,22 +81,20 @@ public class Version_Apk {
 
 	@Override
 	public String toString() {
-		return "Version_Apk [fileName=" + fileName + ", changelog=" + changelog + ", version=" + version + ", fileSize="
-				+ fileSize + ", forceUpdate=" + forceUpdate + "]";
+		return "Version_Apk [fileName=" + fileName + ", changelog=" + changelog + ", version=" + version + ", fileSize=" + fileSize + ", forceUpdate="
+				+ forceUpdate + "]";
 	}
 
 	public static void main(String[] args) {
-		File srcFile = new File(
-				"D:\\Developer\\DeveloperWorks\\Android\\MyBleChatv33\\app\\release\\MyBleChat-release-3.22.apk");
+		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyBleChatv33\\app\\release\\MyBleChat-release-3.22.v202502051500.apk");
 		Version_Apk version = new Version_Apk();
 		version.setTitle("左右手v3.22");
 		version.setFileName(srcFile.getName());
-		version.setChangeLog(
-				"00、增加二维码传文件的功能：手机开启文件共享服务，在电脑浏览器打开文件服务管理页面，在左下方下载【备份工具专业版】后，用备份工具生产文件的二维码，在手机App上用码云传功能可以识别并合并文件。\r\n01、修复更新失败问题。\r\n02、适配Android13。\r\n03、修复了一些体验的问题");
-		version.setUrl("https://github.com/liuyaoxing/MyBLEChat/releases/download/v3.22/MyBleChat-release-3.22.apk");
+		version.setChangeLog("00、升级备份工具专业版。\r\n01、优化文件共享清单查询。\r\n02、修复了一些体验的问题");
+		version.setUrl("https://github.com/liuyaoxing/MyBLEChat/releases/download/v3.22/MyBleChat-release-3.22.v202502051500.apk");
 		version.setFileSize(srcFile.length());
 		version.setVcode(30);
-		version.setVersion(202308010900L);
+		version.setVersion(202502051500L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();

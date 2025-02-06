@@ -16,15 +16,15 @@ public class Version_Apk {
 	private boolean forceUpdate;
 
 	public static void main(String[] args) {
-		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyReaderv33\\app\\release\\MyReader-release-3.31.v202501091200.apk");
+		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyReaderv33\\app\\release\\MyReader-release-3.31.v202502051500.apk");
 		Version_Apk version = new Version_Apk();
 		version.setTitle("读乐乐v3.31");
 		version.setFileName(srcFile.getName());
-		version.setChangeLog("01、适配Android15系统；\n02、修复保存某些网页失败；\n03、方便文件上传下载增加快速发现附近手机功能");
-		version.setUrl("https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202501091200.apk");
+		version.setChangeLog("01、适配Android15系统；\n02、修复文件共享在线共享刷新不到问题；\n03、方便文件上传下载增加快速发现附近手机功能");
+		version.setUrl("https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202502051500.apk");
 		version.setFileSize(srcFile.length());
 		version.setVcode(77);
-		version.setVersion(202501091200L);
+		version.setVersion(202502051500L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();
