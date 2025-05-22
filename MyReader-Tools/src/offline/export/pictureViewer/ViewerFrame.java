@@ -17,6 +17,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +88,14 @@ public class ViewerFrame extends JFrame {
 		// 初始化这个JFrame
 		init();
 		initDnd();
+		
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				if(service != null)
+					service.playPaused = true;
+			}
+		});
 	}
 
 	public void init() {
