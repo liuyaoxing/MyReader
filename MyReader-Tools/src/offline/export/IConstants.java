@@ -45,8 +45,6 @@ public interface IConstants {
 
 	public static final String PROP_GLASSPANE_STOP = "PROP_GLASSPANE_STOP";
 	
-	public static final String PROP_TABBEDPANE_SELECTED_INDEX = "PROP_TABBEDPANE_SELECTED_INDEX";
-	
 	public static final String PROP_TABBEDPANE_SELECTED_NAME = "PROP_TABBEDPANE_SELECTED_NAME";
 	
 	public static final String PROP_SET_ROW_COUNT = "PROP_SET_ROW_COUNT";

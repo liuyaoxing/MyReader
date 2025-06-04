@@ -2,14 +2,10 @@ package offline.export;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.io.File;
-import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
-import offline.export.utils.Base64FileUtil;
 
 public class QrCodeFileFrame extends JFrame {
 
@@ -46,11 +42,6 @@ public class QrCodeFileFrame extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
-	}
-
-	public void setInput(File srcFile) throws IOException {
-		String fileStr = Base64FileUtil.getFileStr(srcFile.getCanonicalPath());
-		System.getProperty("user.dir");
 	}
 
 }

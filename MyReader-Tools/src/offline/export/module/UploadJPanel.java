@@ -46,6 +46,7 @@ import javax.swing.event.PopupMenuListener;
 
 import offline.export.FileUtils;
 import offline.export.log.LogHandler;
+import offline.export.utils.EventDispatcher;
 import offline.export.utils.NetworkUtils;
 import offline.export.utils.ProgressRequestBody;
 import offline.export.utils.ProgressRequestListener;
@@ -57,12 +58,15 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+/**
+ * 上传到手机面板
+ * 
+ * @author liuyaoxing
+ */
 public class UploadJPanel extends UploadJPanelUI {
 
 	/** 序列号 */
 	private static final long serialVersionUID = -5952898543215887697L;
-
-	protected JFrame frame;
 
 	ThreadPoolExecutor tastListExecutor = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>());
 
@@ -72,8 +76,6 @@ public class UploadJPanel extends UploadJPanelUI {
 	private AtomicInteger uploadCount = new AtomicInteger(0);
 
 	public UploadJPanel(JFrame frame) {
-		this.frame = frame;
-
 		createPopupMenu();
 		addListeners();
 		initDnd();
@@ -114,6 +116,14 @@ public class UploadJPanel extends UploadJPanelUI {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
+			}
+		});
+		JMenuItem refreshItem = new JMenuItem("刷新网址");
+		popupMenu.add(refreshItem);
+		refreshItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EventDispatcher.dispatchMessage(PROP_LANPORT_SCAN, UploadJPanel.class.getSimpleName(), null);
 			}
 		});
 		urlCombo2.setComponentPopupMenu(popupMenu);
@@ -240,22 +250,21 @@ public class UploadJPanel extends UploadJPanelUI {
 		});
 
 		uploadTable.addMouseListener(new MouseAdapter() {
-
 			public void mousePressed(MouseEvent me) {
 				if (SwingUtilities.isRightMouseButton(me)) {
+					final JPopupMenu popup = new JPopupMenu();
+					JMenuItem clearItem = new JMenuItem("清空");
+					popup.add(clearItem);
+					clearItem.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							uploadTableModel.setRowCount(0);
+						}
+					});
 					final int row = uploadTable.rowAtPoint(me.getPoint());
-					uploadTable.setRowSelectionInterval(row, row);
 					if (row != -1) {
+						uploadTable.setRowSelectionInterval(row, row);
 						final int column = uploadTable.columnAtPoint(me.getPoint());
 
-						final JPopupMenu popup = new JPopupMenu();
-						JMenuItem clearItem = new JMenuItem("清空");
-						popup.add(clearItem);
-						clearItem.addActionListener(new ActionListener() {
-							public void actionPerformed(ActionEvent e) {
-								uploadTableModel.setRowCount(0);
-							}
-						});
 						JMenuItem copyItem = new JMenuItem("复制");
 						popup.add(copyItem);
 						copyItem.addActionListener(new ActionListener() {
@@ -306,18 +315,17 @@ public class UploadJPanel extends UploadJPanelUI {
 								}
 							}
 						});
-
-						JMenuItem calcel = new JMenuItem("取消");
-						calcel.addActionListener(new ActionListener() {
-							public void actionPerformed(ActionEvent e) {
-								popup.setVisible(false);
-							}
-						});
-
-						popup.add(new JSeparator());
-						popup.add(calcel);
-						popup.show(me.getComponent(), me.getX(), me.getY());
 					}
+					JMenuItem calcel = new JMenuItem("取消");
+					calcel.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							popup.setVisible(false);
+						}
+					});
+
+					popup.add(new JSeparator());
+					popup.add(calcel);
+					popup.show(me.getComponent(), me.getX(), me.getY());
 				}
 			}
 
@@ -444,7 +452,7 @@ public class UploadJPanel extends UploadJPanelUI {
 			Response response = call.execute();
 			if (response.isSuccessful() && deleteOnSuccess)
 				subFile.delete();
-			frame.setTitle(String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()));
+			dispatchMessage(PROP_SET_WINDOW_TITLE, String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()), null);
 			uploadTableModel.setValueAt(response.isSuccessful() ? "100%" : response.message(), currentRow, updateCol);
 			uploadTable.getSelectionModel().setSelectionInterval(currentRow, currentRow);
 			uploadTable.scrollRectToVisible(new Rectangle(uploadTable.getCellRect(currentRow + 10, 0, true)));
@@ -470,7 +478,8 @@ public class UploadJPanel extends UploadJPanelUI {
 					} catch (Exception e) {
 						// donothing
 					}
-					frame.setTitle(String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()));
+					dispatchMessage(PROP_SET_WINDOW_TITLE, String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()), null);
+//					frame.setTitle(String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()));
 				}
 			});
 		}

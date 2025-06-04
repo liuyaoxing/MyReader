@@ -32,6 +32,11 @@ import offline.export.utils.Base64FileUtil;
 import offline.export.utils.ComparatorFactory;
 import offline.export.utils.EventDispatcher;
 
+/**
+ * 码云传面板
+ * 
+ * @author liuyaoxing
+ */
 public class QrCodeJPanel extends QrCodeJPanelUI {
 
 	/** 序列号 */
@@ -121,6 +126,16 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 			}
 		});
 		popupMenu.add(photoViewerMenuItem);
+
+		JMenuItem cleanMenuItem = new JMenuItem("清空");
+		cleanMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				qrCodeTableModel.setRowCount(0);
+				popupMenu.setVisible(false);
+			}
+		});
+		popupMenu.add(cleanMenuItem);
+
 		addPopupMenu(qrCodeButton, popupMenu);
 	}
 
@@ -168,7 +183,7 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 			return;
 		}
 
-		EventDispatcher.dispatchMessage(PROP_GLASSPANE_START, "", "");
+		EventDispatcher.dispatchMessage(PROP_GLASSPANE_START, null, null);
 //		glassPane.start();// 开始动画加载效果
 //		frame.setVisible(true);
 
@@ -179,8 +194,7 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 					String fileStr = Base64FileUtil.getFileStr(getFile.getCanonicalPath());
 					String generateFile = Base64FileUtil.generateFile(getFile, fileStr);
 
-//					glassPane.stop();
-					EventDispatcher.dispatchMessage(PROP_GLASSPANE_STOP, "", "");
+					EventDispatcher.dispatchMessage(PROP_GLASSPANE_STOP, null, null);
 
 //					Desktop.getDesktop().open(new File(generateFile));
 

@@ -8,12 +8,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -31,12 +31,14 @@ import offline.export.log.LogHandler;
 import offline.export.utils.EventDispatcher;
 import okhttp3.Request;
 import okhttp3.Response;
-
+/**
+ * 任务中心面板
+ * 
+ * @author liuyaoxing
+ */
 public class TaskListJPanel extends TaskListJPanelUI {
 
-	/**
-	 * 
-	 */
+	/** 序列号	 */
 	private static final long serialVersionUID = 6597532229772678135L;
 
 	protected String inputHostUrl;
@@ -49,19 +51,19 @@ public class TaskListJPanel extends TaskListJPanelUI {
 		taskListTable.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
 				if (SwingUtilities.isRightMouseButton(me)) {
+					final JPopupMenu popup = new JPopupMenu();
+					JMenuItem clearItem = new JMenuItem("清空");
+					popup.add(clearItem);
+					clearItem.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							taskListTableModel.setRowCount(0);
+						}
+					});
 					final int row = taskListTable.rowAtPoint(me.getPoint());
-					taskListTable.setRowSelectionInterval(row, row);
-					int column = taskListTable.getColumnModel().getColumnIndex(KEY_FILEPATH);
-					final File srcFile = new File(String.valueOf(taskListTable.getValueAt(row, column)));
 					if (row != -1) {
-						final JPopupMenu popup = new JPopupMenu();
-						JMenuItem clearItem = new JMenuItem("清空");
-						popup.add(clearItem);
-						clearItem.addActionListener(new ActionListener() {
-							public void actionPerformed(ActionEvent e) {
-								taskListTableModel.setRowCount(0);
-							}
-						});
+						taskListTable.setRowSelectionInterval(row, row);
+						int column = taskListTable.getColumnModel().getColumnIndex(KEY_FILEPATH);
+						final File srcFile = new File(String.valueOf(taskListTable.getValueAt(row, column)));
 						if (srcFile.exists()) {
 							JMenuItem openFile = new JMenuItem("打开文件");
 							popup.add(openFile);
@@ -90,9 +92,8 @@ public class TaskListJPanel extends TaskListJPanelUI {
 								}
 							}
 						});
-
-						popup.show(me.getComponent(), me.getX(), me.getY());
 					}
+					popup.show(me.getComponent(), me.getX(), me.getY());
 				}
 			}
 
@@ -113,9 +114,7 @@ public class TaskListJPanel extends TaskListJPanelUI {
 
 	private void doDownloadFolder(final String fileUrl, final File toFile) {
 		try {
-			EventDispatcher.dispatchMessage(PROP_GLASSPANE_START, fileUrl, "");
-//			glassPane.start();// 开始动画加载效果
-//			frame.setVisible(true);
+			EventDispatcher.dispatchMessage(PROP_GLASSPANE_START, fileUrl, null);// 开始动画加载效果
 
 			Request request = new Request.Builder().addHeader("x-header", "dll")//
 					.header("sort", "_id")//
@@ -128,8 +127,7 @@ public class TaskListJPanel extends TaskListJPanelUI {
 			String body = response.body().string();
 			List<Map<String, Object>> jsonArray = new Gson().fromJson(body, new TypeToken<List<Map<String, Object>>>() {
 			}.getType());
-			EventDispatcher.dispatchMessage(PROP_GLASSPANE_STOP, fileUrl, "");
-//			glassPane.stop();
+			EventDispatcher.dispatchMessage(PROP_GLASSPANE_STOP, fileUrl, "");// 停止动画加载效果
 			counter.set(0);
 			total.set(jsonArray.size());
 			doSyncFolder(jsonArray, toFile);
@@ -144,30 +142,25 @@ public class TaskListJPanel extends TaskListJPanelUI {
 			JOptionPane.showMessageDialog(null, "请输入正确的服务器地址！");
 			return;
 		}
-		EventDispatcher.dispatchMessage(PROP_TABBEDPANE_SELECTED_NAME, TAB_TASKLIST, "");
-//		tabbedPane.setSelectedComponent(taskContailerPanel);
+		EventDispatcher.dispatchMessage(PROP_TABBEDPANE_SELECTED_NAME, TAB_TASKLIST, null);
 
 		taskListTableModel.setRowCount(0);
 
-		AtomicInteger taskListCount = new AtomicInteger(0);
-
 		for (int row = 0; row < jsonArray.size(); row++) {
 			Map<String, Object> element = jsonArray.get(row);
-//			final String id = (String) element.get(FILESERVER_MD5);
+			final String id = (String) element.get(FILESERVER_MD5);
 			final String title = (String) element.get(FILESERVER_NAME);
-//			final String url = (String) element.get(FILESERVER_PATH);
-//			final String size = (String) element.get(FILESERVER_SIZE);
-//			final String absPath = (String) element.get(FILESERVER_ABSPATH);
+			final String url = (String) element.get(FILESERVER_PATH);
+			final String size = (String) element.get(FILESERVER_SIZE);
+			final String absPath = (String) element.get(FILESERVER_ABSPATH);
 
 			if (title.startsWith(".") || (title.contains("[文件夹]")))
 				continue;
 
-			EventDispatcher.dispatchMessage(PROP_TASKLIST_ADD, CsvUtil.mapToCsv(element), "");
-			taskListCount.incrementAndGet();
-//			taskListTableModel.addRow(new Object[] { taskListTableModel.getRowCount() + 1, id, title, url, size, "", absPath });
+			taskListTableModel.addRow(new Object[] { taskListTableModel.getRowCount() + 1, id, title, url, size, "", absPath });
 		}
 
-		total.set(taskListCount.get());
+		total.set(taskListTableModel.getRowCount());
 
 		for (int row = 0; row < taskListTableModel.getRowCount(); row++) {
 			final String id = (String) taskListTableModel.getValueAt(row, taskListTable.getColumnModel().getColumnIndex(KEY_FILEID));
@@ -245,7 +238,9 @@ public class TaskListJPanel extends TaskListJPanelUI {
 				taskListTableModel.setValueAt("0%", row, taskListTable.getColumnModel().getColumnIndex(KEY_STATUS));
 				taskListTableModel.setValueAt("下载失败" + e.getMessage(), row, taskListTable.getColumnModel().getColumnIndex(KEY_FILEPATH));
 				try {
-					Thread.sleep(6666);
+					if (e instanceof FileNotFoundException)
+						return;
+					Thread.sleep(666);
 					downloadFile(id, row, col, destFile);
 				} catch (Exception ex) {
 					LogHandler.debug("下载失败:" + ex.getMessage());

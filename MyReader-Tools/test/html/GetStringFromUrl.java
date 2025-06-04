@@ -1,6 +1,5 @@
 package html;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.jsoup.Connection;

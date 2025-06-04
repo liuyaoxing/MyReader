@@ -2,7 +2,6 @@ package offline.export.module;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Font;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -20,11 +19,11 @@ public class QrCodeJPanelUI extends MyReaderPanel {
 	private static final long serialVersionUID = 3065141250973534973L;
 
 	protected JButton qrCodeButton;
-	
+
 	protected JTable qrCodeTable;
 	protected DefaultTableModel qrCodeTableModel;
 	protected JLabel qrCodeFileTitle;
-	
+
 	public QrCodeJPanelUI() {
 		setLayout(new BorderLayout(0, 0));
 
@@ -61,7 +60,8 @@ public class QrCodeJPanelUI extends MyReaderPanel {
 			}
 		});
 
-		JScrollPane tableScrollPanel = new JScrollPane(qrCodeTable); // 支持滚动
-		add(tableScrollPanel);
+		deriveFontStyleSize(qrCodeTable, -1, 0);
+
+		add(new JScrollPane(qrCodeTable)); // 支持滚动
 	}
 }

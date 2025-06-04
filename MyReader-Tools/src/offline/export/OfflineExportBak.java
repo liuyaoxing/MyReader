@@ -113,6 +113,10 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+/**
+ * @author liuyaoxing
+ */
+@Deprecated
 public class OfflineExportBak {
 
 	private static final String KEY_ID = "ID";

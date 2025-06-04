@@ -2,7 +2,6 @@ package offline.export.module;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Font;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -59,8 +58,7 @@ public class TaskListJPanelUI extends MyReaderPanel {
 		});
 
 		deriveFontStyleSize(taskListTable, -1, 0);
-		
-		JScrollPane tableScrollPanel = new JScrollPane(taskListTable); // 支持滚动
-		add(tableScrollPanel);
+
+		add(new JScrollPane(taskListTable));// 支持滚动
 	}
 }

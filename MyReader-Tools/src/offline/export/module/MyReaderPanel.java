@@ -23,7 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 
 import offline.export.IConstants;
-import offline.export.dialog.InfiniteProgressPanel;
 import offline.export.utils.EventDispatcher;
 
 public abstract class MyReaderPanel extends JPanel implements IConstants, PropertyChangeListener {

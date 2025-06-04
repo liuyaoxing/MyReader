@@ -53,6 +53,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * 手机备份面板
+ * 
+ * @author liuyaoxing
+ */
 public class BackupJPanel extends BackupJPanelUI {
 
 	/** 序列号 */
@@ -62,13 +67,9 @@ public class BackupJPanel extends BackupJPanelUI {
 
 	protected BackupTask backupTask;
 
-	private JFrame frame;
-
 	protected Thread startThread, startFolderThread;
 
 	public BackupJPanel(JFrame frame) {
-		this.frame = frame;
-
 		createPopupMenu();
 		addListeners();
 
@@ -147,7 +148,7 @@ public class BackupJPanel extends BackupJPanelUI {
 										if (value != null && folderName != null) {
 											String newUrl = getInputHostUrl() + FOLDER_LIST_MD5 + value;
 //											taskListTitle.setText(folderName + ": " + newUrl);
-											EventDispatcher.dispatchMessage(PROP_TASLKIST_TEXT, folderName + ": " + newUrl, "");
+											EventDispatcher.dispatchMessage(PROP_TASLKIST_TEXT, folderName + ": " + newUrl, null);
 											String newFolderName = folderName.toString().replace("[文件夹]", "");
 											doDownloadFolder(newUrl, new File(currentDirectory, newFolderName));
 										}
@@ -290,8 +291,7 @@ public class BackupJPanel extends BackupJPanelUI {
 		refreshItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-//				startScanPorts();
-				EventDispatcher.dispatchMessage(PROP_LANPORT_SCAN, BackupJPanel.class.getSimpleName(), "");
+				dispatchMessage(PROP_LANPORT_SCAN, BackupJPanel.class.getSimpleName(), null);
 			}
 		});
 		urlCombo.setComponentPopupMenu(popupMenu);
@@ -382,7 +382,8 @@ public class BackupJPanel extends BackupJPanelUI {
 			if (backupTableModel.getDataVector().size() > 5000) {
 				backupTableModel.setRowCount(0);
 			}
-			frame.setTitle(String.format("%s (已处理: %s项)", TITLE, counter.incrementAndGet()));
+//			frame.setTitle(String.format("%s (已处理: %s项)", TITLE, counter.incrementAndGet()));
+			dispatchMessage(PROP_SET_WINDOW_TITLE, String.format("%s (已处理: %s项)", TITLE, counter.incrementAndGet()), null);
 		}
 		return jsonArray.size() > 0;
 	}
@@ -392,7 +393,7 @@ public class BackupJPanel extends BackupJPanelUI {
 		backupTask = new BackupTask();
 		try {
 //			database = new DataBaseProxy();
-			frame.getTitle();
+//			frame.getTitle();
 //			int res = database.dbCreate(backupTask);
 //			System.out.println(res);
 
@@ -484,7 +485,7 @@ public class BackupJPanel extends BackupJPanelUI {
 	private void doDownloadFolder(final String fileUrl, final File toFile) {
 		try {
 			EventDispatcher.dispatchMessage(PROP_DOWNLOAD_FOLDER,
-					CsvUtil.stringArrayToCsv(new String[] { fileUrl, toFile.getCanonicalPath(), getInputHostUrl() }), "");
+					CsvUtil.stringArrayToCsv(new String[] { fileUrl, toFile.getCanonicalPath(), getInputHostUrl() }), null);
 		} catch (IOException ex) {
 			LogHandler.debug("下载文件夹失败:" + ex.getMessage());
 		}

@@ -25,6 +25,9 @@ import offline.export.utils.EventDispatcher;
 import offline.export.utils.LanPortScanner;
 import offline.export.utils.LanPortScanner.ScannerResultCallback;
 
+/**
+ * @author liuyaoxing
+ */
 public class OfflineExport implements IConstants, PropertyChangeListener {
 
 	public static final String FILESERVER_NAME = "name";
@@ -35,7 +38,7 @@ public class OfflineExport implements IConstants, PropertyChangeListener {
 	public static final String FILESERVER_LENGTH = "length";
 	public static final String FILESERVER_MD5 = "md5";
 
-	private static final String TITLE = "读乐乐备份工具 v3.31";
+	private static final String TITLE = "读乐乐备份工具 v3.32";
 
 	private JFrame frame;
 
@@ -137,7 +140,7 @@ public class OfflineExport implements IConstants, PropertyChangeListener {
 					LanPortScanner.scan(new ScannerResultCallback() {
 						@Override
 						public void onSuccess(String ip) {
-							EventDispatcher.dispatchMessage(PROP_LANPORT_SCAN_IP, "http://" + ip, "");
+							EventDispatcher.dispatchMessage(PROP_LANPORT_SCAN_IP, "http://" + ip, null);
 						}
 					});
 				} catch (Exception e) {

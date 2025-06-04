@@ -2,11 +2,8 @@ package offline.export.module;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Font;
-import java.awt.FontMetrics;
 
 import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -83,8 +80,7 @@ public class BackupJPanelUI extends MyReaderPanel {
 
 //		setTableFont(backupTable, new Font("宋体", Font.PLAIN, 12));
 
-		JScrollPane backupscrollPane = new JScrollPane(backupTable); // 支持滚动
-		add(backupscrollPane);
+		add(new JScrollPane(backupTable)); // 支持滚动
 	}
 
 }
