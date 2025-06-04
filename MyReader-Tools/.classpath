@@ -12,8 +12,6 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="lib" path="libs/gson-2.2.4.jar"/>
 	<classpathentry kind="lib" path="libs/okio-1.17.5.jar"/>
-	<classpathentry kind="lib" path="libs/hsqldb-2.5.1.jar"/>
-	<classpathentry kind="lib" path="libs/commons-dbutils-1.7.jar" sourcepath="libs/commons-dbutils-1.7-sources.jar"/>
 	<classpathentry kind="lib" path="libs/zxing-core-3.4.1.jar"/>
 	<classpathentry kind="lib" path="libs/zxing-javase-3.4.1.jar"/>
 	<classpathentry kind="lib" path="libs/okhttp-3.14.9.jar"/>

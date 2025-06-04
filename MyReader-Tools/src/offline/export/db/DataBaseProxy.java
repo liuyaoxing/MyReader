@@ -11,9 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.handlers.MapListHandler;
-
 public class DataBaseProxy {
 
 	Connection conn;
@@ -69,10 +66,11 @@ public class DataBaseProxy {
 	}
 
 	public List<Map<String, Object>> dbQuery(final String sql) throws SQLException {
-		if (!enabled)
-			return Collections.emptyList();
-		QueryRunner runner = new QueryRunner();
-		return runner.query(conn, sql, new MapListHandler());
+//		if (!enabled)
+//			return Collections.emptyList();
+//		QueryRunner runner = new QueryRunner();
+//		return runner.query(conn, sql, new MapListHandler());
+		throw new IllegalAccessError();
 	}
 
 	public int dbInsert(BaseDo baseDo) throws SQLException {
