@@ -2,7 +2,7 @@
 
 ## 下载最新版
 
-下载读乐乐：https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202408111500.apk
+下载读乐乐：[https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202408111500.apk](https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202506060900.apk)
 
 ## 没有4G、3G或Wi-Fi？随时查看网页图片和视频，不受网络限制！
 
@@ -135,7 +135,7 @@ PP助手|http://m.pp.cn/detail.html?ch_src=pp&appid=7253951
 ---
 ## 下载最新版
 
-下载读乐乐：https://github.com/liuyaoxing/repository/releases/download/v20230413/MyReader-release-3.29.apk
+下载读乐乐：[https://github.com/liuyaoxing/repository/releases/download/v20230413/MyReader-release-3.29.apk](https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202506060900.apk)
 
 ---
 ## 使用指南
