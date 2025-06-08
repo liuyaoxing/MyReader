@@ -43,7 +43,6 @@ public class DownloadUtil {
 				.connectTimeout(20, TimeUnit.SECONDS) // 连接超时
 				.readTimeout(20, TimeUnit.SECONDS) // 读取超时
 				.writeTimeout(20, TimeUnit.SECONDS) // 写超时
-				.writeTimeout(20, TimeUnit.SECONDS) // 写超时
 //                .addInterceptor(new CommonHeaderInterceptor())
 //                .addInterceptor(new CacheInterceptor())
 //                .addInterceptor(new HttpLoggerInterceptor())
