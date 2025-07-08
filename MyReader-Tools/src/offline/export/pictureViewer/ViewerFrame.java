@@ -17,6 +17,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -148,6 +150,16 @@ public class ViewerFrame extends JFrame {
 			public void componentResized(ComponentEvent e) {
 				if (service.getImageFile() != null)
 					service.setImageFile(ViewerFrame.this, service.getImageFile());
+			}
+		});
+		
+		photoLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(service != null) {
+					service.playPaused = !service.playPaused;
+					service.refreshTitle(ViewerFrame.this);
+				}
 			}
 		});
 	}

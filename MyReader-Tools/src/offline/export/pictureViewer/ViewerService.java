@@ -10,6 +10,8 @@ import java.util.TimerTask;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
 
 import offline.export.utils.ComparatorFactory;
@@ -53,9 +55,21 @@ public class ViewerService {
 	}
 
 	public void open(ViewerFrame frame) {
-		if (fileChooser.showOpenDialog(frame) == ViewerFileChooser.APPROVE_OPTION) {
-			this.currentFile = fileChooser.getSelectedFile();
-			open(frame, this.currentFile);
+		try {
+			if (!System.getProperty("os.name").contains("Windows"))
+				UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+		} catch (Throwable ex) {
+		}
+		try {
+			if (fileChooser.showOpenDialog(frame) == ViewerFileChooser.APPROVE_OPTION) {
+				this.currentFile = fileChooser.getSelectedFile();
+				open(frame, this.currentFile);
+			}
+		} finally {
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (Exception e) {
+			}
 		}
 	}
 
@@ -173,7 +187,7 @@ public class ViewerService {
 		}
 	}
 
-	private void refreshTitle(ViewerFrame frame) {
+	void refreshTitle(ViewerFrame frame) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(currentFile.getName() + String.format(" [%s - %s]", currentFiles.size(), currentFiles.indexOf(currentFile) + 1));
 		if (timer != null) {
