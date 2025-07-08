@@ -1,10 +1,10 @@
 {
 	"title": "左右手v3.22",
-	"fileName": "MyBleChat-release-3.22.v202502051500.apk",
-	"url": "https://github.com/liuyaoxing/MyBLEChat/releases/download/v3.22/MyBleChat-release-3.22.v202502051500.apk",
-	"changelog": "00、升级备份工具专业版。\r\n01、优化文件共享清单查询。\r\n02、修复了一些体验的问题",
+	"fileName": "MyBleChat-release-3.22.v202507082000.apk",
+	"url": "https://github.com/liuyaoxing/MyBLEChat/releases/download/v3.22/MyBleChat-release-3.22.v202507082000.apk",
+	"changelog": "00、优化码云传的用户体验\r\n01、修复了一些体验的问题",
 	"vcode": 30,
-	"version": 202502051500,
-	"fileSize": 15896937,
+	"version": 202507082000,
+	"fileSize": 14873903,
 	"forceUpdate": true
 }

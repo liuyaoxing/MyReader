@@ -86,20 +86,20 @@ public class Version_Apk {
 	}
 
 	public static void main(String[] args) {
-		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyBleChatv33\\app\\release\\MyBleChat-release-3.22.v202502051500.apk");
+		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyBleChatv33\\app\\release\\MyBleChat-release-3.22.v202507082000.apk");
 		Version_Apk version = new Version_Apk();
 		version.setTitle("左右手v3.22");
 		version.setFileName(srcFile.getName());
-		version.setChangeLog("00、升级备份工具专业版。\r\n01、优化文件共享清单查询。\r\n02、修复了一些体验的问题");
-		version.setUrl("https://github.com/liuyaoxing/MyBLEChat/releases/download/v3.22/MyBleChat-release-3.22.v202502051500.apk");
+		version.setChangeLog("00、优化码云传的用户体验\r\n01、修复了一些体验的问题");
+		version.setUrl("https://github.com/liuyaoxing/MyBLEChat/releases/download/v3.22/MyBleChat-release-3.22.v202507082000.apk");
 		version.setFileSize(srcFile.length());
 		version.setVcode(30);
-		version.setVersion(202502051500L);
+		version.setVersion(202507082000L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();
 		String toJson = gson.toJson(version);
-		System.out.println("Json = " + toJson);
+		System.out.println("Json = \n" + toJson);
 
 //		Version_Apk version0 = gson.fromJson(toJson, Version_Apk.class);
 //		System.out.println(version0);
