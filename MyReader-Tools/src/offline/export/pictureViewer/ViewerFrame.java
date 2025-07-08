@@ -90,11 +90,11 @@ public class ViewerFrame extends JFrame {
 		// 初始化这个JFrame
 		init();
 		initDnd();
-		
+
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				if(service != null)
+				if (service != null)
 					service.playPaused = true;
 			}
 		});
@@ -152,13 +152,20 @@ public class ViewerFrame extends JFrame {
 					service.setImageFile(ViewerFrame.this, service.getImageFile());
 			}
 		});
-		
+
 		photoLabel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if(service != null) {
-					service.playPaused = !service.playPaused;
-					service.refreshTitle(ViewerFrame.this);
+				if (e.getClickCount() == 2) {
+					if (service != null) {
+						service.playPaused = false;
+						service.doAutoPlay(ViewerFrame.this, 1);
+					}
+				} else {
+					if (service != null) {
+						service.playPaused = !service.playPaused;
+						service.refreshTitle(ViewerFrame.this);
+					}
 				}
 			}
 		});
@@ -257,11 +264,10 @@ public class ViewerFrame extends JFrame {
 		// 设置布局方式
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		// 工具数组
-		String[] toolarr = { "action.OpenAction", "action.LastAction", "action.NextAction", "action.BigAction", "action.SmallAction",
-				"action.FixAction" };
+		String[] toolarr = { "action.OpenAction", "action.LastAction", "action.NextAction", "action.BigAction", "action.SmallAction", "action.FixAction" };
 		for (int i = 0; i < toolarr.length; i++) {
-			ViewerAction action = new ViewerAction(new ImageIcon("resource" + File.separator + "image" + File.separator + toolarr[i] + ".gif"),
-					toolarr[i], this);
+			ViewerAction action = new ViewerAction(new ImageIcon("resource" + File.separator + "image" + File.separator + toolarr[i] + ".gif"), toolarr[i],
+					this);
 			JButton button = new JButton(action);
 			// 把button加到工具栏中
 			toolBar.add(button);
