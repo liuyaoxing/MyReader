@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -165,6 +166,18 @@ public class ViewerFrame extends JFrame {
 					if (service != null) {
 						service.playPaused = !service.playPaused;
 						service.refreshTitle(ViewerFrame.this);
+					}
+				}
+			}
+		});
+		photoLabel.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				if (service != null) {
+					if (e.getKeyChar() == '=' || e.getKeyChar() == '+') {
+						service.doNext(ViewerFrame.this);
+					} else if (e.getKeyChar() == '-' || e.getKeyChar() == '_') {
+						service.doPrevious(ViewerFrame.this);
 					}
 				}
 			}

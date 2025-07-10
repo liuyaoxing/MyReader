@@ -262,6 +262,7 @@ public class ViewerService {
 
 	public void doAutoPlay(final ViewerFrame frame, double period) {
 		this.playTimerPeriod = period;
+		refreshTitle(frame);
 		if (timer != null) {
 			timer.cancel();
 			timer = null;
