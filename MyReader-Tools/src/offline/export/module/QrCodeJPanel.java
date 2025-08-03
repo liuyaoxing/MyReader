@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -81,7 +82,8 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 					}
 					System.out.println(selectedText);
 					viewerFrame.setVisible(true);
-					viewerFrame.openFile(new File(qrCodeFileTitle.getText(), selectedText));
+//					viewerFrame.openFile(new File(qrCodeFileTitle.getText(), selectedText));
+					viewerFrame.setFile(new File(qrCodeFileTitle.getText(), selectedText));
 				}
 			}
 		});
@@ -119,13 +121,44 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 					frame.setExtendedState(Frame.ICONIFIED);
 					ViewerFrame viewerFrame = new ViewerFrame();
 					viewerFrame.setLocationRelativeTo(null);
-					viewerFrame.openFile();
+					File openFile = viewerFrame.openFile();
+					if (openFile != null) {
+						qrCodeTableModel.setRowCount(0);
+						refreshFileItems(openFile.getParent());
+					}
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
 			}
 		});
 		popupMenu.add(photoViewerMenuItem);
+
+		JMenuItem openFolderMenuItem = new JMenuItem("打开文件夹");
+		openFolderMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					popupMenu.setVisible(false);
+					JFileChooser fileChooser = new JFileChooser();
+					fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+					if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+						File choosedFolder = fileChooser.getSelectedFile();
+						EventDispatcher.dispatchMessage(PROP_GLASSPANE_START, null, null);
+						File[] qrCodeFiles = refreshFileItems(choosedFolder.getCanonicalPath());
+						if (viewerFrame == null) {
+							viewerFrame = new ViewerFrame();
+							viewerFrame.setLocationRelativeTo(null);
+						}
+						EventDispatcher.dispatchMessage(PROP_GLASSPANE_STOP, null, null);
+						viewerFrame.setVisible(true);
+						viewerFrame.openFile(qrCodeFiles, qrCodeFiles[0]);
+					}
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		popupMenu.add(openFolderMenuItem);
 
 		JMenuItem cleanMenuItem = new JMenuItem("清空");
 		cleanMenuItem.addActionListener(new ActionListener() {
@@ -177,8 +210,8 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 	}
 
 	private void parseFile2QrCodes(final File getFile) {
-		if (getFile.length() > FileUtils.ONE_MB) {
-			JOptionPane.showMessageDialog(null, getFile.getPath(), String.format("文件大小[%s]超过1M！不允许使用!", FileUtils.getFileSize(getFile.length())),
+		if (getFile.length() > FileUtils.ONE_MB * 5) {
+			JOptionPane.showMessageDialog(null, getFile.getPath(), String.format("文件大小[%s]超过5M！不允许使用!", FileUtils.getFileSize(getFile.length())),
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
@@ -198,17 +231,7 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 
 //					Desktop.getDesktop().open(new File(generateFile));
 
-					File[] qrCodeFiles = new File(generateFile).listFiles();
-					Arrays.sort(qrCodeFiles, new ComparatorFactory.WindowsExplorerComparator());
-
-					for (int i = 0; i < qrCodeFiles.length; i += qrCodeTable.getColumnCount()) {
-						Vector<String> rowData = new Vector<String>(qrCodeTable.getColumnCount());
-						for (int j = 0; j < Math.min(qrCodeTable.getColumnCount(), qrCodeFiles.length - i); j++) {
-							rowData.add(qrCodeFiles[i + j].getName());
-						}
-						qrCodeTableModel.addRow(rowData);
-					}
-					qrCodeFileTitle.setText(generateFile);
+					File[] qrCodeFiles = refreshFileItems(generateFile);
 
 					if (viewerFrame == null) {
 						viewerFrame = new ViewerFrame();
@@ -241,5 +264,20 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		});
+	}
+
+	private File[] refreshFileItems(String generateFile) {
+		File[] qrCodeFiles = new File(generateFile).listFiles();
+		Arrays.sort(qrCodeFiles, new ComparatorFactory.WindowsExplorerComparator());
+
+		for (int i = 0; i < qrCodeFiles.length; i += qrCodeTable.getColumnCount()) {
+			Vector<String> rowData = new Vector<String>(qrCodeTable.getColumnCount());
+			for (int j = 0; j < Math.min(qrCodeTable.getColumnCount(), qrCodeFiles.length - i); j++) {
+				rowData.add(qrCodeFiles[i + j].getName());
+			}
+			qrCodeTableModel.addRow(rowData);
+		}
+		qrCodeFileTitle.setText(generateFile);
+		return qrCodeFiles;
 	}
 }

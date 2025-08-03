@@ -36,6 +36,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 
 public class ViewerFrame extends JFrame {
@@ -43,6 +44,10 @@ public class ViewerFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	public static final String MENU_PLAY1_0S = "播放(1s)";
+
+	public static final String MENU_PLAY0_8S = "播放(0.8s)";
+
+	public static final String MENU_PLAY0_5S = "播放(0.5s)";
 
 	public static final String MENU_PLAYCUSTOMS = "播放(自定义)";
 
@@ -71,7 +76,7 @@ public class ViewerFrame extends JFrame {
 	public static final String MENUBAR_FILE = "文件";
 
 	// 设置读图区的宽和高
-	private int width = 666, height = 666;
+	private int width = 555, height = 555;
 
 	// 用一个JLabel放置图片
 	private JLabel photoLabel;
@@ -114,8 +119,11 @@ public class ViewerFrame extends JFrame {
 		JPanel toolBar = createToolPanel();
 		toolBar.setVisible(false);
 		photoLabel = new JLabel();
+		photoLabel.setFocusable(true);
 		photoLabel.setHorizontalAlignment(JLabel.CENTER);
 		photoLabel.setVerticalAlignment(JLabel.CENTER);
+		photoLabel.setBorder(new EmptyBorder(0, 0, 0, 0));
+		photoLabel.setIconTextGap(0);
 		// 把工具栏和读图区加到JFrame里面
 		this.add(toolBar, BorderLayout.NORTH);
 		this.add(new JScrollPane(photoLabel), BorderLayout.CENTER);
@@ -255,12 +263,20 @@ public class ViewerFrame extends JFrame {
 
 	}
 
-	public void openFile() {
-		service.open(this);
+	public File openFile() {
+		return service.open(this);
 	}
 
 	public void openFile(File srcFile) {
 		service.open(this, srcFile);
+	}
+
+	public void openFile(File[] allFiles, File srcFile) {
+		service.open(this, allFiles, srcFile);
+	}
+
+	public void setFile(File srcFile) {
+		service.setImageFile(this, srcFile);
 	}
 
 	public JLabel getLabel() {
@@ -297,8 +313,8 @@ public class ViewerFrame extends JFrame {
 		String[] menuArr = { MENUBAR_FILE, MENUBAR_TOOLS };
 		// 菜单项文字数组
 		String[][] menuItemArr = { { MENU_OPENFILE, "-", MENU_SET_ALWAYS_ONTOP, "-", MENU_EXIT }, //
-				{ MENU_ZOOM_IN, MENU_ZOOM_OUT, MENU_ZOOM_FIX, "-", MENU_PREVIOUS, MENU_NEXT, "-", MENU_PLAY1_0S, MENU_PLAYCUSTOMS, MENU_PLAY_PAUSE,
-						MENU_PLAY_STOP } };
+				{ MENU_ZOOM_IN, MENU_ZOOM_OUT, MENU_ZOOM_FIX, "-", MENU_PREVIOUS, MENU_NEXT, "-", MENU_PLAY1_0S, MENU_PLAY0_8S, MENU_PLAY0_5S,
+						MENU_PLAYCUSTOMS, MENU_PLAY_PAUSE, MENU_PLAY_STOP } };
 		// 遍历menuArr与menuItemArr去创建菜单
 		for (int i = 0; i < menuArr.length; i++) {
 			// 新建一个JMenu菜单

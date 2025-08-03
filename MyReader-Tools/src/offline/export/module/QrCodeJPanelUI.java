@@ -42,7 +42,14 @@ public class QrCodeJPanelUI extends MyReaderPanel {
 		deriveFontStyleSize(qrCodeFileTitle, -4, 0);
 		qrCodePanel_1.add(qrCodeFileTitle);
 
-		qrCodeTableModel = new DefaultTableModel(null, new String[] { "0", "1", "2", "4", "5" });
+		qrCodeTableModel = new DefaultTableModel(null, new String[] { "0", "1", "2", "4", "5" }) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean isCellEditable(int row, int colulmn) {
+				return false;
+			}
+		};
 		qrCodeTable = new JTable(qrCodeTableModel);
 		qrCodeTable.setFillsViewportHeight(true);
 //		qrCodeTable.setRowHeight(30);

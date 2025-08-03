@@ -54,25 +54,39 @@ public class ViewerService {
 		return service;
 	}
 
-	public void open(ViewerFrame frame) {
-		try {
-			if (!System.getProperty("os.name").contains("Windows"))
-				UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-		} catch (Throwable ex) {
-		}
+	public File open(ViewerFrame frame) {
+//		try {
+//			if (!System.getProperty("os.name").contains("Windows"))
+//				UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+//		} catch (Throwable ex) {
+//		}
+//		try {
+			return open0(frame);
+//		}catch(Exception ex) {
+//			ex.printStackTrace();
+//			open0(frame);
+//		} finally {
+//			try {
+//				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//			} catch (Exception e) {
+//			}
+//		}
+	}
+	
+	File open0(ViewerFrame frame) {
 		try {
 			if (fileChooser.showOpenDialog(frame) == ViewerFileChooser.APPROVE_OPTION) {
 				this.currentFile = fileChooser.getSelectedFile();
 				open(frame, this.currentFile);
+			} else {
+				return null;
 			}
-		} finally {
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (Exception e) {
-			}
+		}catch(Exception ex) {
+			ex.printStackTrace();
 		}
+		return this.currentFile;
 	}
-
+	
 	public void open(ViewerFrame frame, File srcFile) {
 		this.currentFile = srcFile;
 		currentFiles.clear();
@@ -91,6 +105,12 @@ public class ViewerService {
 			}
 		}
 		setImageFile(frame, this.currentFile);
+	}
+	
+	public void open(ViewerFrame frame, File[] allFiles, File currentFile) {
+		this.currentFile = currentFile;
+		this.currentFiles = Arrays.asList(allFiles);
+		setImageFile(frame, currentFile);
 	}
 
 	public void doPrevious(ViewerFrame frame) {
@@ -141,12 +161,18 @@ public class ViewerService {
 		if (cmd.equals(ViewerFrame.MENU_PREVIOUS)) {
 			doPrevious(frame);
 		}
-		// 下一个
+		// 下一个b
 		if (cmd.equals(ViewerFrame.MENU_NEXT)) {
 			doNext(frame);
 		}
 		if (cmd.equals(ViewerFrame.MENU_PLAY1_0S)) {
 			doAutoPlay(frame, 1);
+		}
+		if (cmd.equals(ViewerFrame.MENU_PLAY0_8S)) {
+			doAutoPlay(frame, 0.8);
+		}
+		if (cmd.equals(ViewerFrame.MENU_PLAY0_5S)) {
+			doAutoPlay(frame, 0.5);
 		}
 		if (cmd.equals(ViewerFrame.MENU_PLAYCUSTOMS)) {
 			String m = JOptionPane.showInputDialog("请输入轮播间隔,单位秒");
