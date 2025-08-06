@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -25,6 +26,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -36,6 +38,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 
@@ -54,6 +57,8 @@ public class ViewerFrame extends JFrame {
 	public static final String MENU_PLAY_PAUSE = "暂停播放";
 
 	public static final String MENU_PLAY_STOP = "停止播放";
+
+	public static final String WINDOW_SHAKE = "窗口抖动";
 
 	public static final String MENU_SET_ALWAYS_ONTOP = "窗口置顶";
 
@@ -104,6 +109,37 @@ public class ViewerFrame extends JFrame {
 					service.playPaused = true;
 			}
 		});
+		addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentMoved(ComponentEvent arg0) {
+				naturalLocation = getLocation();
+			}
+		});
+		startShake();
+	}
+
+	Point naturalLocation;
+
+	public void startShake() {
+		// 抖动幅度（像素）,值越大抖动越
+		final int SHAKE_RANGE = 1;
+		AtomicBoolean ab = new AtomicBoolean(false);
+		Timer shakeTimer = new Timer(500, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (service.playPaused || !service.windowShake)
+					return;
+				naturalLocation = (naturalLocation == null ? getLocation() : naturalLocation);
+				int dx = ab.get() ? SHAKE_RANGE : -SHAKE_RANGE;
+				int dy = ab.get() ? SHAKE_RANGE : -SHAKE_RANGE;
+				int newX = naturalLocation.x + dx;
+				int newY = naturalLocation.y + dy;
+
+				setLocation(newX, newY);
+				ab.set(!ab.get());
+			}
+		});
+		shakeTimer.start();
 	}
 
 	public void init() {
@@ -312,7 +348,7 @@ public class ViewerFrame extends JFrame {
 		// 菜单文字数组，以下面的menuItemArr一一对应
 		String[] menuArr = { MENUBAR_FILE, MENUBAR_TOOLS };
 		// 菜单项文字数组
-		String[][] menuItemArr = { { MENU_OPENFILE, "-", MENU_SET_ALWAYS_ONTOP, "-", MENU_EXIT }, //
+		String[][] menuItemArr = { { MENU_OPENFILE, "-", MENU_SET_ALWAYS_ONTOP, WINDOW_SHAKE, "-", MENU_EXIT }, //
 				{ MENU_ZOOM_IN, MENU_ZOOM_OUT, MENU_ZOOM_FIX, "-", MENU_PREVIOUS, MENU_NEXT, "-", MENU_PLAY1_0S, MENU_PLAY0_8S, MENU_PLAY0_5S,
 						MENU_PLAYCUSTOMS, MENU_PLAY_PAUSE, MENU_PLAY_STOP } };
 		// 遍历menuArr与menuItemArr去创建菜单

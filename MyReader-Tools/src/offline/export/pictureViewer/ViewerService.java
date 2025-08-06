@@ -40,6 +40,9 @@ public class ViewerService {
 
 	/** 是否暂停播放 */
 	protected boolean playPaused = false;
+	
+	/** 是否窗口抖動 */
+	protected boolean windowShake = false;
 
 	/** 自动播放间隔时间 */
 	protected double playTimerPeriod = 0;
@@ -142,6 +145,9 @@ public class ViewerService {
 		}
 		if (cmd.equals(ViewerFrame.MENU_SET_ALWAYS_ONTOP)) {
 			frame.setAlwaysOnTop(!frame.isAlwaysOnTop());
+		}
+		if (cmd.equals(ViewerFrame.WINDOW_SHAKE)) {
+			windowShake = !windowShake;
 		}
 		if (currentFile == null)
 			return;
