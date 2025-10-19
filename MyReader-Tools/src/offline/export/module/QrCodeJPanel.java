@@ -19,13 +19,19 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 import offline.export.FileUtils;
 import offline.export.pictureViewer.ViewerFrame;
@@ -49,12 +55,48 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 
 	private JPopupMenu popupMenu;
 
+	private TableRowSorter<DefaultTableModel> tableSorter;
 	public QrCodeJPanel(JFrame frame) {
 		this.frame = frame;
 
 		initMenus();
 		initDnd();
+		addFilters();
 		addListeners();
+	}
+	private void addFilters() {
+		tableSorter = new TableRowSorter<DefaultTableModel>(qrCodeTableModel);
+		qrCodeTable.setRowSorter(tableSorter);
+		searchField.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {
+				applyTableFilter(searchField.getText());
+			}
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				applyTableFilter(searchField.getText());
+			}
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+				applyTableFilter(searchField.getText());
+			}
+		});
+		searchField.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent me) {
+				if (me.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(me)) {
+					searchField.setText("");
+					applyTableFilter("");
+				}
+			}
+		});
+	}
+	
+	protected void applyTableFilter(String text) {
+		if (text == null || text.trim().length() == 0) {
+			tableSorter.setRowFilter(null);
+		} else {
+			tableSorter.setRowFilter(RowFilter.regexFilter(".*-" + Pattern.quote(text) + "].*"));
+		}
 	}
 
 	private void addListeners() {
@@ -75,15 +117,17 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 				if (me.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(me)) {
 					final int row = qrCodeTable.rowAtPoint(me.getPoint());
 					final int col = qrCodeTable.columnAtPoint(me.getPoint());
-					String selectedText = (String) qrCodeTableModel.getValueAt(row, col);
+					int modelRow = qrCodeTable.convertRowIndexToModel(row);
+					int modelCol = qrCodeTable.convertColumnIndexToModel(col);
+					String selectedText = (String) qrCodeTableModel.getValueAt(modelRow, modelCol);
 					if (viewerFrame == null) {
 						viewerFrame = new ViewerFrame();
 						viewerFrame.setLocationRelativeTo(null);
 					}
 					System.out.println(selectedText);
-					viewerFrame.setVisible(true);
 //					viewerFrame.openFile(new File(qrCodeFileTitle.getText(), selectedText));
 					viewerFrame.setFile(new File(qrCodeFileTitle.getText(), selectedText));
+					viewerFrame.setVisible(true);
 				}
 			}
 		});
@@ -102,8 +146,9 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 					fd.setTitle("请选择文件");
 					fd.setVisible(true);
 
+					
 					File getFile = new File(fd.getDirectory(), fd.getFile());
-
+					qrCodeTableModel.setRowCount(0);
 					parseFile2QrCodes(getFile);
 
 				} catch (Exception ex) {

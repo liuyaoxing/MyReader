@@ -312,7 +312,12 @@ public class ViewerFrame extends JFrame {
 	}
 
 	public void setFile(File srcFile) {
-		service.setImageFile(this, srcFile);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				service.setImageFile(ViewerFrame.this, srcFile);
+			}
+		});
 	}
 
 	public JLabel getLabel() {

@@ -210,8 +210,8 @@ public class ViewerService {
 	}
 
 	public void setImageFile(ViewerFrame frame, File imageFile) {
-		refreshTitle(frame);
 		this.currentFile = imageFile;
+		refreshTitle(frame);
 		if (zoomFit) {
 			doZoomFit(frame);
 		} else {
@@ -271,6 +271,7 @@ public class ViewerService {
 		ImageIcon newIcon = new ImageIcon(icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
 		// 改变显示的图片
 		frame.getLabel().setIcon(newIcon);
+		frame.getLabel().repaint();
 	}
 
 	/**
