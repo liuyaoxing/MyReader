@@ -205,7 +205,7 @@ public class ViewerFrame extends JFrame {
 				if (e.getClickCount() == 2) {
 					if (service != null) {
 						service.playPaused = false;
-						service.doAutoPlay(ViewerFrame.this, 1);
+						service.doAutoPlay(ViewerFrame.this, 0.8);
 					}
 				} else {
 					if (service != null) {

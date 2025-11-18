@@ -128,6 +128,7 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 //					viewerFrame.openFile(new File(qrCodeFileTitle.getText(), selectedText));
 					viewerFrame.setFile(new File(qrCodeFileTitle.getText(), selectedText));
 					viewerFrame.setVisible(true);
+					viewerFrame.setExtendedState(JFrame.NORMAL);
 				}
 			}
 		});

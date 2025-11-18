@@ -191,6 +191,7 @@ public class ViewerService {
 		if (cmd.equals(ViewerFrame.MENU_PLAY_PAUSE)) {
 			playPaused = !playPaused;
 			refreshTitle(frame);
+			frame.setExtendedState(playPaused ? JFrame.ICONIFIED: JFrame.NORMAL);
 		}
 
 		if (cmd.equals(ViewerFrame.MENU_PLAY_STOP)) {
