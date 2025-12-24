@@ -484,6 +484,7 @@ public class BackupJPanel extends BackupJPanelUI {
 
 	private void doDownloadFolder(final String fileUrl, final File toFile) {
 		try {
+			System.out.println(String.format("开始下载文件%s到%s", fileUrl, toFile));
 			EventDispatcher.dispatchMessage(PROP_DOWNLOAD_FOLDER,
 					CsvUtil.stringArrayToCsv(new String[] { fileUrl, toFile.getCanonicalPath(), getInputHostUrl() }), null);
 		} catch (IOException ex) {

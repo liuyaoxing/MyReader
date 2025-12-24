@@ -31,6 +31,7 @@ import offline.export.log.LogHandler;
 import offline.export.utils.EventDispatcher;
 import okhttp3.Request;
 import okhttp3.Response;
+
 /**
  * 任务中心面板
  * 
@@ -38,7 +39,7 @@ import okhttp3.Response;
  */
 public class TaskListJPanel extends TaskListJPanelUI {
 
-	/** 序列号	 */
+	/** 序列号 */
 	private static final long serialVersionUID = 6597532229772678135L;
 
 	protected String inputHostUrl;
@@ -133,6 +134,8 @@ public class TaskListJPanel extends TaskListJPanelUI {
 			doSyncFolder(jsonArray, toFile);
 		} catch (Exception ex) {
 			LogHandler.error(ex);
+			JOptionPane.showMessageDialog(null, "下载失败:" + ex.getMessage());
+			EventDispatcher.dispatchMessage(PROP_GLASSPANE_STOP, fileUrl, null);// 开始动画加载效果
 		}
 	}
 
