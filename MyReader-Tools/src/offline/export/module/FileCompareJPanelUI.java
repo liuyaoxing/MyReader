@@ -36,17 +36,17 @@ public class FileCompareJPanelUI extends MyReaderPanel {
 	protected JButton leftBtn;
 	protected JComboBox<String> rightCombo;
 	protected JButton rightBtn;
-	private JCheckBox showEqualsBtn;
-	private JButton deleteEqulasBtn;
-	private JButton refreshBtn;
-	private JSplitPane splitPane;
+	protected JCheckBox showEqualsBtn;
+	protected JButton deleteEqulasBtn;
+	protected JButton refreshBtn;
+	protected JSplitPane splitPane;
 
-	private JTree leftTree;
-	private JTree rightTree;
-	private DefaultTreeModel leftModel;
-	private DefaultTreeModel rightModel;
+	protected JTree leftTree;
+	protected JTree rightTree;
+	protected DefaultTreeModel leftModel;
+	protected DefaultTreeModel rightModel;
 
-	private CompareTreeNode leftRoot, rightRoot;
+	protected CompareTreeNode leftRoot, rightRoot;
 
 	public FileCompareJPanelUI() {
 		setLayout(new BorderLayout(0, 0));
