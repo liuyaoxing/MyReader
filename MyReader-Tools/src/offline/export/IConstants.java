@@ -34,6 +34,7 @@ public interface IConstants {
 	public static final String NAME_QRCODE = "码云传";
 	public static final String NAME_TASKLIST = "任务列表";
 	public static final String NAME_BACKUP = "手机备份";
+	public static final String NAME_COMPARE = "文件夹比较";
 
 	public static final String PROP_TASLKIST_TEXT = "PROP_TASLKIST_TEXT";
 

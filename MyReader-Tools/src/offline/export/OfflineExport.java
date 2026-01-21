@@ -18,6 +18,7 @@ import offline.export.config.Configuration;
 import offline.export.dialog.InfiniteProgressPanel;
 import offline.export.log.LogHandler;
 import offline.export.module.BackupJPanel;
+import offline.export.module.FileCompareJPanel;
 import offline.export.module.QrCodeJPanel;
 import offline.export.module.TaskListJPanel;
 import offline.export.module.UploadJPanel;
@@ -178,6 +179,7 @@ public class OfflineExport implements IConstants, PropertyChangeListener {
 		tabbedPane.addTab(NAME_UPLOAD, new UploadJPanel(frame));
 		tabbedPane.addTab(NAME_QRCODE, new QrCodeJPanel(frame));
 		tabbedPane.addTab(NAME_TASKLIST, new TaskListJPanel(frame));
+		tabbedPane.addTab(NAME_COMPARE, new FileCompareJPanel(frame));
 	}
 
 	@Override

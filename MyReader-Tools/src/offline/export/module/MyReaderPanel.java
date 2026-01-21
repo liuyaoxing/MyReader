@@ -21,6 +21,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.JTree;
 
 import offline.export.IConstants;
 import offline.export.utils.EventDispatcher;
@@ -54,9 +55,22 @@ public abstract class MyReaderPanel extends JPanel implements IConstants, Proper
 		if (component instanceof JTable) {
 			setTableFont((JTable) component, newFont);
 		}
+		if (component instanceof JTree) {
+			setTreeFont((JTree) component, newFont);
+		}
 	}
 
 	public void setTableFont(JTable table, Font font) {
+		Font currentFont = table.getFont();
+		if (currentFont == null)
+			currentFont = font;
+		table.setFont(font);
+		FontMetrics fontMetrics = table.getFontMetrics(font);
+		int rowHeight = fontMetrics.getHeight();
+		table.setRowHeight(rowHeight);
+	}
+	
+	public void setTreeFont(JTree table, Font font) {
 		Font currentFont = table.getFont();
 		if (currentFont == null)
 			currentFont = font;
