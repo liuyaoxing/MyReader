@@ -44,9 +44,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import offline.export.FileUtils;
 import offline.export.log.LogHandler;
 import offline.export.utils.EventDispatcher;
+import offline.export.utils.FileUtils;
 import offline.export.utils.NetworkUtils;
 import offline.export.utils.ProgressRequestBody;
 import offline.export.utils.ProgressRequestListener;
@@ -80,7 +80,7 @@ public class UploadJPanel extends UploadJPanelUI {
 		addListeners();
 		initDnd();
 
-		addItemsToCombo(urlCombo2, new String[] { "http://192.168.43.1:61666" + FOLDER_UPLOAD }, 0);
+		addItemsToCombo(urlCombo2, new String[]{"http://192.168.43.1:61666" + FOLDER_UPLOAD}, 0);
 	}
 
 	protected void createPopupMenu() {
@@ -137,7 +137,7 @@ public class UploadJPanel extends UploadJPanelUI {
 				if (!t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 					evt.rejectDrag(); // 没有需要的类型，拒绝进入
 				}
-//				evt.acceptDrag(DnDConstants.ACTION_COPY);
+				// evt.acceptDrag(DnDConstants.ACTION_COPY);
 			}
 
 			@Override
@@ -230,7 +230,8 @@ public class UploadJPanel extends UploadJPanelUI {
 					itemSet.add(String.valueOf(newItem));
 					URL url = new URL(newItem);
 					String newUrl = "http://" + String.format("%s:%s", url.getHost(), url.getPort());
-//					itemSet.add(String.valueOf(newUrl + FOLDER_UPLOAD + FLAG_DELETE_ON_SUCCESS));
+					// itemSet.add(String.valueOf(newUrl + FOLDER_UPLOAD +
+					// FLAG_DELETE_ON_SUCCESS));
 					itemSet.add(String.valueOf(newUrl + FOLDER_UPLOAD));
 				} catch (MalformedURLException e1) {
 					e1.printStackTrace();
@@ -354,12 +355,12 @@ public class UploadJPanel extends UploadJPanelUI {
 	}
 
 	private void addToUploadTable(File srcFile) throws IOException {
-		uploadTableModel.addRow(new String[] { String.valueOf(uploadTableModel.getRowCount() + 1), //
+		uploadTableModel.addRow(new String[]{String.valueOf(uploadTableModel.getRowCount() + 1), //
 				srcFile.getName(), //
 				"0%", //
 				srcFile.getCanonicalPath(), //
 				FileUtils.getFileSize(srcFile.length()), //
-				new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(srcFile.lastModified())) });
+				new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(srcFile.lastModified()))});
 	}
 
 	private void doUploadFolder(File baseDir, final File[] allFiles) throws IOException, InterruptedException {
@@ -479,7 +480,8 @@ public class UploadJPanel extends UploadJPanelUI {
 						// donothing
 					}
 					dispatchMessage(PROP_SET_WINDOW_TITLE, String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()), null);
-//					frame.setTitle(String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()));
+					// frame.setTitle(String.format("%s (已处理: %s/%s项)", TITLE,
+					// counter.incrementAndGet(), total.get()));
 				}
 			});
 		}

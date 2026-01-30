@@ -147,7 +147,8 @@ public class ViewerFrame extends JFrame {
 		// 设置标题
 		this.setTitle("读乐乐图片浏览器");
 		// 设置图标
-//		this.setIconImage(Toolkit.getDefaultToolkit().getImage("resource" + File.separator + "image" + File.separator + "frameIcon.jpg"));
+		// this.setIconImage(Toolkit.getDefaultToolkit().getImage("resource" +
+		// File.separator + "image" + File.separator + "frameIcon.jpg"));
 		// 设置大小
 		this.setPreferredSize(new Dimension(width, height));
 		// 创建菜单
@@ -173,18 +174,18 @@ public class ViewerFrame extends JFrame {
 			public boolean dispatchKeyEvent(KeyEvent arg0) {
 				if (arg0.getID() == KeyEvent.KEY_PRESSED) {
 					switch (arg0.getKeyCode()) {
-					case KeyEvent.VK_LEFT:
-						service.doPrevious(ViewerFrame.this);
-						break;
-					case KeyEvent.VK_RIGHT:
-						service.doNext(ViewerFrame.this);
-						break;
-					case KeyEvent.VK_SPACE:
-						service.menuDo(ViewerFrame.this, ViewerFrame.MENU_PLAY_PAUSE);
-						break;
-					case KeyEvent.VK_ESCAPE:
-						service.menuDo(ViewerFrame.this, ViewerFrame.MENU_PLAY_STOP);
-						break;
+						case KeyEvent.VK_LEFT :
+							service.doPrevious(ViewerFrame.this);
+							break;
+						case KeyEvent.VK_RIGHT :
+							service.doNext(ViewerFrame.this);
+							break;
+						case KeyEvent.VK_SPACE :
+							service.menuDo(ViewerFrame.this, ViewerFrame.MENU_PLAY_PAUSE);
+							break;
+						case KeyEvent.VK_ESCAPE :
+							service.menuDo(ViewerFrame.this, ViewerFrame.MENU_PLAY_STOP);
+							break;
 					}
 				}
 				return false;
@@ -335,7 +336,7 @@ public class ViewerFrame extends JFrame {
 		// 设置布局方式
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		// 工具数组
-		String[] toolarr = { "action.OpenAction", "action.LastAction", "action.NextAction", "action.BigAction", "action.SmallAction", "action.FixAction" };
+		String[] toolarr = {"action.OpenAction", "action.LastAction", "action.NextAction", "action.BigAction", "action.SmallAction", "action.FixAction"};
 		for (int i = 0; i < toolarr.length; i++) {
 			ViewerAction action = new ViewerAction(new ImageIcon("resource" + File.separator + "image" + File.separator + toolarr[i] + ".gif"), toolarr[i],
 					this);
@@ -352,11 +353,11 @@ public class ViewerFrame extends JFrame {
 		// 创建一个JMenuBar放置菜单
 		JMenuBar menuBar = new JMenuBar();
 		// 菜单文字数组，以下面的menuItemArr一一对应
-		String[] menuArr = { MENUBAR_FILE, MENUBAR_TOOLS };
+		String[] menuArr = {MENUBAR_FILE, MENUBAR_TOOLS};
 		// 菜单项文字数组
-		String[][] menuItemArr = { { MENU_OPENFILE, "-", MENU_SET_ALWAYS_ONTOP, WINDOW_SHAKE, "-", MENU_EXIT }, //
-				{ MENU_ZOOM_IN, MENU_ZOOM_OUT, MENU_ZOOM_FIX, "-", MENU_PREVIOUS, MENU_NEXT, "-", MENU_PLAY1_0S, MENU_PLAY0_8S, MENU_PLAY0_5S,
-						MENU_PLAYCUSTOMS, MENU_PLAY_PAUSE, MENU_PLAY_STOP } };
+		String[][] menuItemArr = {{MENU_OPENFILE, "-", MENU_SET_ALWAYS_ONTOP, WINDOW_SHAKE, "-", MENU_EXIT}, //
+				{MENU_ZOOM_IN, MENU_ZOOM_OUT, MENU_ZOOM_FIX, "-", MENU_PREVIOUS, MENU_NEXT, "-", MENU_PLAY1_0S, MENU_PLAY0_8S, MENU_PLAY0_5S,
+						MENU_PLAYCUSTOMS, MENU_PLAY_PAUSE, MENU_PLAY_STOP}};
 		// 遍历menuArr与menuItemArr去创建菜单
 		for (int i = 0; i < menuArr.length; i++) {
 			// 新建一个JMenu菜单

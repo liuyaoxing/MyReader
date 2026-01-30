@@ -13,7 +13,8 @@ public class UrlUtils {
 	/**
 	 * 获取链接的参数
 	 * 
-	 * @param url 链接
+	 * @param url
+	 *            链接
 	 * @return
 	 */
 	public static LinkedHashMap<String, String> getParamsMap(String url) {
@@ -57,7 +58,7 @@ public class UrlUtils {
 
 		return null;
 	}
-	
+
 	public static boolean isBlank(String url) {
 		return url == null || url.isEmpty();
 	}
@@ -65,9 +66,12 @@ public class UrlUtils {
 	/**
 	 * 向url链接追加参数（会覆盖已经有的参数）
 	 * 
-	 * @param url        链接地址
-	 * @param params     LinkedHashMap<String, String> 参数
-	 * @param isOverride 是否覆盖参数，true表示将新参数覆盖链接原参数，false不覆盖
+	 * @param url
+	 *            链接地址
+	 * @param params
+	 *            LinkedHashMap<String, String> 参数
+	 * @param isOverride
+	 *            是否覆盖参数，true表示将新参数覆盖链接原参数，false不覆盖
 	 * @return
 	 */
 	public static String addParams(String url, LinkedHashMap<String, String> params, boolean isOverride) {
@@ -141,10 +145,14 @@ public class UrlUtils {
 	/**
 	 * 向url链接追加参数(单个) （会覆盖已经有的参数）
 	 * 
-	 * @param url        链接地址
-	 * @param name       String 参数名
-	 * @param value      String 参数值
-	 * @param isOverride 是否覆盖参数，true表示将新参数覆盖链接原参数，false不覆盖
+	 * @param url
+	 *            链接地址
+	 * @param name
+	 *            String 参数名
+	 * @param value
+	 *            String 参数值
+	 * @param isOverride
+	 *            是否覆盖参数，true表示将新参数覆盖链接原参数，false不覆盖
 	 * @return
 	 */
 	public static String addParam(String url, String name, String value, boolean isOverride) {
@@ -162,9 +170,12 @@ public class UrlUtils {
 	/**
 	 * 向url链接追加参数(单个) （会覆盖已经有的参数）
 	 * 
-	 * @param url   链接地址
-	 * @param name  String 参数名
-	 * @param value String 参数值
+	 * @param url
+	 *            链接地址
+	 * @param name
+	 *            String 参数名
+	 * @param value
+	 *            String 参数值
 	 * @return
 	 */
 	public static String addParam(String url, String name, String value) {
@@ -174,9 +185,12 @@ public class UrlUtils {
 	/**
 	 * 向url链接追加参数(单个) （不会覆盖已经有的参数）
 	 * 
-	 * @param url   链接地址
-	 * @param name  String 参数名
-	 * @param value String 参数值
+	 * @param url
+	 *            链接地址
+	 * @param name
+	 *            String 参数名
+	 * @param value
+	 *            String 参数值
 	 * @return
 	 */
 	public static String addParamNotExist(String url, String name, String value) {
@@ -186,8 +200,10 @@ public class UrlUtils {
 	/**
 	 * 向url链接追加参数（会覆盖已经有的参数）
 	 * 
-	 * @param url    链接地址
-	 * @param params LinkedHashMap<String, String> 参数
+	 * @param url
+	 *            链接地址
+	 * @param params
+	 *            LinkedHashMap<String, String> 参数
 	 * @return
 	 */
 	public static String addParams(String url, LinkedHashMap<String, String> params) {
@@ -197,8 +213,10 @@ public class UrlUtils {
 	/**
 	 * 向url链接追加参数（不会覆盖已经有的参数）
 	 * 
-	 * @param url    链接地址
-	 * @param params LinkedHashMap<String, String> 参数
+	 * @param url
+	 *            链接地址
+	 * @param params
+	 *            LinkedHashMap<String, String> 参数
 	 * @return
 	 */
 	public static String addParamsNotExist(String url, LinkedHashMap<String, String> params) {
@@ -208,8 +226,10 @@ public class UrlUtils {
 	/**
 	 * 移除url链接的多个参数
 	 * 
-	 * @param url        String 链接地址
-	 * @param paramNames String... 参数
+	 * @param url
+	 *            String 链接地址
+	 * @param paramNames
+	 *            String... 参数
 	 * @return
 	 */
 	public static String removeParams(String url, String... paramNames) {

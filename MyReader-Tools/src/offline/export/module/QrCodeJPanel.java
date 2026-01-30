@@ -33,11 +33,11 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
-import offline.export.FileUtils;
 import offline.export.pictureViewer.ViewerFrame;
 import offline.export.utils.Base64FileUtil;
 import offline.export.utils.ComparatorFactory;
 import offline.export.utils.EventDispatcher;
+import offline.export.utils.FileUtils;
 
 /**
  * 码云传面板
@@ -56,6 +56,7 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 	private JPopupMenu popupMenu;
 
 	private TableRowSorter<DefaultTableModel> tableSorter;
+
 	public QrCodeJPanel(JFrame frame) {
 		this.frame = frame;
 
@@ -64,6 +65,7 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 		addFilters();
 		addListeners();
 	}
+
 	private void addFilters() {
 		tableSorter = new TableRowSorter<DefaultTableModel>(qrCodeTableModel);
 		qrCodeTable.setRowSorter(tableSorter);
@@ -72,10 +74,12 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 			public void removeUpdate(DocumentEvent arg0) {
 				applyTableFilter(searchField.getText());
 			}
+
 			@Override
 			public void insertUpdate(DocumentEvent arg0) {
 				applyTableFilter(searchField.getText());
 			}
+
 			@Override
 			public void changedUpdate(DocumentEvent arg0) {
 				applyTableFilter(searchField.getText());
@@ -90,7 +94,7 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 			}
 		});
 	}
-	
+
 	protected void applyTableFilter(String text) {
 		if (text == null || text.trim().length() == 0) {
 			tableSorter.setRowFilter(null);
@@ -125,7 +129,8 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 						viewerFrame.setLocationRelativeTo(null);
 					}
 					System.out.println(selectedText);
-//					viewerFrame.openFile(new File(qrCodeFileTitle.getText(), selectedText));
+					// viewerFrame.openFile(new File(qrCodeFileTitle.getText(),
+					// selectedText));
 					viewerFrame.setFile(new File(qrCodeFileTitle.getText(), selectedText));
 					viewerFrame.setVisible(true);
 					viewerFrame.setExtendedState(JFrame.NORMAL);
@@ -141,13 +146,12 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					popupMenu.setVisible(false);
-//					FileDialog fd = new FileDialog(frame);
+					// FileDialog fd = new FileDialog(frame);
 					FileDialog fd = new FileDialog(frame);
-//					fd.setMultipleMode(false);
+					// fd.setMultipleMode(false);
 					fd.setTitle("请选择文件");
 					fd.setVisible(true);
 
-					
 					File getFile = new File(fd.getDirectory(), fd.getFile());
 					qrCodeTableModel.setRowCount(0);
 					parseFile2QrCodes(getFile);
@@ -226,7 +230,7 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 				if (!t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 					evt.rejectDrag(); // 没有需要的类型，拒绝进入
 				}
-//				evt.acceptDrag(DnDConstants.ACTION_COPY);
+				// evt.acceptDrag(DnDConstants.ACTION_COPY);
 			}
 
 			@Override
@@ -263,8 +267,8 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 		}
 
 		EventDispatcher.dispatchMessage(PROP_GLASSPANE_START, null, null);
-//		glassPane.start();// 开始动画加载效果
-//		frame.setVisible(true);
+		// glassPane.start();// 开始动画加载效果
+		// frame.setVisible(true);
 
 		new Thread(new Runnable() {
 			@Override
@@ -275,7 +279,7 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 
 					EventDispatcher.dispatchMessage(PROP_GLASSPANE_STOP, null, null);
 
-//					Desktop.getDesktop().open(new File(generateFile));
+					// Desktop.getDesktop().open(new File(generateFile));
 
 					File[] qrCodeFiles = refreshFileItems(generateFile);
 

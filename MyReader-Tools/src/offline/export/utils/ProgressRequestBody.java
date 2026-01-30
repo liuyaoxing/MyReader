@@ -14,7 +14,7 @@ import okio.Sink;
  * 包装的请求体，处理进度
  */
 public class ProgressRequestBody extends RequestBody {
-	
+
 	// 实际的待包装请求体
 	private final RequestBody requestBody;
 	// 进度回调接口
@@ -25,8 +25,10 @@ public class ProgressRequestBody extends RequestBody {
 	/**
 	 * 构造函数，赋值
 	 * 
-	 * @param requestBody      待包装的请求体
-	 * @param progressListener 回调接口
+	 * @param requestBody
+	 *            待包装的请求体
+	 * @param progressListener
+	 *            回调接口
 	 */
 	public ProgressRequestBody(RequestBody requestBody, ProgressRequestListener progressListener) {
 		this.requestBody = requestBody;
@@ -47,7 +49,8 @@ public class ProgressRequestBody extends RequestBody {
 	 * 重写调用实际的响应体的contentLength
 	 * 
 	 * @return contentLength
-	 * @throws IOException 异常
+	 * @throws IOException
+	 *             异常
 	 */
 	@Override
 	public long contentLength() throws IOException {
@@ -57,8 +60,10 @@ public class ProgressRequestBody extends RequestBody {
 	/**
 	 * 重写进行写入
 	 * 
-	 * @param sink BufferedSink
-	 * @throws IOException 异常
+	 * @param sink
+	 *            BufferedSink
+	 * @throws IOException
+	 *             异常
 	 */
 	@Override
 	public void writeTo(BufferedSink sink) throws IOException {
@@ -76,7 +81,8 @@ public class ProgressRequestBody extends RequestBody {
 	/**
 	 * 写入，回调进度接口
 	 * 
-	 * @param sink Sink
+	 * @param sink
+	 *            Sink
 	 * @return Sink
 	 */
 	private Sink sink(Sink sink) {

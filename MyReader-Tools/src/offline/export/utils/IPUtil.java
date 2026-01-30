@@ -36,9 +36,8 @@ public class IPUtil {
 				}
 
 				String netDisplayName = networkInterface.getDisplayName();
-				if (netDisplayName != null && ("docker".equals(netDisplayName) || "virbr0".equals(netDisplayName)
-						|| netDisplayName.startsWith("VirtualBox") || netDisplayName.startsWith("VMware")
-						|| netDisplayName.startsWith("Hyper-V"))) {
+				if (netDisplayName != null && ("docker".equals(netDisplayName) || "virbr0".equals(netDisplayName) || netDisplayName.startsWith("VirtualBox")
+						|| netDisplayName.startsWith("VMware") || netDisplayName.startsWith("Hyper-V"))) {
 					continue;
 				}
 

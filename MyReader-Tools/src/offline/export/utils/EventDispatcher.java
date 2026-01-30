@@ -16,9 +16,12 @@ public class EventDispatcher {
 	/**
 	 * 分发消息 。
 	 * 
-	 * @param propName 事件的属性名称 在处理的时候会根据属性名称作相应的处理
-	 * @param obj      属性值，用于描述......
-	 * @param source   由哪个类发出的属性修改事件 数据源
+	 * @param propName
+	 *            事件的属性名称 在处理的时候会根据属性名称作相应的处理
+	 * @param obj
+	 *            属性值，用于描述......
+	 * @param source
+	 *            由哪个类发出的属性修改事件 数据源
 	 */
 	public static void dispatchMessage(String propName, Object newValue, Object oldValue) {
 		instance.firePropertyChange(propName, oldValue, newValue);

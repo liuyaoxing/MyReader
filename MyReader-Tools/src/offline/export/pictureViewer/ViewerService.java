@@ -39,7 +39,7 @@ public class ViewerService {
 
 	/** 是否暂停播放 */
 	protected boolean playPaused = false;
-	
+
 	/** 是否窗口抖動 */
 	protected boolean windowShake = false;
 
@@ -57,24 +57,24 @@ public class ViewerService {
 	}
 
 	public File open(ViewerFrame frame) {
-//		try {
-//			if (!System.getProperty("os.name").contains("Windows"))
-//				UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-//		} catch (Throwable ex) {
-//		}
-//		try {
-			return open0(frame);
-//		}catch(Exception ex) {
-//			ex.printStackTrace();
-//			open0(frame);
-//		} finally {
-//			try {
-//				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//			} catch (Exception e) {
-//			}
-//		}
+		// try {
+		// if (!System.getProperty("os.name").contains("Windows"))
+		// UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+		// } catch (Throwable ex) {
+		// }
+		// try {
+		return open0(frame);
+		// }catch(Exception ex) {
+		// ex.printStackTrace();
+		// open0(frame);
+		// } finally {
+		// try {
+		// UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		// } catch (Exception e) {
+		// }
+		// }
 	}
-	
+
 	File open0(ViewerFrame frame) {
 		try {
 			if (fileChooser.showOpenDialog(frame) == ViewerFileChooser.APPROVE_OPTION) {
@@ -83,12 +83,12 @@ public class ViewerService {
 			} else {
 				return null;
 			}
-		}catch(Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		return this.currentFile;
 	}
-	
+
 	public void open(ViewerFrame frame, File srcFile) {
 		this.currentFile = srcFile;
 		currentFiles.clear();
@@ -108,7 +108,7 @@ public class ViewerService {
 		}
 		setImageFile(frame, this.currentFile);
 	}
-	
+
 	public void open(ViewerFrame frame, File[] allFiles, File currentFile) {
 		this.currentFile = currentFile;
 		this.currentFiles = Arrays.asList(allFiles);
@@ -190,7 +190,7 @@ public class ViewerService {
 		if (cmd.equals(ViewerFrame.MENU_PLAY_PAUSE)) {
 			playPaused = !playPaused;
 			refreshTitle(frame);
-			frame.setExtendedState(playPaused ? JFrame.ICONIFIED: JFrame.NORMAL);
+			frame.setExtendedState(playPaused ? JFrame.ICONIFIED : JFrame.NORMAL);
 		}
 
 		if (cmd.equals(ViewerFrame.MENU_PLAY_STOP)) {

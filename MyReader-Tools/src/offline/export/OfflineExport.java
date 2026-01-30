@@ -93,32 +93,32 @@ public class OfflineExport implements IConstants, PropertyChangeListener {
 		for (String arg : args) {
 			int switchCnt = arg.startsWith("--") ? 2 : arg.startsWith("/") ? 1 : arg.startsWith("-") ? 1 : 0;
 			switch (switchCnt) {
-			case 2:
-				if (arg.length() == 2) {
-					continue;
+				case 2 :
+					if (arg.length() == 2) {
+						continue;
+					}
+				case 1 : {
+					String[] switchVals = arg.substring(switchCnt).split("=");
+					if (switchVals.length == 2) {
+						String key = switchVals[0], value = switchVals[1];
+						if ("CAPACITY".equalsIgnoreCase(key) || "QRCODECAPACITY".equalsIgnoreCase(key)) {
+							Configuration.getInstance().setQrCodeCapacity(Integer.valueOf(value));
+						}
+						if ("qrCodeSize".equalsIgnoreCase(key)) {
+							Configuration.getInstance().setQrCodeSize(Integer.valueOf(value));
+						}
+						if ("qrCodeLogoWidth".equalsIgnoreCase(key)) {
+							Configuration.getInstance().setQrCodeLogoWidth(Integer.valueOf(value));
+						}
+						if ("qrCodeLogoHeight".equalsIgnoreCase(key)) {
+							Configuration.getInstance().setQrCodeLogoHeight(Integer.valueOf(value));
+						}
+					} else {
+					}
+					break;
 				}
-			case 1: {
-				String[] switchVals = arg.substring(switchCnt).split("=");
-				if (switchVals.length == 2) {
-					String key = switchVals[0], value = switchVals[1];
-					if ("CAPACITY".equalsIgnoreCase(key) || "QRCODECAPACITY".equalsIgnoreCase(key)) {
-						Configuration.getInstance().setQrCodeCapacity(Integer.valueOf(value));
-					}
-					if ("qrCodeSize".equalsIgnoreCase(key)) {
-						Configuration.getInstance().setQrCodeSize(Integer.valueOf(value));
-					}
-					if ("qrCodeLogoWidth".equalsIgnoreCase(key)) {
-						Configuration.getInstance().setQrCodeLogoWidth(Integer.valueOf(value));
-					}
-					if ("qrCodeLogoHeight".equalsIgnoreCase(key)) {
-						Configuration.getInstance().setQrCodeLogoHeight(Integer.valueOf(value));
-					}
-				} else {
-				}
-				break;
-			}
-			case 0:
-				break;
+				case 0 :
+					break;
 			}
 		}
 	}

@@ -28,9 +28,7 @@ public class DataBaseProxy {
 	public Connection getConnection(String dbName, String userName, String password) {
 		try {
 			Class.forName("org.hsqldb.jdbc.JDBCDriver");
-			return DriverManager.getConnection(
-					"jdbc:hsqldb:" + dbName + ";crypt_key=604a6105889da65326bf35790a923932;crypt_type=blowfish", "SA",
-					"");
+			return DriverManager.getConnection("jdbc:hsqldb:" + dbName + ";crypt_key=604a6105889da65326bf35790a923932;crypt_type=blowfish", "SA", "");
 		} catch (Exception e) {
 			return null;
 		}
@@ -66,10 +64,10 @@ public class DataBaseProxy {
 	}
 
 	public List<Map<String, Object>> dbQuery(final String sql) throws SQLException {
-//		if (!enabled)
-//			return Collections.emptyList();
-//		QueryRunner runner = new QueryRunner();
-//		return runner.query(conn, sql, new MapListHandler());
+		// if (!enabled)
+		// return Collections.emptyList();
+		// QueryRunner runner = new QueryRunner();
+		// return runner.query(conn, sql, new MapListHandler());
 		throw new IllegalAccessError();
 	}
 

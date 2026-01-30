@@ -67,7 +67,8 @@ import java.nio.charset.Charset;
 public class Charsets {
 
 	//
-	// This class should only contain Charset instances for required encodings. This
+	// This class should only contain Charset instances for required encodings.
+	// This
 	// guarantees that it will load
 	// correctly and without delay on all Java platforms.
 	//
@@ -76,8 +77,10 @@ public class Charsets {
 	 * Returns the given Charset or the default Charset if the given Charset is
 	 * null.
 	 *
-	 * @param charset A charset or null.
-	 * @return the given Charset or the default Charset if the given Charset is null
+	 * @param charset
+	 *            A charset or null.
+	 * @return the given Charset or the default Charset if the given Charset is
+	 *         null
 	 */
 	public static Charset toCharset(final Charset charset) {
 		return charset == null ? Charset.defaultCharset() : charset;
@@ -87,10 +90,11 @@ public class Charsets {
 	 * Returns a Charset for the named charset. If the name is null, return the
 	 * default Charset.
 	 *
-	 * @param charset The name of the requested charset, may be null.
+	 * @param charset
+	 *            The name of the requested charset, may be null.
 	 * @return a Charset for the named charset
-	 * @throws java.nio.charset.UnsupportedCharsetException If the named charset is
-	 *         unavailable
+	 * @throws java.nio.charset.UnsupportedCharsetException
+	 *             If the named charset is unavailable
 	 */
 	public static Charset toCharset(final String charset) {
 		return charset == null ? Charset.defaultCharset() : Charset.forName(charset);
@@ -111,8 +115,8 @@ public class Charsets {
 	public static final Charset ISO_8859_1 = Charset.forName(CharEncoding.ISO_8859_1);
 
 	/**
-	 * Seven-bit ASCII, also known as ISO646-US, also known as the Basic Latin block
-	 * of the Unicode character set.
+	 * Seven-bit ASCII, also known as ISO646-US, also known as the Basic Latin
+	 * block of the Unicode character set.
 	 * <p>
 	 * Every implementation of the Java platform is required to support this
 	 * character encoding.
@@ -127,8 +131,8 @@ public class Charsets {
 
 	/**
 	 * Sixteen-bit Unicode Transformation Format, The byte order specified by a
-	 * mandatory initial byte-order mark (either order accepted on input, big-endian
-	 * used on output)
+	 * mandatory initial byte-order mark (either order accepted on input,
+	 * big-endian used on output)
 	 * <p>
 	 * Every implementation of the Java platform is required to support this
 	 * character encoding.

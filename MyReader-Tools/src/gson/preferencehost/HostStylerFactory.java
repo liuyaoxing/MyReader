@@ -6,7 +6,7 @@ public class HostStylerFactory {
 
 	public static void main(String[] args) {
 		HostStyler style = new HostStyler();
-		
+
 		System.out.println(new Gson().toJson(style));
 	}
 }

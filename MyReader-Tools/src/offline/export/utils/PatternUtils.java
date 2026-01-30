@@ -134,8 +134,7 @@ public class PatternUtils {
 			return "mp.weixin.qq.com";
 		}
 		url = url.startsWith("http://") ? url : "http://" + PatternUtils.trimHttpPrefix(url);
-		Pattern p = Pattern.compile("(?<=https://|\\.)[^.]*?\\.(com|cn|net|org|biz|info|cc|tv|me|sb)",
-				Pattern.CASE_INSENSITIVE);
+		Pattern p = Pattern.compile("(?<=https://|\\.)[^.]*?\\.(com|cn|net|org|biz|info|cc|tv|me|sb)", Pattern.CASE_INSENSITIVE);
 		Matcher matcher = p.matcher(url);
 		if (matcher.find()) {
 			return matcher.group(0);

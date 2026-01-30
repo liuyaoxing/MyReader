@@ -69,17 +69,17 @@ public class CsvParser {
 		while (charBuffer.remaining() > 0) {
 			int c = charBuffer.get();
 			switch (state) {
-			case ST_LINESTART:
-				handleLineStart(c);
-				break;
-			case ST_FIELDSTART:
-				handleFieldStart(c);
-				break;
-			case ST_FIELDCONTENT:
-				handleFieldContent(c);
-				break;
-			default:
-				System.out.println("bad state");
+				case ST_LINESTART :
+					handleLineStart(c);
+					break;
+				case ST_FIELDSTART :
+					handleFieldStart(c);
+					break;
+				case ST_FIELDCONTENT :
+					handleFieldContent(c);
+					break;
+				default :
+					System.out.println("bad state");
 			}
 			if (bufferedField != null && fieldLengthLimit > 0 && bufferedField.length() > fieldLengthLimit) {
 				reset();

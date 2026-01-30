@@ -27,8 +27,8 @@ public class BackupJPanelUI extends MyReaderPanel {
 
 	protected DefaultTableModel backupTableModel;
 
-	protected String[] columnNames = new String[] { KEY_ID, KEY_FILENAME, KEY_URL, KEY_LENGTH, KEY_STATUS, KEY_FILEPATH, "个 数" };
-	protected int[] columnWidths = new int[] { 50, 250, 50, 50, 50, 250, 50 };
+	protected String[] columnNames = new String[]{KEY_ID, KEY_FILENAME, KEY_URL, KEY_LENGTH, KEY_STATUS, KEY_FILEPATH, "个 数"};
+	protected int[] columnWidths = new int[]{50, 250, 50, 50, 50, 250, 50};
 
 	protected JTable backupTable;
 
@@ -43,7 +43,7 @@ public class BackupJPanelUI extends MyReaderPanel {
 		firstPanel_1.setLayout(new BoxLayout(firstPanel_1, BoxLayout.X_AXIS));
 
 		urlCombo = new JComboBox<String>();
-//		urlCombo.setFont(new Font("宋体", Font.PLAIN, 16));
+		// urlCombo.setFont(new Font("宋体", Font.PLAIN, 16));
 		urlCombo.setEditable(true);
 		urlCombo.setToolTipText("请输入读乐乐服务URL");
 		firstPanel_1.add(urlCombo);
@@ -78,7 +78,7 @@ public class BackupJPanelUI extends MyReaderPanel {
 
 		deriveFontStyleSize(backupTable, -1, 0);
 
-//		setTableFont(backupTable, new Font("宋体", Font.PLAIN, 12));
+		// setTableFont(backupTable, new Font("宋体", Font.PLAIN, 12));
 
 		add(new JScrollPane(backupTable)); // 支持滚动
 	}

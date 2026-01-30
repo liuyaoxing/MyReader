@@ -72,7 +72,7 @@ public class Csv {
 		int idx = getHeaderIndex(header);
 		Iterator<String[]> iterator = list.iterator();
 		Set<?> keys = context.keySet();
-		LABEL: while (iterator.hasNext()) {
+		LABEL : while (iterator.hasNext()) {
 			// get next csv row
 			String[] strs = (String[]) iterator.next();
 

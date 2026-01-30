@@ -41,12 +41,12 @@ public class DownloadUtil {
 				.dispatcher(dispatcher)//
 				.retryOnConnectionFailure(true)//
 				.connectTimeout(20, TimeUnit.SECONDS) // 连接超时
-				.readTimeout(20 , TimeUnit.MINUTES) // 读取超时
+				.readTimeout(20, TimeUnit.MINUTES) // 读取超时
 				.writeTimeout(20, TimeUnit.SECONDS) // 写超时
-//                .addInterceptor(new CommonHeaderInterceptor())
-//                .addInterceptor(new CacheInterceptor())
-//                .addInterceptor(new HttpLoggerInterceptor())
-//                .addNetworkInterceptor(new EncryptInterceptor())
+				// .addInterceptor(new CommonHeaderInterceptor())
+				// .addInterceptor(new CacheInterceptor())
+				// .addInterceptor(new HttpLoggerInterceptor())
+				// .addNetworkInterceptor(new EncryptInterceptor())
 				.build();
 	}
 
@@ -55,10 +55,14 @@ public class DownloadUtil {
 	}
 
 	/**
-	 * @param url          下载连接
-	 * @param destFileDir  下载的文件储存目录
-	 * @param destFileName 下载文件名称，后面记得拼接后缀，否则手机没法识别文件类型
-	 * @param listener     下载监听
+	 * @param url
+	 *            下载连接
+	 * @param destFileDir
+	 *            下载的文件储存目录
+	 * @param destFileName
+	 *            下载文件名称，后面记得拼接后缀，否则手机没法识别文件类型
+	 * @param listener
+	 *            下载监听
 	 * @throws IOException
 	 */
 
@@ -67,10 +71,14 @@ public class DownloadUtil {
 	}
 
 	/**
-	 * @param url          下载连接
-	 * @param destFileDir  下载的文件储存目录
-	 * @param destFileName 下载文件名称，后面记得拼接后缀，否则手机没法识别文件类型
-	 * @param listener     下载监听
+	 * @param url
+	 *            下载连接
+	 * @param destFileDir
+	 *            下载的文件储存目录
+	 * @param destFileName
+	 *            下载文件名称，后面记得拼接后缀，否则手机没法识别文件类型
+	 * @param listener
+	 *            下载监听
 	 * @throws IOException
 	 */
 
@@ -81,10 +89,14 @@ public class DownloadUtil {
 	}
 
 	/**
-	 * @param url          下载连接
-	 * @param destFileDir  下载的文件储存目录
-	 * @param destFileName 下载文件名称，后面记得拼接后缀，否则手机没法识别文件类型
-	 * @param listener     下载监听
+	 * @param url
+	 *            下载连接
+	 * @param destFileDir
+	 *            下载的文件储存目录
+	 * @param destFileName
+	 *            下载文件名称，后面记得拼接后缀，否则手机没法识别文件类型
+	 * @param listener
+	 *            下载监听
 	 */
 
 	public void asyncDownload(final String url, final String destFileDir, final String destFileName, final OnDownloadListener listener) {

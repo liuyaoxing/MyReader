@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -27,6 +26,7 @@ public class QrCodeJPanelUI extends MyReaderPanel {
 	protected JLabel qrCodeFileTitle;
 
 	protected JTextField searchField;
+
 	public QrCodeJPanelUI() {
 		setLayout(new BorderLayout(0, 0));
 
@@ -41,14 +41,14 @@ public class QrCodeJPanelUI extends MyReaderPanel {
 		qrCodeFileTitle = new JLabel();
 		qrCodeFileTitle.setAlignmentX(0.5f);
 		qrCodeFileTitle.setText("请将文件拖入到下方                              ");
-//		qrCodeFileTitle.setFont(new Font("宋体", Font.PLAIN, 12));
+		// qrCodeFileTitle.setFont(new Font("宋体", Font.PLAIN, 12));
 		deriveFontStyleSize(qrCodeFileTitle, -1, 0);
 		qrCodePanel_1.add(qrCodeFileTitle);
 
 		searchField = new JTextField(88);
 		qrCodePanel_1.add(searchField);
-		
-		qrCodeTableModel = new DefaultTableModel(null, new String[] { "0", "1"}) {
+
+		qrCodeTableModel = new DefaultTableModel(null, new String[]{"0", "1"}) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -58,8 +58,8 @@ public class QrCodeJPanelUI extends MyReaderPanel {
 		};
 		qrCodeTable = new JTable(qrCodeTableModel);
 		qrCodeTable.setFillsViewportHeight(true);
-//		qrCodeTable.setRowHeight(30);
-//		qrCodeTable.setFont(new Font("宋体", Font.PLAIN, 12));
+		// qrCodeTable.setRowHeight(30);
+		// qrCodeTable.setFont(new Font("宋体", Font.PLAIN, 12));
 		qrCodeTable.setCellSelectionEnabled(false);
 		qrCodeTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			/*** 序列号 */

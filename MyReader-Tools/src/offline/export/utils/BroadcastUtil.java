@@ -22,7 +22,8 @@ public class BroadcastUtil {
 			byte msg[] = CsvUtil.mapToCsv(map).getBytes();
 			DatagramPacket dgPacket = new DatagramPacket(msg, msg.length, InetAddress.getByName(boradcastIp), port);
 			System.out.println("准备广播，广播地址：" + boradcastIp + ":" + port + "，消息：" + map);
-//			System.out.println("获得的本机ip：" + Arrays.toString(IPUtil.getAllNonLoopbackAddress().toArray()));
+			// System.out.println("获得的本机ip：" +
+			// Arrays.toString(IPUtil.getAllNonLoopbackAddress().toArray()));
 			dgSocket.send(dgPacket);
 			msg = new byte[256];
 			DatagramPacket packet = new DatagramPacket(msg, msg.length);

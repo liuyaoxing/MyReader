@@ -160,7 +160,7 @@ public class TaskListJPanel extends TaskListJPanelUI {
 			if (title.startsWith(".") || (title.contains("[文件夹]")))
 				continue;
 
-			taskListTableModel.addRow(new Object[] { taskListTableModel.getRowCount() + 1, id, title, url, size, "", absPath });
+			taskListTableModel.addRow(new Object[]{taskListTableModel.getRowCount() + 1, id, title, url, size, "", absPath});
 		}
 
 		total.set(taskListTableModel.getRowCount());
@@ -205,7 +205,8 @@ public class TaskListJPanel extends TaskListJPanelUI {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			} finally {
-//				frame.setTitle(String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()));
+				// frame.setTitle(String.format("%s (已处理: %s/%s项)", TITLE,
+				// counter.incrementAndGet(), total.get()));
 				dispatchMessage(PROP_SET_WINDOW_TITLE, String.format("%s (已处理: %s/%s项)", TITLE, counter.incrementAndGet(), total.get()), "");
 			}
 		}
@@ -286,7 +287,7 @@ public class TaskListJPanel extends TaskListJPanelUI {
 			final String url = (String) element.get(FILESERVER_PATH);
 			final String size = (String) element.get(FILESERVER_SIZE);
 			final String absPath = (String) element.get(FILESERVER_ABSPATH);
-			taskListTableModel.addRow(new Object[] { taskListTableModel.getRowCount() + 1, id, title, url, size, "", absPath });
+			taskListTableModel.addRow(new Object[]{taskListTableModel.getRowCount() + 1, id, title, url, size, "", absPath});
 		}
 		if (PROP_DOWNLOAD_FOLDER.equals(propertyName)) {
 			String[] commands = CsvUtil.csvToStringArray((String) event.getNewValue());

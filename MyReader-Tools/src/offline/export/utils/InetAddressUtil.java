@@ -192,14 +192,16 @@ public class InetAddressUtil {
 			broadcastIps.add(getBroadcastIP(clientIp, getMask(clientIp)));
 		}
 		return broadcastIps;
-//		return getBroadcastIP(getClientIp(), getMask(getClientIp()));
+		// return getBroadcastIP(getClientIp(), getMask(getClientIp()));
 	}
 
 	/**
 	 * 根据ip地址与子网掩码计算出广播地址用于UDP广播
 	 * 
-	 * @param ip   ip地址
-	 * @param mask 子网掩码
+	 * @param ip
+	 *            ip地址
+	 * @param mask
+	 *            子网掩码
 	 * @return 广播地址
 	 */
 	private static String getBroadcastIP(String ip, String mask) {

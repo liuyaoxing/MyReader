@@ -43,9 +43,9 @@ public abstract class MyReaderPanel extends JPanel implements IConstants, Proper
 		EventDispatcher.addPropertyChangeListener(this);
 	}
 
-	public void deriveFontStyleSize(Component component, float fontSize, int style) {
+	public Font deriveFontStyleSize(Component component, float fontSize, int style) {
 		if (component == null || component.getFont() == null)
-			return;
+			return null;
 		Font newFont = component.getFont();
 		if (fontSize != 0)
 			newFont = newFont.deriveFont(newFont.getSize() + fontSize);
@@ -54,10 +54,10 @@ public abstract class MyReaderPanel extends JPanel implements IConstants, Proper
 		component.setFont(newFont);
 		if (component instanceof JTable) {
 			setTableFont((JTable) component, newFont);
-		}
-		if (component instanceof JTree) {
+		} else if (component instanceof JTree) {
 			setTreeFont((JTree) component, newFont);
 		}
+		return newFont;
 	}
 
 	public void setTableFont(JTable table, Font font) {
@@ -69,7 +69,7 @@ public abstract class MyReaderPanel extends JPanel implements IConstants, Proper
 		int rowHeight = fontMetrics.getHeight();
 		table.setRowHeight(rowHeight);
 	}
-	
+
 	public void setTreeFont(JTree table, Font font) {
 		Font currentFont = table.getFont();
 		if (currentFont == null)

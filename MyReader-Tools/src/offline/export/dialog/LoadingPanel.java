@@ -273,6 +273,6 @@ public class LoadingPanel extends JComponent implements MouseListener {
 		frame.setVisible(true);
 
 		// Later, to disable,在合适的地方关闭动画效果
-//      glasspane.stop();
+		// glasspane.stop();
 	}
 }

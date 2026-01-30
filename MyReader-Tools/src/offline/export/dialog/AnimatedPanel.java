@@ -41,11 +41,13 @@ public class AnimatedPanel extends JPanel {
 	private static AlphaComposite composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER);
 
 	/**
-	 * Cr茅e un panneau anim茅 contenant l'image pass茅e en param猫tre. L'animation ne
-	 * d茅marre que par un appel 脿 start().
+	 * Cr茅e un panneau anim茅 contenant l'image pass茅e en param猫tre. L'animation
+	 * ne d茅marre que par un appel 脿 start().
 	 * 
-	 * @param message Le message 脿 afficher
-	 * @param icon    L'image 脿 afficher et 脿 animer
+	 * @param message
+	 *            Le message 脿 afficher
+	 * @param icon
+	 *            L'image 脿 afficher et 脿 animer
 	 * @author Romain Guy
 	 */
 	public AnimatedPanel(String message, ImageIcon icon) {
@@ -95,10 +97,11 @@ public class AnimatedPanel extends JPanel {
 	/**
 	 * Modifie la luminosit茅 de l'image.
 	 * 
-	 * @param multiple Le taux de luminosit茅
+	 * @param multiple
+	 *            Le taux de luminosit茅
 	 */
 	private void setBrightness(float multiple) {
-		float[] brightKernel = { multiple };
+		float[] brightKernel = {multiple};
 		RenderingHints hints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		BufferedImageOp bright = new ConvolveOp(new Kernel(1, 1, brightKernel), ConvolveOp.EDGE_NO_OP, hints);
 		bright.filter(originalImage, convolvedImage);
@@ -108,7 +111,8 @@ public class AnimatedPanel extends JPanel {
 	/**
 	 * Modifie le d茅grad茅 du texte.
 	 * 
-	 * @param gradient Le coefficient de d茅grad茅
+	 * @param gradient
+	 *            Le coefficient de d茅grad茅
 	 */
 	private void setGradientFactor(float gradient) {
 		this.gradient = gradient;

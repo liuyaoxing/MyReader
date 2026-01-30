@@ -1,12 +1,16 @@
 package offline.export.module;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -16,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.border.TitledBorder;
 import javax.swing.tree.DefaultTreeModel;
 
 import offline.export.module.compare.CompareTreeCellRenderer;
@@ -26,8 +31,8 @@ public class FileCompareJPanelUI extends MyReaderPanel {
 	/** 序列号 */
 	private static final long serialVersionUID = 1431561609475052749L;
 
-	protected String[] uploadColumnNames = new String[] { KEY_ID, KEY_FILENAME, COL_PROGRESS, KEY_FILEPATH, KEY_LENGTH, "修改时间" };
-	protected int[] uploadColumnWidths = new int[] { 6, 100, 6, 360, 10, 88 };
+	protected String[] uploadColumnNames = new String[]{KEY_ID, KEY_FILENAME, COL_PROGRESS, KEY_FILEPATH, KEY_LENGTH, "修改时间"};
+	protected int[] uploadColumnWidths = new int[]{6, 100, 6, 360, 10, 88};
 
 	protected DefaultTreeModel uploadTableModel;
 	private JPanel panel1;
@@ -36,8 +41,9 @@ public class FileCompareJPanelUI extends MyReaderPanel {
 	protected JButton leftBtn;
 	protected JComboBox<String> rightCombo;
 	protected JButton rightBtn;
-	protected JCheckBox showEqualsBtn;
-	protected JButton deleteEqulasBtn;
+	protected JCheckBox md5CompBtn, sizeDateCompBtn;
+	protected JCheckBox showEqualsBtn, showAddedBtn, showModifiedBtn, synActionBtn;
+	protected JButton deleteEqualBtn, expandAllBtn, collapseAllBtn;
 	protected JButton refreshBtn;
 	protected JSplitPane splitPane;
 
@@ -46,6 +52,8 @@ public class FileCompareJPanelUI extends MyReaderPanel {
 	protected DefaultTreeModel leftModel;
 	protected DefaultTreeModel rightModel;
 
+	protected JScrollPane leftJScrollPane, rightJScrollPane;
+	
 	protected CompareTreeNode leftRoot, rightRoot;
 
 	public FileCompareJPanelUI() {
@@ -58,10 +66,10 @@ public class FileCompareJPanelUI extends MyReaderPanel {
 		panel1 = new JPanel();
 		titlePanel.add(panel1);
 		GridBagLayout gbl_panel1 = new GridBagLayout();
-		gbl_panel1.columnWidths = new int[] { 0, 112, 0, 0, 112, 0, 0 };
-		gbl_panel1.rowHeights = new int[] { 23 };
-		gbl_panel1.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-		gbl_panel1.rowWeights = new double[] { 0.0 };
+		gbl_panel1.columnWidths = new int[]{0, 112, 0, 0, 112, 0, 0};
+		gbl_panel1.rowHeights = new int[]{23};
+		gbl_panel1.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		gbl_panel1.rowWeights = new double[]{0.0};
 		panel1.setLayout(gbl_panel1);
 
 		JLabel lblNewLabel = new JLabel("文件夹1");
@@ -124,11 +132,91 @@ public class FileCompareJPanelUI extends MyReaderPanel {
 		titlePanel.add(panel2);
 		panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
 
-		showEqualsBtn = new JCheckBox("查看相同");
-		panel2.add(showEqualsBtn);
+		{
+			JPanel comparePanel = new JPanel();
+			TitledBorder titledBorder = BorderFactory.createTitledBorder("比较选项");
+			titledBorder.setTitleFont(deriveFontStyleSize(comparePanel, -3, 0)); // 标题字体
+			titledBorder.setTitleColor(Color.BLUE);
+			comparePanel.setBorder(titledBorder);
+			comparePanel.setLayout(new BoxLayout(comparePanel, BoxLayout.X_AXIS));
+			panel2.add(comparePanel);
 
-		deleteEqulasBtn = new JButton("删除相同");
-		panel2.add(deleteEqulasBtn);
+			md5CompBtn = new JCheckBox("二进制");
+			md5CompBtn.setSelected(true);
+			comparePanel.add(md5CompBtn);
+
+			sizeDateCompBtn = new JCheckBox("文件大小和修改时间");
+			sizeDateCompBtn.setSelected(true);
+			comparePanel.add(sizeDateCompBtn);
+		}
+
+		{
+			JPanel checkPanel = new JPanel();
+			TitledBorder titledBorder = BorderFactory.createTitledBorder("查看选项");
+			titledBorder.setTitleFont(deriveFontStyleSize(checkPanel, -4, 0)); // 标题字体
+			titledBorder.setTitleColor(Color.BLUE);
+			checkPanel.setBorder(titledBorder);
+			checkPanel.setLayout(new BoxLayout(checkPanel, BoxLayout.X_AXIS));
+			panel2.add(checkPanel);
+
+			showEqualsBtn = new JCheckBox("相同");
+			showEqualsBtn.setSelected(true);
+			checkPanel.add(showEqualsBtn);
+
+			showAddedBtn = new JCheckBox("新增");
+			showAddedBtn.setSelected(true);
+			checkPanel.add(showAddedBtn);
+
+			showModifiedBtn = new JCheckBox("修改");
+			showModifiedBtn.setSelected(true);
+			checkPanel.add(showModifiedBtn);
+			
+			synActionBtn = new JCheckBox("两边镜像操作");
+			synActionBtn.setToolTipText("当展开/收缩时,更新另一边状态");
+			synActionBtn.setSelected(true);
+			checkPanel.add(synActionBtn);
+		}
+
+		{
+			JPanel btnPanel = new JPanel();
+			TitledBorder btnTitledBorder = BorderFactory.createTitledBorder("操作");
+			btnTitledBorder.setTitleFont(deriveFontStyleSize(btnPanel, -4, 0)); // 标题字体
+			btnTitledBorder.setTitleColor(Color.BLUE);
+			btnPanel.setBorder(btnTitledBorder);
+			btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.X_AXIS));
+			panel2.add(btnPanel);
+
+			deleteEqualBtn = new JButton("删除两边相同文件");
+			deleteEqualBtn.setBorder(BorderFactory.createEmptyBorder());
+			deleteEqualBtn.setOpaque(false);
+			deleteEqualBtn.setContentAreaFilled(false);
+			deleteEqualBtn.setFocusPainted(false);
+			deleteEqualBtn.setFocusable(false); // 可选
+			deleteEqualBtn.setIcon(new ImageIcon(getClass().getResource("/icons/delete.gif")));
+			btnPanel.add(deleteEqualBtn);
+
+			btnPanel.add(Box.createHorizontalStrut(10));
+
+			expandAllBtn = new JButton("全部展开");
+			expandAllBtn.setBorder(BorderFactory.createEmptyBorder());
+			expandAllBtn.setOpaque(false);
+			expandAllBtn.setContentAreaFilled(false);
+			expandAllBtn.setFocusPainted(false);
+			expandAllBtn.setFocusable(false); // 可选
+			expandAllBtn.setIcon(new ImageIcon(getClass().getResource("/icons/collapse.png")));
+			btnPanel.add(expandAllBtn);
+
+			btnPanel.add(Box.createHorizontalStrut(10));
+
+			collapseAllBtn = new JButton("全部收缩");
+			collapseAllBtn.setBorder(BorderFactory.createEmptyBorder());
+			collapseAllBtn.setOpaque(false);
+			collapseAllBtn.setContentAreaFilled(false);
+			collapseAllBtn.setFocusPainted(false);
+			collapseAllBtn.setFocusable(false); // 可选
+			collapseAllBtn.setIcon(new ImageIcon(getClass().getResource("/icons/expand.png")));
+			btnPanel.add(collapseAllBtn);
+		}
 
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		add(splitPane);
@@ -139,6 +227,7 @@ public class FileCompareJPanelUI extends MyReaderPanel {
 		leftTree = new JTree(leftModel);
 		leftTree.setCellRenderer(new CompareTreeCellRenderer());
 		leftTree.setRootVisible(true);
+		leftJScrollPane = new JScrollPane(leftTree);
 		splitPane.setLeftComponent(new JScrollPane(leftTree));
 
 		rightRoot = new CompareTreeNode(null, "目标目录", CompareTreeNode.Status.UNKNOWN);
@@ -146,7 +235,8 @@ public class FileCompareJPanelUI extends MyReaderPanel {
 		rightTree = new JTree(rightModel);
 		rightTree.setCellRenderer(new CompareTreeCellRenderer());
 		rightTree.setRootVisible(true);
-		splitPane.setRightComponent(new JScrollPane(rightTree));
+		rightJScrollPane = new JScrollPane(rightTree);
+		splitPane.setRightComponent(rightJScrollPane);
 
 		add(splitPane, BorderLayout.CENTER);
 

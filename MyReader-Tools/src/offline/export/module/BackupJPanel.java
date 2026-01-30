@@ -44,10 +44,10 @@ import com.liuyx.common.csv.CsvUtil;
 
 import offline.export.DownloadUtil;
 import offline.export.DownloadUtil.OnDownloadListener;
-import offline.export.FileUtils;
 import offline.export.db.BackupTask;
 import offline.export.log.LogHandler;
 import offline.export.utils.EventDispatcher;
+import offline.export.utils.FileUtils;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -73,7 +73,7 @@ public class BackupJPanel extends BackupJPanelUI {
 		createPopupMenu();
 		addListeners();
 
-		addItemsToCombo(urlCombo, new String[] { "http://192.168.43.1:61666" }, 0);
+		addItemsToCombo(urlCombo, new String[]{"http://192.168.43.1:61666"}, 0);
 	}
 
 	private void addListeners() {
@@ -123,7 +123,7 @@ public class BackupJPanel extends BackupJPanelUI {
 							if (getSelectedRows == null || getSelectedRows.length == 1) {
 								final int row = backupTable.rowAtPoint(me.getPoint());
 								backupTable.setRowSelectionInterval(row, row);
-								getSelectedRows = new int[] { row };
+								getSelectedRows = new int[]{row};
 							}
 
 							if (getSelectedRows == null || getSelectedRows.length == 0)
@@ -147,7 +147,8 @@ public class BackupJPanel extends BackupJPanelUI {
 										Object folderName = backupTable.getValueAt(row, 1);
 										if (value != null && folderName != null) {
 											String newUrl = getInputHostUrl() + FOLDER_LIST_MD5 + value;
-//											taskListTitle.setText(folderName + ": " + newUrl);
+											// taskListTitle.setText(folderName
+											// + ": " + newUrl);
 											EventDispatcher.dispatchMessage(PROP_TASLKIST_TEXT, folderName + ": " + newUrl, null);
 											String newFolderName = folderName.toString().replace("[文件夹]", "");
 											doDownloadFolder(newUrl, new File(currentDirectory, newFolderName));
@@ -163,7 +164,8 @@ public class BackupJPanel extends BackupJPanelUI {
 					cleanFolderItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
 							int row = backupTable.rowAtPoint(me.getPoint());
-//								int column = backupTable.columnAtPoint(me.getPoint());
+							// int column =
+							// backupTable.columnAtPoint(me.getPoint());
 							Object id = backupTable.getValueAt(row, 0);
 							Object fileName = backupTable.getValueAt(row, 1);
 							if (id != null) {
@@ -171,7 +173,7 @@ public class BackupJPanel extends BackupJPanelUI {
 								int opt = JOptionPane.showConfirmDialog(null, msg, "确认删除", JOptionPane.YES_NO_OPTION);
 								if (opt == JOptionPane.YES_OPTION) {
 									// 确认继续操作
-//										http://192.168.133.65:61666/files/ad60dc86d022c92f66715899686753e2
+									// http://192.168.133.65:61666/files/ad60dc86d022c92f66715899686753e2
 									String hostUrl = getInputHostUrl(urlCombo);
 									String deleteUrl = hostUrl + "/files/" + id;
 									try {
@@ -209,7 +211,7 @@ public class BackupJPanel extends BackupJPanelUI {
 				String comboText = getComboText(urlCombo);
 				String folderList = comboText + (comboText.endsWith(FOLDER_LIST) ? "" : FOLDER_LIST);
 
-				addItemsToCombo(urlCombo, new String[] { comboText, folderList }, 1);
+				addItemsToCombo(urlCombo, new String[]{comboText, folderList}, 1);
 
 				Request request = new Request.Builder().addHeader("x-header", "dll")//
 						.header("sort", "_id")//
@@ -234,7 +236,7 @@ public class BackupJPanel extends BackupJPanelUI {
 						final String url = jsonObject.get(FILESERVER_PATH).getAsString();
 						final String size = jsonObject.get(FILESERVER_SIZE).getAsString();
 						final int fileList = jsonObject.get(FILESERVER_FILELIST).getAsInt();
-						backupTableModel.insertRow(0, new Object[] { id, title, url, size, "", "", fileList });
+						backupTableModel.insertRow(0, new Object[]{id, title, url, size, "", "", fileList});
 					}
 				} catch (IOException e1) {
 					e1.printStackTrace();
@@ -323,12 +325,14 @@ public class BackupJPanel extends BackupJPanelUI {
 
 			whereMap.put(BackupTask.KEY_ID, id);
 
-//			List<Map<String, Object>> resList = database.dbQuery(backupTask.getTableName(), whereMap);
-//			if (resList != null && resList.size() > 0) {
-//				backupTableModel.insertRow(0, new Object[] { id, title, url, FileUtils.getFileSize(length), "文件已存在！" });
-////				continue;
-//			}
-			backupTableModel.insertRow(0, new Object[] { id, title, url, FileUtils.getFileSize(length), "0%" });
+			// List<Map<String, Object>> resList =
+			// database.dbQuery(backupTask.getTableName(), whereMap);
+			// if (resList != null && resList.size() > 0) {
+			// backupTableModel.insertRow(0, new Object[] { id, title, url,
+			// FileUtils.getFileSize(length), "文件已存在！" });
+			//// continue;
+			// }
+			backupTableModel.insertRow(0, new Object[]{id, title, url, FileUtils.getFileSize(length), "0%"});
 
 			backupTable.scrollRectToVisible(backupTable.getCellRect(0, 0, true));
 			backupTable.setRowSelectionInterval(0, 0);
@@ -350,11 +354,11 @@ public class BackupJPanel extends BackupJPanelUI {
 					try {
 						backupTableModel.setValueAt("100%", row, statusCol);
 						backupTableModel.setValueAt(file.getCanonicalFile(), row, pathCol);
-//						backupTask.setId(id);
-//						backupTask.setTitle(title);
-//						backupTask.setUrl(url);
-//						backupTask.setLength(String.valueOf(length));
-//						database.dbInsert(backupTask);
+						// backupTask.setId(id);
+						// backupTask.setTitle(title);
+						// backupTask.setUrl(url);
+						// backupTask.setLength(String.valueOf(length));
+						// database.dbInsert(backupTask);
 					} catch (Exception ex) {
 						LogHandler.error(ex);
 						ex.printStackTrace();
@@ -382,7 +386,8 @@ public class BackupJPanel extends BackupJPanelUI {
 			if (backupTableModel.getDataVector().size() > 5000) {
 				backupTableModel.setRowCount(0);
 			}
-//			frame.setTitle(String.format("%s (已处理: %s项)", TITLE, counter.incrementAndGet()));
+			// frame.setTitle(String.format("%s (已处理: %s项)", TITLE,
+			// counter.incrementAndGet()));
 			dispatchMessage(PROP_SET_WINDOW_TITLE, String.format("%s (已处理: %s项)", TITLE, counter.incrementAndGet()), null);
 		}
 		return jsonArray.size() > 0;
@@ -392,10 +397,10 @@ public class BackupJPanel extends BackupJPanelUI {
 		LogHandler.debug("开始备份...");
 		backupTask = new BackupTask();
 		try {
-//			database = new DataBaseProxy();
-//			frame.getTitle();
-//			int res = database.dbCreate(backupTask);
-//			System.out.println(res);
+			// database = new DataBaseProxy();
+			// frame.getTitle();
+			// int res = database.dbCreate(backupTask);
+			// System.out.println(res);
 
 			File toDir = new File("backup");
 			if (!toDir.exists())
@@ -456,7 +461,7 @@ public class BackupJPanel extends BackupJPanelUI {
 			URL url = new URL(newItem);
 			String newUrl = "http://" + String.format("%s:%s", url.getHost(), url.getPort());
 			itemSet.add(newUrl);
-//			itemSet.add(String.valueOf(newUrl + FOLDER_LIST));
+			// itemSet.add(String.valueOf(newUrl + FOLDER_LIST));
 		} catch (MalformedURLException e1) {
 			e1.printStackTrace();
 		}
@@ -486,7 +491,7 @@ public class BackupJPanel extends BackupJPanelUI {
 		try {
 			System.out.println(String.format("开始下载文件%s到%s", fileUrl, toFile));
 			EventDispatcher.dispatchMessage(PROP_DOWNLOAD_FOLDER,
-					CsvUtil.stringArrayToCsv(new String[] { fileUrl, toFile.getCanonicalPath(), getInputHostUrl() }), null);
+					CsvUtil.stringArrayToCsv(new String[]{fileUrl, toFile.getCanonicalPath(), getInputHostUrl()}), null);
 		} catch (IOException ex) {
 			LogHandler.debug("下载文件夹失败:" + ex.getMessage());
 		}

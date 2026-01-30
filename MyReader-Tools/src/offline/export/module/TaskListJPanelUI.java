@@ -17,8 +17,8 @@ public class TaskListJPanelUI extends MyReaderPanel {
 	/** 序列号 */
 	private static final long serialVersionUID = -7164145189781853270L;
 
-	protected String[] taskListColumnNames = new String[] { KEY_ID, KEY_FILEID, KEY_FILENAME, KEY_URL, KEY_LENGTH, KEY_STATUS, KEY_FILEPATH, "个 数" };
-	protected int[] taskListcolumnWidths = new int[] { 10, 50, 250, 50, 50, 50, 250, 50 };
+	protected String[] taskListColumnNames = new String[]{KEY_ID, KEY_FILEID, KEY_FILENAME, KEY_URL, KEY_LENGTH, KEY_STATUS, KEY_FILEPATH, "个 数"};
+	protected int[] taskListcolumnWidths = new int[]{10, 50, 250, 50, 50, 50, 250, 50};
 
 	protected JTable taskListTable;
 	protected DefaultTableModel taskListTableModel;
@@ -34,7 +34,7 @@ public class TaskListJPanelUI extends MyReaderPanel {
 		taskListTitle = new JLabel();
 		taskListTitle.setAlignmentX(0.5f);
 		taskListTitle.setText("                              ");
-//		taskListTitle.setFont(new Font("宋体", Font.PLAIN, 12));
+		// taskListTitle.setFont(new Font("宋体", Font.PLAIN, 12));
 		deriveFontStyleSize(taskListTitle, -4, 0);
 		titlePanel.add(taskListTitle);
 

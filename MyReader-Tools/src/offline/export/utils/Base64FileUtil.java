@@ -16,15 +16,15 @@ import java.util.Map;
 
 import com.liuyx.common.csv.CsvUtil;
 
-import offline.export.FileUtils;
 import offline.export.config.Configuration;
 
 public class Base64FileUtil {
 
 	public static void main(String[] args) throws Exception {
-//		File srcFile = new File("D:\\Jobs\\市场支持\\华润银行\\AB.docx");
+		// File srcFile = new File("D:\\Jobs\\市场支持\\华润银行\\AB.docx");
 		File srcFile = new File("D:\\Jobs\\市场支持\\华润银行\\ABC.txt");
-//		File srcFile = new File("C:\\Users\\liuyaoxing\\Desktop\\plugins\\ESB改造计划ESB改造计划ESB改造计划ESB改造计划ESB改造计划.xlsx");
+		// File srcFile = new
+		// File("C:\\Users\\liuyaoxing\\Desktop\\plugins\\ESB改造计划ESB改造计划ESB改造计划ESB改造计划ESB改造计划.xlsx");
 
 		String fileStr = getFileStr(srcFile.getCanonicalPath());
 		System.out.println(generateFile(srcFile, fileStr));
@@ -81,10 +81,10 @@ public class Base64FileUtil {
 			}
 		}
 		return new String(Base64.encodeBase64(data));
-//		// 对字节数组Base64编码
-//		BASE64Encoder encoder = new BASE64Encoder();
-//		// 返回 Base64 编码过的字节数组字符串
-//		return encoder.encode(data);
+		// // 对字节数组Base64编码
+		// BASE64Encoder encoder = new BASE64Encoder();
+		// // 返回 Base64 编码过的字节数组字符串
+		// return encoder.encode(data);
 	}
 
 	/**
@@ -102,17 +102,17 @@ public class Base64FileUtil {
 			return false;
 		}
 		byte[] byt = Base64.decodeBase64(base64FileStr.getBytes());
-		
-//		BASE64Decoder decoder = new BASE64Decoder();
-//
-//		// Base64解码,对字节数组字符串进行Base64解码并生成文件
-//		byte[] byt = decoder.decodeBuffer(base64FileStr);
-//		for (int i = 0, len = byt.length; i < len; ++i) {
-//			// 调整异常数据
-//			if (byt[i] < 0) {
-//				byt[i] += 256;
-//			}
-//		}
+
+		// BASE64Decoder decoder = new BASE64Decoder();
+		//
+		// // Base64解码,对字节数组字符串进行Base64解码并生成文件
+		// byte[] byt = decoder.decodeBuffer(base64FileStr);
+		// for (int i = 0, len = byt.length; i < len; ++i) {
+		// // 调整异常数据
+		// if (byt[i] < 0) {
+		// byt[i] += 256;
+		// }
+		// }
 		OutputStream out = null;
 		InputStream input = new ByteArrayInputStream(byt);
 		try {

@@ -78,8 +78,8 @@ public class CharEncoding {
 	public static final String ISO_8859_1 = "ISO-8859-1";
 
 	/**
-	 * Seven-bit ASCII, also known as ISO646-US, also known as the Basic Latin block
-	 * of the Unicode character set.
+	 * Seven-bit ASCII, also known as ISO646-US, also known as the Basic Latin
+	 * block of the Unicode character set.
 	 * <p>
 	 * Every implementation of the Java platform is required to support this
 	 * character encoding.
@@ -92,8 +92,8 @@ public class CharEncoding {
 
 	/**
 	 * Sixteen-bit Unicode Transformation Format, The byte order specified by a
-	 * mandatory initial byte-order mark (either order accepted on input, big-endian
-	 * used on output)
+	 * mandatory initial byte-order mark (either order accepted on input,
+	 * big-endian used on output)
 	 * <p>
 	 * Every implementation of the Java platform is required to support this
 	 * character encoding.

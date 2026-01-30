@@ -36,6 +36,6 @@ public class HostStyler {
 
 	private class CralwerStyle {
 		private String root;
-		
+
 	}
 }
