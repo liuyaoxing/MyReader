@@ -33,6 +33,7 @@ public interface IConstants {
 	public static final String NAME_UPLOAD = "上传到手机";
 	public static final String NAME_QRCODE = "码云传";
 	public static final String NAME_TASKLIST = "任务列表";
+	public static final String NAME_FILESERVER = "文件服务";
 	public static final String NAME_BACKUP = "手机备份";
 	public static final String NAME_COMPARE = "文件夹比较";
 

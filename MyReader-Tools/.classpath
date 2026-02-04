@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="libs/zxing-javase-3.4.1.jar"/>
 	<classpathentry kind="lib" path="libs/okhttp-3.14.9.jar"/>
 	<classpathentry kind="lib" path="libs/jsoup-1.11.3.jar"/>
+	<classpathentry kind="lib" path="libs/hutool-http-5.7.22.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
