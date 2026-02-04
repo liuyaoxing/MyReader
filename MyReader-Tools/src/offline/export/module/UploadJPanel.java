@@ -264,6 +264,7 @@ public class UploadJPanel extends UploadJPanelUI {
 					final int row = uploadTable.rowAtPoint(me.getPoint());
 					if (row != -1) {
 						uploadTable.setRowSelectionInterval(row, row);
+						SwingUtilities.invokeLater(() -> uploadTable.repaint());
 						final int column = uploadTable.columnAtPoint(me.getPoint());
 
 						JMenuItem copyItem = new JMenuItem("复制");

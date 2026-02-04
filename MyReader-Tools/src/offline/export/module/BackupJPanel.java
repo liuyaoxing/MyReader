@@ -123,6 +123,7 @@ public class BackupJPanel extends BackupJPanelUI {
 							if (getSelectedRows == null || getSelectedRows.length == 1) {
 								final int row = backupTable.rowAtPoint(me.getPoint());
 								backupTable.setRowSelectionInterval(row, row);
+								SwingUtilities.invokeLater(() -> backupTable.repaint());
 								getSelectedRows = new int[]{row};
 							}
 
@@ -337,6 +338,7 @@ public class BackupJPanel extends BackupJPanelUI {
 			backupTable.scrollRectToVisible(backupTable.getCellRect(0, 0, true));
 			backupTable.setRowSelectionInterval(0, 0);
 			backupTable.setSelectionBackground(Color.LIGHT_GRAY);// 选中行设置背景色
+			SwingUtilities.invokeLater(() -> backupTable.repaint());
 
 			final int row = 0;
 			int statusCol = backupTable.getColumnModel().getColumnIndex(KEY_STATUS);

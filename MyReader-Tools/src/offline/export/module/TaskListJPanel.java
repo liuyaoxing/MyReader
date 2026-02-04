@@ -63,6 +63,7 @@ public class TaskListJPanel extends TaskListJPanelUI {
 					final int row = taskListTable.rowAtPoint(me.getPoint());
 					if (row != -1) {
 						taskListTable.setRowSelectionInterval(row, row);
+						SwingUtilities.invokeLater(() -> taskListTable.repaint());
 						int column = taskListTable.getColumnModel().getColumnIndex(KEY_FILEPATH);
 						final File srcFile = new File(String.valueOf(taskListTable.getValueAt(row, column)));
 						if (srcFile.exists()) {
@@ -174,6 +175,7 @@ public class TaskListJPanel extends TaskListJPanelUI {
 
 			taskListTable.setRowSelectionInterval(row, row);
 			taskListTable.scrollRectToVisible(new Rectangle(taskListTable.getCellRect(row + 10, 0, true)));
+			SwingUtilities.invokeLater(() -> taskListTable.repaint());
 
 			int col = taskListTable.getColumnModel().getColumnIndex(KEY_STATUS);
 
