@@ -12,21 +12,22 @@ import okhttp3.Response;
 public class GetStringFromUrl {
 
 	public static void main(String[] args) throws Throwable {
-//		System.out.println(getStringFromUrl("https://cl.xgbrnb.org/htm_mob/2501/7/6663802.html"));
+		// System.out.println(getStringFromUrl("https://cl.xgbrnb.org/htm_mob/2501/7/6663802.html"));
 
-		System.out.println(getStringFromUrl("https://mbd.baidu.com/newspage/data/landingsuper?id=1791474120816221227&third=baijiahao&baijiahao_id=1791474120816221227&wfr=&c_source=duedge&c_score=0.999100&p_tk=7631rRq9H4L%2B8qP0AQg%2FLJ%2BH1xbCL2XJupZjLHFgdPFuFgTaYsofNypU4qRxLbzZbnXBVjWsaBekq5g%2BeEaCiLHk6p%2BF%2BnwFbZrm1ecF%2FYI%2Bc3Cj%2Frecqq7%2BaNnB%2FXUrQLnZ%2FrqwuMw0%2BBJ85Af4phJNFk7566OcjxPr5h5BgOzKnNk%3D&p_timestamp=1739341545&p_sign=42ccfa1525294c5a1476f19d1e21e631&p_signature=2fd4dbe059e672b7ea20b0f348243511&__pc2ps_ab=7631rRq9H4L%2B8qP0AQg%2FLJ%2BH1xbCL2XJupZjLHFgdPFuFgTaYsofNypU4qRxLbzZbnXBVjWsaBekq5g%2BeEaCiLHk6p%2BF%2BnwFbZrm1ecF%2FYI%2Bc3Cj%2Frecqq7%2BaNnB%2FXUrQLnZ%2FrqwuMw0%2BBJ85Af4phJNFk7566OcjxPr5h5BgOzKnNk%3D|1739341545|2fd4dbe059e672b7ea20b0f348243511|42ccfa1525294c5a1476f19d1e21e631"));
-//		System.out.println(getStringFromUrl(
-//				"https://baijiahao.baidu.com/s?id=1820677285038563021&wfr=spider&for=pc&searchword=%E7%8E%8B%E5%B0%94%E5%BE%B7%E7%BB%8F%E5%85%B8%E5%8F%A5%E5%AD%90"));
+		System.out.println(getStringFromUrl(
+				"https://mbd.baidu.com/newspage/data/landingsuper?id=1791474120816221227&third=baijiahao&baijiahao_id=1791474120816221227&wfr=&c_source=duedge&c_score=0.999100&p_tk=7631rRq9H4L%2B8qP0AQg%2FLJ%2BH1xbCL2XJupZjLHFgdPFuFgTaYsofNypU4qRxLbzZbnXBVjWsaBekq5g%2BeEaCiLHk6p%2BF%2BnwFbZrm1ecF%2FYI%2Bc3Cj%2Frecqq7%2BaNnB%2FXUrQLnZ%2FrqwuMw0%2BBJ85Af4phJNFk7566OcjxPr5h5BgOzKnNk%3D&p_timestamp=1739341545&p_sign=42ccfa1525294c5a1476f19d1e21e631&p_signature=2fd4dbe059e672b7ea20b0f348243511&__pc2ps_ab=7631rRq9H4L%2B8qP0AQg%2FLJ%2BH1xbCL2XJupZjLHFgdPFuFgTaYsofNypU4qRxLbzZbnXBVjWsaBekq5g%2BeEaCiLHk6p%2BF%2BnwFbZrm1ecF%2FYI%2Bc3Cj%2Frecqq7%2BaNnB%2FXUrQLnZ%2FrqwuMw0%2BBJ85Af4phJNFk7566OcjxPr5h5BgOzKnNk%3D|1739341545|2fd4dbe059e672b7ea20b0f348243511|42ccfa1525294c5a1476f19d1e21e631"));
+		// System.out.println(getStringFromUrl(
+		// "https://baijiahao.baidu.com/s?id=1820677285038563021&wfr=spider&for=pc&searchword=%E7%8E%8B%E5%B0%94%E5%BE%B7%E7%BB%8F%E5%85%B8%E5%8F%A5%E5%AD%90"));
 
-//		System.out.println(getStringFromJsoup("https://baijiahao.baidu.com/s?id=1791474120816221227"));
+		// System.out.println(getStringFromJsoup("https://baijiahao.baidu.com/s?id=1791474120816221227"));
 
-//		System.out.println(getUrl("https://baijiahao.baidu.com/s?id=1820677285038563021&wfr=spider&for=pc"));
+		// System.out.println(getUrl("https://baijiahao.baidu.com/s?id=1820677285038563021&wfr=spider&for=pc"));
 	}
 
 	private static char[] getStringFromJsoup(String url) throws Throwable {
 		// 如果报错，忽略url的https证书；http开头的应该可以不用处理
 
-//		HttpsUrlValidator.retrieveResponseFromServer(url);
+		// HttpsUrlValidator.retrieveResponseFromServer(url);
 
 		// 加入url并编写请求头，打开浏览器控制台照着写
 
@@ -71,11 +72,12 @@ public class GetStringFromUrl {
 
 		okhttp3.Request.Builder reqBuilder = new Request.Builder();
 		reqBuilder.url(url);
-//	        reqBuilder.tag(PageSaver.HTTP_REQUEST_TAG);
-//		reqBuilder.cacheControl(new CacheControl.Builder().maxStale(365, TimeUnit.DAYS).build());
+		// reqBuilder.tag(PageSaver.HTTP_REQUEST_TAG);
+		// reqBuilder.cacheControl(new CacheControl.Builder().maxStale(365,
+		// TimeUnit.DAYS).build());
 		String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.5845.97 Safari/537.36 Core/1.116.475.400 QQBrowser/13.5.6267.400";
 		reqBuilder.addHeader("User-Agent", userAgent);
-//		reqBuilder.addHeader("Referer", url);
+		// reqBuilder.addHeader("Referer", url);
 		reqBuilder.addHeader("Accept",
 				"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
 		reqBuilder.addHeader("Accept-Encoding", "gzip, deflate, br");
@@ -113,15 +115,15 @@ public class GetStringFromUrl {
 	}
 
 	public static String getHtml(String url) throws Exception {
-//		OkHttpClient client = new OkHttpClient();
-//		Request request = new Request.Builder()//
-//				.url(url)//
-//				.addHeader("User-Agent", RefererMapping.getUserAgent(null))//
-//				.addHeader("Referer", RefererMapping.getReferer(url, url))//
-//				.tag(PageSaver.HTTP_REQUEST_TAG)//
-//				.build();
-//		Response response = client.newCall(request).execute();
-//		return response.body().string();
+		// OkHttpClient client = new OkHttpClient();
+		// Request request = new Request.Builder()//
+		// .url(url)//
+		// .addHeader("User-Agent", RefererMapping.getUserAgent(null))//
+		// .addHeader("Referer", RefererMapping.getReferer(url, url))//
+		// .tag(PageSaver.HTTP_REQUEST_TAG)//
+		// .build();
+		// Response response = client.newCall(request).execute();
+		// return response.body().string();
 		return null;
 	}
 }

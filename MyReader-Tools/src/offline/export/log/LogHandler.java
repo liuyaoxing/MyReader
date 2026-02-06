@@ -115,7 +115,7 @@ public class LogHandler {
 
 	private static void writeFile(String sb) {
 		try {
-//			String fileName = "myreader.log";
+			// String fileName = "myreader.log";
 			File logsFile = getLogFile();
 			if (!logsFile.exists()) {
 				logsFile.mkdirs();

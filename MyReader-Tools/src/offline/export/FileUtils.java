@@ -80,7 +80,8 @@ public class FileUtils {
 	/**
 	 * 获取文件大小 10.24M
 	 *
-	 * @param size 字节
+	 * @param size
+	 *            字节
 	 * @return
 	 */
 	public static String getFileSize(long size) {
@@ -238,9 +239,9 @@ public class FileUtils {
 	 */
 	public static List<String> listPath(String root) {
 		List<String> allDir = new ArrayList<String>();
-//		SecurityManager checker = new SecurityManager();
+		// SecurityManager checker = new SecurityManager();
 		File path = new File(root);
-//		checker.checkRead(root);
+		// checker.checkRead(root);
 		// 过滤掉以.开始的文件夹
 		if (path.isDirectory()) {
 			for (File f : path.listFiles()) {
@@ -260,9 +261,9 @@ public class FileUtils {
 	 */
 	public static List<File> listPathFiles(String root) {
 		List<File> allDir = new ArrayList<File>();
-//		SecurityManager checker = new SecurityManager();
+		// SecurityManager checker = new SecurityManager();
 		File path = new File(root);
-//		checker.checkRead(root);
+		// checker.checkRead(root);
 		File[] files = path.listFiles();
 		for (File f : files) {
 			if (f.isFile())
@@ -314,7 +315,7 @@ public class FileUtils {
 		if (files == null)
 			return;
 		for (int i = 0; i < files.length; i++) {
-			if(files[i].isHidden())
+			if (files[i].isHidden())
 				continue;
 			if (files[i].isDirectory())
 				listFiles(files[i], fileSet);
@@ -329,8 +330,7 @@ public class FileUtils {
 		String fileFormat = getFileFormat(srcFile.getName());
 		if (fileFormat == null || fileFormat.length() == 0)
 			return false;
-		return fileFormat.toUpperCase(Locale.getDefault())
-				.matches("^[(JPG)|(JPGX)|(PNG)|(PNGX)|(GIF)|(GIFX)|(JPEG)|(JPEGX)|(BMP)|(BMPX)]+$");
+		return fileFormat.toUpperCase(Locale.getDefault()).matches("^[(JPG)|(JPGX)|(PNG)|(PNGX)|(GIF)|(GIFX)|(JPEG)|(JPEGX)|(BMP)|(BMPX)]+$");
 	}
 
 	public static boolean isVideoFile(File srcFile) {

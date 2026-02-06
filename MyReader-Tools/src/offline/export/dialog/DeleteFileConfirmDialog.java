@@ -86,7 +86,7 @@ public class DeleteFileConfirmDialog {
 
 		public FileListCellRenderer() {
 			setOpaque(true);
-//			setFont(new Font("宋体", Font.PLAIN, 12));
+			// setFont(new Font("宋体", Font.PLAIN, 12));
 			setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
 		}
 

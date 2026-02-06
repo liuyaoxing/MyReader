@@ -68,7 +68,7 @@ public class UploadJPanelUI extends MyReaderPanel {
 		refreshUrlBtn = new JButton("刷新地址");
 		refreshUrlBtn.setHorizontalAlignment(SwingConstants.RIGHT);
 		secondPanel_1.add(refreshUrlBtn);
-		
+
 		uploadFolderBtn = new JButton("上传文件夹");
 		uploadFolderBtn.setHorizontalAlignment(SwingConstants.RIGHT);
 		secondPanel_1.add(uploadFolderBtn);

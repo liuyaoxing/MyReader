@@ -47,7 +47,7 @@ public class MyReaderCookie implements CookieJar {
 
 	@Override
 	public List<Cookie> loadForRequest(HttpUrl url) {
-		
+
 		List<Cookie> cookies = cookieStore.get(url);
 		return cookies != null ? cookies : new ArrayList<Cookie>();
 	}

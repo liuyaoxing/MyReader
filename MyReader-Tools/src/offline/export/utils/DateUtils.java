@@ -269,10 +269,11 @@ public class DateUtils {
 			return getDateMinute("yyyy-MM-dd HH:mm:ss", -result);
 		}
 		if (minuteValue.matches("^[0-9]+小时[0-9]+分钟前$")) {// xx小时xx分钟前
-//			String str = minuteValue.replace("小时", "*60+").replace("分钟前", "*1");
-//			Evaluator evaluator = new Evaluator();
-//			Double result = Double.valueOf(evaluator.evaluate(str));
-//			return getDateMinute("yyyy-MM-dd HH:mm:ss", -result.intValue());
+			// String str = minuteValue.replace("小时", "*60+").replace("分钟前",
+			// "*1");
+			// Evaluator evaluator = new Evaluator();
+			// Double result = Double.valueOf(evaluator.evaluate(str));
+			// return getDateMinute("yyyy-MM-dd HH:mm:ss", -result.intValue());
 			return minuteValue;
 		}
 		if (minuteValue.matches("^[0-9]+小时前$")) {// xx小时前

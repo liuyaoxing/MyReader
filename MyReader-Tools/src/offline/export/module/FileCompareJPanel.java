@@ -87,7 +87,7 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 			JMenuItem deleteEqualItem = new JMenuItem("删除右侧相同文件");
 			deleteEqualItem.addActionListener(e -> deleteEqualFiles(leftTree, rightTree));
 			leftPopupMenu.add(deleteEqualItem);
-			
+
 			JMenuItem deleteInputFileItem = new JMenuItem("删除指定文件");
 			deleteInputFileItem.addActionListener(e -> deleteInputFiles(leftTree));
 			leftPopupMenu.add(deleteInputFileItem);
@@ -132,7 +132,7 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 			JMenuItem deleteInputFileItem = new JMenuItem("删除指定文件");
 			deleteInputFileItem.addActionListener(e -> deleteInputFiles(rightTree));
 			rightPopupMenu.add(deleteInputFileItem);
-			
+
 			JMenuItem explorerItem = new JMenuItem("查看文件");
 			explorerItem.addActionListener(e -> showFileInExplorer(rightTree));
 			rightPopupMenu.add(explorerItem);
@@ -296,7 +296,6 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 	 *            目标节点
 	 * @return TreePath 或 null（未找到）
 	 */
-	@SuppressWarnings("unchecked")
 	public TreePath findPathByFile(CompareTreeNode parent, File target) {
 		if (parent == null || target == null)
 			return null;
@@ -365,20 +364,12 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 			System.out.println("用户取消删除");
 		}
 	}
-	
+
 	private void deleteInputFiles(JTree tree) {
-        String input = (String) JOptionPane.showInputDialog(
-                null,
-                "请输入要删除的文件或文件夹",
-                "文件",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                null,
-                "bin"
-            );
-        if (input == null || input.trim().isEmpty()) 
-            return;
-        PathMatcher matcher = Paths.get("").getFileSystem().getPathMatcher("glob:" + input);
+		String input = (String) JOptionPane.showInputDialog(null, "请输入要删除的文件或文件夹", "文件", JOptionPane.QUESTION_MESSAGE, null, null, "bin");
+		if (input == null || input.trim().isEmpty())
+			return;
+		PathMatcher matcher = Paths.get("").getFileSystem().getPathMatcher("glob:" + input);
 		File selectedFile = getSelectedFile(tree);
 		Set<File> toDeletedFiles = new HashSet<>();
 		if (selectedFile.isDirectory()) {
@@ -386,15 +377,15 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 			try {
 				fileSet = FileUtils.listFiles(selectedFile);
 				for (File file : fileSet) {
-		            if(matcher.matches(Paths.get(file.getName())))
-		            	toDeletedFiles.add(file);
+					if (matcher.matches(Paths.get(file.getName())))
+						toDeletedFiles.add(file);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(this, "比对文件失败:" + e.getMessage());
 			}
 		} else {
-			if(matcher.matches(selectedFile.toPath()))
+			if (matcher.matches(selectedFile.toPath()))
 				toDeletedFiles.add(selectedFile);
 		}
 		if (toDeletedFiles.isEmpty()) {
@@ -434,7 +425,6 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void removeAllSubNodes(DefaultMutableTreeNode parent, Set<File> toDeletedFiles) {
 		for (Enumeration<? extends TreeNode> e = parent.children(); e.hasMoreElements();) {
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();

@@ -31,8 +31,8 @@ public class Version_Apk {
 		String toJson = gson.toJson(version);
 		System.out.println("Json = " + toJson);
 
-//		Version_Apk version0 = gson.fromJson(toJson, Version_Apk.class);
-//		System.out.println(version0);
+		// Version_Apk version0 = gson.fromJson(toJson, Version_Apk.class);
+		// System.out.println(version0);
 	}
 
 	public String getTitle() {

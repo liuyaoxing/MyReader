@@ -202,7 +202,7 @@ public class FileServerJPanel extends FileServerJPanelUI {
 				}
 			}
 		});
-		
+
 		serverInfoBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -315,11 +315,6 @@ public class FileServerJPanel extends FileServerJPanelUI {
 
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
-		String propertyName = event.getPropertyName();
-		if (PROP_LANPORT_SCAN_IP.equals(propertyName)) {
-			itemSet.add((String) event.getNewValue());
-			addItemsToCombo(ipCombo, itemSet.toArray(new String[0]), 0);
-		}
 		super.propertyChange(event);
 	}
 

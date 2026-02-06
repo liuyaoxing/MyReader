@@ -1,6 +1,6 @@
 var STRINGS = {};
 
-STRINGS.WIFI_TRANS_TITLE = '读乐乐文件服务';
+STRINGS.WIFI_TRANS_TITLE = '读乐乐文件快传';
 STRINGS.FILES_ON_DEVICE = '您设备上的文件列表';
 STRINGS.FILENAME = '文件名';
 STRINGS.FILE_SIZE = '大小';

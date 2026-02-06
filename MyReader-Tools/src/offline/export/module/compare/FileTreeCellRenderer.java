@@ -61,9 +61,9 @@ public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
 			setForeground(COLOR_DEFAULT);
 		}
 
-        // 设置最小宽度
-//        setMinimumSize(new Dimension(250, getPreferredSize().height));
-        setPreferredSize(new Dimension(300, getPreferredSize().height));
+		// 设置最小宽度
+		// setMinimumSize(new Dimension(250, getPreferredSize().height));
+		setPreferredSize(new Dimension(300, getPreferredSize().height));
 		return this;
 	}
 }

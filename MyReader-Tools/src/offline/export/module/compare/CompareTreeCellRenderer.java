@@ -12,7 +12,7 @@ public class CompareTreeCellRenderer extends DefaultTreeCellRenderer {
 
 	/** 序列号 */
 	private static final long serialVersionUID = -8016942887471551141L;
-	
+
 	private final Color COLOR_ADDED = new Color(0, 150, 0); // 深绿
 	private final Color COLOR_DELETED = Color.RED;
 	private final Color COLOR_MODIFIED = Color.ORANGE;

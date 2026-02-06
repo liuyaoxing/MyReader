@@ -34,10 +34,10 @@ public class UrlParameterReplacer {
 			throw new IllegalArgumentException("Invalid URL", e);
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		String url = "https://baijiahao.baidu.com/s?id=1820677285038563021&wfr=spider&for=pc&searchword=%E7%8E%8B%E5%B0%94%E5%BE%B7%E7%BB%8F%E5%85%B8%E5%8F%A5%E5%AD%90";
-		
+
 		System.out.println(replaceUrlParameter(url, "for", "mobile"));
 	}
 }

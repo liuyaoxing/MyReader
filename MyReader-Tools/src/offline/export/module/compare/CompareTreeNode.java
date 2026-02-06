@@ -6,7 +6,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 // 自定义树节点类
 public class CompareTreeNode extends DefaultMutableTreeNode {
-	
+
 	/** 序列号 */
 	private static final long serialVersionUID = -683870836107718279L;
 

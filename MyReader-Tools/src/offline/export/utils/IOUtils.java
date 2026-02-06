@@ -227,45 +227,51 @@ public class IOUtils {
 		int ch2 = input2.read();
 		return (ch2 == -1);
 	}
-	
-	/**
-     * Get the contents of an <code>InputStream</code> as a String
-     * using the default character encoding of the platform.
-     * <p>
-     * This method buffers the input internally, so there is no need to use a
-     * <code>BufferedInputStream</code>.
-     * 
-     * @param input  the <code>InputStream</code> to read from
-     * @return the requested String
-     * @throws NullPointerException if the input is null
-     * @throws IOException if an I/O error occurs
-     */
-    public static String toString(InputStream input) throws IOException {
-        StringWriter sw = new StringWriter();
-        copy(input, sw);
-        return sw.toString();
-    }
 
-    /**
-     * Get the contents of an <code>InputStream</code> as a String
-     * using the specified character encoding.
-     * <p>
-     * Character encoding names can be found at
-     * <a href="http://www.iana.org/assignments/character-sets">IANA</a>.
-     * <p>
-     * This method buffers the input internally, so there is no need to use a
-     * <code>BufferedInputStream</code>.
-     * 
-     * @param input  the <code>InputStream</code> to read from
-     * @param encoding  the encoding to use, null means platform default
-     * @return the requested String
-     * @throws NullPointerException if the input is null
-     * @throws IOException if an I/O error occurs
-     */
-    public static String toString(InputStream input, String encoding)
-            throws IOException {
-        StringWriter sw = new StringWriter();
-        copy(input, sw, encoding);
-        return sw.toString();
-    }
+	/**
+	 * Get the contents of an <code>InputStream</code> as a String using the
+	 * default character encoding of the platform.
+	 * <p>
+	 * This method buffers the input internally, so there is no need to use a
+	 * <code>BufferedInputStream</code>.
+	 * 
+	 * @param input
+	 *            the <code>InputStream</code> to read from
+	 * @return the requested String
+	 * @throws NullPointerException
+	 *             if the input is null
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	public static String toString(InputStream input) throws IOException {
+		StringWriter sw = new StringWriter();
+		copy(input, sw);
+		return sw.toString();
+	}
+
+	/**
+	 * Get the contents of an <code>InputStream</code> as a String using the
+	 * specified character encoding.
+	 * <p>
+	 * Character encoding names can be found at
+	 * <a href="http://www.iana.org/assignments/character-sets">IANA</a>.
+	 * <p>
+	 * This method buffers the input internally, so there is no need to use a
+	 * <code>BufferedInputStream</code>.
+	 * 
+	 * @param input
+	 *            the <code>InputStream</code> to read from
+	 * @param encoding
+	 *            the encoding to use, null means platform default
+	 * @return the requested String
+	 * @throws NullPointerException
+	 *             if the input is null
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	public static String toString(InputStream input, String encoding) throws IOException {
+		StringWriter sw = new StringWriter();
+		copy(input, sw, encoding);
+		return sw.toString();
+	}
 }

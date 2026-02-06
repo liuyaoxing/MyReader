@@ -53,7 +53,7 @@ public class FileCompareJPanelUI extends MyReaderPanel {
 	protected DefaultTreeModel rightModel;
 
 	protected JScrollPane leftJScrollPane, rightJScrollPane;
-	
+
 	protected CompareTreeNode leftRoot, rightRoot;
 
 	public FileCompareJPanelUI() {
@@ -170,7 +170,7 @@ public class FileCompareJPanelUI extends MyReaderPanel {
 			showModifiedBtn = new JCheckBox("修改");
 			showModifiedBtn.setSelected(true);
 			checkPanel.add(showModifiedBtn);
-			
+
 			synActionBtn = new JCheckBox("两边镜像操作");
 			synActionBtn.setToolTipText("当展开/收缩时,更新另一边状态");
 			synActionBtn.setSelected(true);

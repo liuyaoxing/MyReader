@@ -69,7 +69,8 @@ public class FileUtils {
 	/**
 	 * 获取文件大小 10.24M
 	 *
-	 * @param size 字节
+	 * @param size
+	 *            字节
 	 * @return
 	 */
 	public static String getFileSize(long size) {

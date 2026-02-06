@@ -17,7 +17,7 @@ public class Mr_FileServer {
 	public static final String WEBSRC = "websrc";
 	public static final String FOLDER_SIZE = "foldersize";
 	public static final String MD5 = "md5";
-    public static final String CONTENT_TYPE = "content_type";
+	public static final String CONTENT_TYPE = "content_type";
 	public static final String UPDATETIME = "updatetime";
 	public static final String TIMESTAMP = "timestamp";
 	public static final String REQ_TYPE = "req_type";
@@ -29,10 +29,10 @@ public class Mr_FileServer {
 	public Mr_FileServer(Map<String, String> attributeMap) {
 		this.attributeMap = attributeMap;
 	}
-	
-    public Map<String, String> getAttributeMap() {
-        return attributeMap;
-    }
+
+	public Map<String, String> getAttributeMap() {
+		return attributeMap;
+	}
 
 	public String get(String key) {
 		return attributeMap.get(key);
@@ -92,14 +92,14 @@ public class Mr_FileServer {
 	public String getFileMD5() {
 		return get(MD5);
 	}
-	
-    public void setContentType(String contentType) {
-        put(CONTENT_TYPE, contentType);
-    }
 
-    public String getContentType() {
-        return get(CONTENT_TYPE);
-    }
+	public void setContentType(String contentType) {
+		put(CONTENT_TYPE, contentType);
+	}
+
+	public String getContentType() {
+		return get(CONTENT_TYPE);
+	}
 
 	public void setUpdateTime(String updateTime) {
 		put(UPDATETIME, updateTime);

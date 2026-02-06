@@ -51,7 +51,7 @@ public class BackupJPanelUI extends MyReaderPanel {
 		backupBtn = new JButton("开始备份");
 		backupBtn.setHorizontalAlignment(SwingConstants.RIGHT);
 		firstPanel_1.add(backupBtn);
-		
+
 		refreshUrlBtn = new JButton("刷新地址");
 		refreshUrlBtn.setHorizontalAlignment(SwingConstants.RIGHT);
 		firstPanel_1.add(refreshUrlBtn);
