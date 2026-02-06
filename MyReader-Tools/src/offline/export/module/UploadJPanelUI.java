@@ -28,7 +28,7 @@ public class UploadJPanelUI extends MyReaderPanel {
 
 	protected JCheckBox deleteFileAfterUploadBtn;
 
-	protected JButton uploadFolderBtn;
+	protected JButton refreshUrlBtn, uploadFolderBtn;
 
 	protected String[] uploadColumnNames = new String[]{KEY_ID, KEY_FILENAME, COL_PROGRESS, KEY_FILEPATH, KEY_LENGTH, "修改时间"};
 	protected int[] uploadColumnWidths = new int[]{6, 100, 6, 360, 10, 88};
@@ -65,6 +65,10 @@ public class UploadJPanelUI extends MyReaderPanel {
 		});
 		secondPanel_1.add(deleteFileAfterUploadBtn);
 
+		refreshUrlBtn = new JButton("刷新地址");
+		refreshUrlBtn.setHorizontalAlignment(SwingConstants.RIGHT);
+		secondPanel_1.add(refreshUrlBtn);
+		
 		uploadFolderBtn = new JButton("上传文件夹");
 		uploadFolderBtn.setHorizontalAlignment(SwingConstants.RIGHT);
 		secondPanel_1.add(uploadFolderBtn);

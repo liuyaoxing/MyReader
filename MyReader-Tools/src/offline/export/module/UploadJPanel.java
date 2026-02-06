@@ -341,6 +341,12 @@ public class UploadJPanel extends UploadJPanelUI {
 				}
 			}
 		});
+		refreshUrlBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EventDispatcher.dispatchMessage(PROP_LANPORT_SCAN, UploadJPanel.class.getSimpleName(), null);
+			}
+		});
 	}
 
 	protected File[] doPreUploadFolder(File file) throws IOException {

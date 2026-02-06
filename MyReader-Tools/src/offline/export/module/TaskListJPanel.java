@@ -167,11 +167,11 @@ public class TaskListJPanel extends TaskListJPanelUI {
 		total.set(taskListTableModel.getRowCount());
 
 		for (int row = 0; row < taskListTableModel.getRowCount(); row++) {
-			final String id = (String) taskListTableModel.getValueAt(row, taskListTable.getColumnModel().getColumnIndex(KEY_FILEID));
-			final String title = (String) taskListTableModel.getValueAt(row, taskListTable.getColumnModel().getColumnIndex(KEY_FILENAME));
-			final String url = (String) taskListTableModel.getValueAt(row, taskListTable.getColumnModel().getColumnIndex(KEY_URL));
-			final String size = (String) taskListTableModel.getValueAt(row, taskListTable.getColumnModel().getColumnIndex(KEY_LENGTH));
-			final String absPath = (String) taskListTableModel.getValueAt(row, taskListTable.getColumnModel().getColumnIndex(KEY_FILEPATH));
+			final String id = getTableValueAt(taskListTable, row, KEY_FILEID);
+			final String title = getTableValueAt(taskListTable, row, KEY_FILENAME);
+			final String url = getTableValueAt(taskListTable, row, KEY_URL);
+			final String size = getTableValueAt(taskListTable, row, KEY_LENGTH);
+			final String absPath = getTableValueAt(taskListTable, row, KEY_FILEPATH);
 
 			taskListTable.setRowSelectionInterval(row, row);
 			taskListTable.scrollRectToVisible(new Rectangle(taskListTable.getCellRect(row + 10, 0, true)));

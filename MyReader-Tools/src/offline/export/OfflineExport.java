@@ -176,8 +176,8 @@ public class OfflineExport implements IConstants, PropertyChangeListener {
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
-		tabbedPane.addTab(NAME_FILESERVER, new FileServerJPanel(frame));
 		tabbedPane.addTab(NAME_BACKUP, new BackupJPanel(frame));
+		tabbedPane.addTab(NAME_FILESERVER, new FileServerJPanel(frame));
 		tabbedPane.addTab(NAME_UPLOAD, new UploadJPanel(frame));
 		tabbedPane.addTab(NAME_QRCODE, new QrCodeJPanel(frame));
 		tabbedPane.addTab(NAME_TASKLIST, new TaskListJPanel(frame));

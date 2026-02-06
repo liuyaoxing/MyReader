@@ -21,7 +21,7 @@ public class BackupJPanelUI extends MyReaderPanel {
 
 	protected JComboBox<String> urlCombo;
 
-	protected JButton backupBtn;
+	protected JButton backupBtn, refreshUrlBtn;
 
 	protected JButton folderListBtn;
 
@@ -51,6 +51,10 @@ public class BackupJPanelUI extends MyReaderPanel {
 		backupBtn = new JButton("开始备份");
 		backupBtn.setHorizontalAlignment(SwingConstants.RIGHT);
 		firstPanel_1.add(backupBtn);
+		
+		refreshUrlBtn = new JButton("刷新地址");
+		refreshUrlBtn.setHorizontalAlignment(SwingConstants.RIGHT);
+		firstPanel_1.add(refreshUrlBtn);
 
 		folderListBtn = new JButton("刷新文件夹");
 		folderListBtn.setHorizontalAlignment(SwingConstants.RIGHT);

@@ -24,18 +24,18 @@ public class FileServerJPanelUI extends MyReaderPanel {
 
 	protected JComboBox<String> ipCombo;
 
-	protected JButton startStopBtn;
+	protected JButton startStopBtn, serverInfoBtn, removeSelectedBtn;
 
-	protected JButton refreshUrlBtn;
+	protected JButton addFileBtn, addFolderBtn, clearBtn;
 
 	protected DefaultTableModel fileServerTableModel;
 
-	protected String[] columnNames = new String[]{KEY_ID, KEY_FILENAME, KEY_URL, KEY_LENGTH, KEY_STATUS, KEY_FILEPATH, "个 数"};
-	protected int[] columnWidths = new int[]{50, 250, 50, 50, 50, 250, 50};
+	protected String[] columnNames = new String[]{KEY_ID, KEY_FILENAME, KEY_FILEPATH, KEY_LENGTH, KEY_URL, "个 数"};
+	protected int[] columnWidths = new int[]{10, 166, 150, 40, 250, 10};
 
 	protected JTable fileServerTable;
 
-	private JTextField ipTxt;
+	protected JTextField portTxt;
 
 	/**
 	 * Create the panel.
@@ -49,37 +49,54 @@ public class FileServerJPanelUI extends MyReaderPanel {
 
 		JLabel lblNewLabel = new JLabel("当前IP:");
 		firstPanel_1.add(lblNewLabel);
-		
+
 		ipCombo = new JComboBox<String>();
 		// urlCombo.setFont(new Font("宋体", Font.PLAIN, 16));
 		ipCombo.setEditable(true);
-		ipCombo.setPreferredSize(new Dimension(400, ipCombo.getPreferredSize().height));
-		ipCombo.setMinimumSize(new Dimension(400, ipCombo.getPreferredSize().height));
-		ipCombo.setMaximumSize(new Dimension(400, ipCombo.getPreferredSize().height));
+		ipCombo.setPreferredSize(new Dimension(180, ipCombo.getPreferredSize().height));
+		ipCombo.setMinimumSize(new Dimension(180, ipCombo.getPreferredSize().height));
+		ipCombo.setMaximumSize(new Dimension(180, ipCombo.getPreferredSize().height));
 		ipCombo.setToolTipText("读乐乐服务IP");
 		firstPanel_1.add(ipCombo);
-		
+
 		JLabel lblNewLabel2 = new JLabel("端口:");
 		firstPanel_1.add(lblNewLabel2);
-		
-		ipTxt = new JTextField();
-		ipTxt.setPreferredSize(new Dimension(100, ipTxt.getPreferredSize().height));
-		ipTxt.setMinimumSize(new Dimension(100, ipTxt.getPreferredSize().height));
-		ipTxt.setMaximumSize(new Dimension(100, ipTxt.getPreferredSize().height));
-		firstPanel_1.add(ipTxt);
+
+		portTxt = new JTextField();
+		portTxt.setPreferredSize(new Dimension(66, portTxt.getPreferredSize().height));
+		portTxt.setMinimumSize(new Dimension(66, portTxt.getPreferredSize().height));
+		portTxt.setMaximumSize(new Dimension(66, portTxt.getPreferredSize().height));
+		portTxt.setText("61666");
+		firstPanel_1.add(portTxt);
 
 		startStopBtn = new JButton("开启服务");
 		startStopBtn.setHorizontalAlignment(SwingConstants.RIGHT);
 		firstPanel_1.add(startStopBtn);
 
-		refreshUrlBtn = new JButton("刷新网址");
-		refreshUrlBtn.setHorizontalAlignment(SwingConstants.RIGHT);
-		firstPanel_1.add(refreshUrlBtn);
+		addFileBtn = new JButton("添加文件");
+		addFileBtn.setHorizontalAlignment(SwingConstants.RIGHT);
+		firstPanel_1.add(addFileBtn);
+
+		addFolderBtn = new JButton("添加文件夹");
+		addFolderBtn.setHorizontalAlignment(SwingConstants.RIGHT);
+		firstPanel_1.add(addFolderBtn);
+
+		removeSelectedBtn = new JButton("移除选中");
+		removeSelectedBtn.setHorizontalAlignment(SwingConstants.RIGHT);
+		firstPanel_1.add(removeSelectedBtn);
+
+		clearBtn = new JButton("清空");
+		clearBtn.setHorizontalAlignment(SwingConstants.RIGHT);
+		firstPanel_1.add(clearBtn);
+
+		serverInfoBtn = new JButton("连接详情");
+		serverInfoBtn.setHorizontalAlignment(SwingConstants.RIGHT);
+		firstPanel_1.add(serverInfoBtn);
 
 		// 创建水平方向胶水，填充水平剩余空间
 		Component hGlue = Box.createHorizontalGlue();
 		firstPanel_1.add(hGlue);
-		
+
 		fileServerTableModel = new DefaultTableModel(null, columnNames);
 		fileServerTable = new JTable(fileServerTableModel);
 		fileServerTable.setFillsViewportHeight(true);

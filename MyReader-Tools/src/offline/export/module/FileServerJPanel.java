@@ -2,6 +2,7 @@ package offline.export.module;
 
 import java.awt.Color;
 import java.awt.Desktop;
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -9,51 +10,39 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URI;
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.HashMap;
+import java.nio.file.Files;
+import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
-import com.liuyx.common.csv.CsvUtil;
+import com.liuyx.common.db.dao.Mr_FileServer;
+import com.sun.net.httpserver.HttpServer;
 
-import cn.hutool.http.ContentType;
-import cn.hutool.http.HttpUtil;
-import offline.export.DownloadUtil;
-import offline.export.DownloadUtil.OnDownloadListener;
+import db.FileUtils;
 import offline.export.db.BackupTask;
+import offline.export.dialog.QRCodeDialog;
 import offline.export.log.LogHandler;
-import offline.export.utils.EventDispatcher;
-import offline.export.utils.FileUtils;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import offline.export.module.httpserver.FileServerPreferences;
+import offline.export.module.httpserver.WebServerHandler;
+import offline.export.utils.DateUtils;
+import offline.export.utils.MD5Utils;
 
 /**
  * 手机备份面板
@@ -69,28 +58,77 @@ public class FileServerJPanel extends FileServerJPanelUI {
 
 	protected BackupTask backupTask;
 
-	protected Thread startThread, startFolderThread;
+	private HttpServer server;
+
+	private JFrame frame;
 
 	public FileServerJPanel(JFrame frame) {
+		this.frame = frame;
 		createPopupMenu();
 		addListeners();
 
-		addItemsToCombo(ipCombo, new String[]{"http://192.168.43.1:61666"}, 0);
+		addItemsToCombo(ipCombo, new String[]{getHostIP(), "127.0.0.1"}, 0);
+		refreshFileServerTable();
 	}
 
 	private void addListeners() {
-		ipCombo.addPopupMenuListener(new PopupMenuListener() {
+		startStopBtn.addActionListener(new ActionListener() {
 			@Override
-			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-				refreshServerIp();
-			}
+			public void actionPerformed(ActionEvent e) {
+				if (server != null) {
+					server.stop(5);
+					server = null;
+					startStopBtn.setText("开启服务");
+					startStopBtn.setForeground(Color.BLACK);
+				} else {
+					try {
+						int port = parseInt(portTxt.getText().trim(), 61666);
+						server = HttpServer.create(new InetSocketAddress(port), 0);
+					} catch (Throwable ex) {
+						LogHandler.error(ex);
+					}
+					// 使用自定义处理器处理所有请求
+					server.createContext("/", new WebServerHandler());
 
-			@Override
-			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-			}
+					server.setExecutor(null); // 使用默认 executor
+					server.start();
 
+					// 获取绑定的地址信息
+					InetSocketAddress address = server.getAddress();
+
+					// 可能是 "0.0.0.0"或具体 IP
+					int port = address.getPort(); // 8080
+					setComboBox(ipCombo, getHostIP());
+					portTxt.setText(port + "");
+					System.out.println("Server started on port 8080");
+					startStopBtn.setText("停止服务");
+					startStopBtn.setForeground(Color.RED);
+				}
+			}
+		});
+
+		addFileBtn.addActionListener(new ActionListener() {
 			@Override
-			public void popupMenuCanceled(PopupMenuEvent e) {
+			public void actionPerformed(ActionEvent e) {
+				// FileDialog.LOAD 表示打开文件，FileDialog.SAVE 表示保存文件
+				FileDialog fileDialog = new FileDialog(frame, "请选择文件", FileDialog.LOAD);
+				fileDialog.setMultipleMode(true);
+				fileDialog.setVisible(true);
+				File[] selectedFiles = fileDialog.getFiles();
+				if (selectedFiles != null && selectedFiles.length > 0) {
+					System.out.println("您选择了 " + selectedFiles.length + " 个文件：");
+					for (File filePath : selectedFiles) {
+						try {
+							Mr_FileServer fileServer = newFileServer(filePath);
+							FileServerPreferences.addFileServer(fileServer);
+						} catch (Throwable ex) {
+							LogHandler.debug("添加文件失败:" + ex.getMessage());
+							LogHandler.error(ex);
+						}
+					}
+				} else {
+					System.out.println("未选择任何文件或已取消。");
+				}
 			}
 		});
 
@@ -98,13 +136,7 @@ public class FileServerJPanel extends FileServerJPanelUI {
 			public void mousePressed(MouseEvent me) {
 				if (SwingUtilities.isRightMouseButton(me)) {
 					final JPopupMenu popup = new JPopupMenu();
-					JMenuItem clearItem = new JMenuItem("清空");
-					popup.add(clearItem);
-					clearItem.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							fileServerTableModel.setRowCount(0);
-						}
-					});
+
 					JMenuItem copyItem = new JMenuItem("复制");
 					popup.add(copyItem);
 					copyItem.addActionListener(new ActionListener() {
@@ -117,77 +149,36 @@ public class FileServerJPanel extends FileServerJPanelUI {
 						}
 					});
 					popup.add(new JSeparator());
-					JMenuItem syncFolderItem = new JMenuItem("下载文件夹");
+					JMenuItem syncFolderItem = new JMenuItem("链接二维码");
 					popup.add(syncFolderItem);
 					syncFolderItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							int[] getSelectedRows = fileServerTable.getSelectedRows();
-							if (getSelectedRows == null || getSelectedRows.length == 1) {
-								final int row = fileServerTable.rowAtPoint(me.getPoint());
-								fileServerTable.setRowSelectionInterval(row, row);
-								SwingUtilities.invokeLater(() -> fileServerTable.repaint());
-								getSelectedRows = new int[]{row};
-							}
-
-							if (getSelectedRows == null || getSelectedRows.length == 0)
-								return;
-
-							final JFileChooser fileChooser = new JFileChooser();// 文件选择器
-							fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);// 设定只能选择到文件夹
-							if (currentDirectory != null)
-								fileChooser.setCurrentDirectory(currentDirectory);
-							int state = fileChooser.showSaveDialog(null);// 此句是打开文件选择器界面的触发语句
-							if (state != JFileChooser.APPROVE_OPTION)
-								return;
-							currentDirectory = fileChooser.getSelectedFile();// toFile为选择到的目录
-							System.out.println("CurrentDirectory:" + currentDirectory);
-
-							for (int row : getSelectedRows) {
-								tastListExecutor.submit(new Runnable() {
-									@Override
-									public void run() {
-										Object value = fileServerTable.getValueAt(row, 0);
-										Object folderName = fileServerTable.getValueAt(row, 1);
-										if (value != null && folderName != null) {
-											String newUrl = getInputHostUrl() + FOLDER_LIST_MD5 + value;
-											// taskListTitle.setText(folderName
-											// + ": " + newUrl);
-											EventDispatcher.dispatchMessage(PROP_TASLKIST_TEXT, folderName + ": " + newUrl, null);
-											String newFolderName = folderName.toString().replace("[文件夹]", "");
-											doDownloadFolder(newUrl, new File(currentDirectory, newFolderName));
-										}
-									}
-								});
-							}
+							int row = fileServerTable.rowAtPoint(me.getPoint());
+							String fileUrl = getTableValueAt(fileServerTable, row, KEY_URL);
+							QRCodeDialog dialog = new QRCodeDialog(frame, fileUrl, "扫码打开", fileUrl);
+							dialog.setVisible(true);
 						}
 					});
 					popup.add(new JSeparator());
-					JMenuItem cleanFolderItem = new JMenuItem("清空文件夹");
+					JMenuItem removeItem = new JMenuItem("移除共享");
+					popup.add(removeItem);
+					removeItem.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							int opt = JOptionPane.showConfirmDialog(null, "是否要清空本地文件服务器共享列表?", "确认清空", JOptionPane.YES_NO_OPTION);
+							if (opt == JOptionPane.YES_OPTION) {
+								FileServerPreferences.clearFileServers();
+								refreshFileServerTable();
+							}
+						}
+					});
+					JMenuItem cleanFolderItem = new JMenuItem("清空共享");
 					popup.add(cleanFolderItem);
 					cleanFolderItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							int row = fileServerTable.rowAtPoint(me.getPoint());
-							// int column =
-							// backupTable.columnAtPoint(me.getPoint());
-							Object id = fileServerTable.getValueAt(row, 0);
-							Object fileName = fileServerTable.getValueAt(row, 1);
-							if (id != null) {
-								String msg = String.format("确认是否要删除文件服务器上的%s?", fileName);
-								int opt = JOptionPane.showConfirmDialog(null, msg, "确认删除", JOptionPane.YES_NO_OPTION);
-								if (opt == JOptionPane.YES_OPTION) {
-									// 确认继续操作
-									// http://192.168.133.65:61666/files/ad60dc86d022c92f66715899686753e2
-									String hostUrl = getInputHostUrl(ipCombo);
-									String deleteUrl = hostUrl + "/files/" + id;
-									try {
-										LinkedHashMap<String, String> urlParams = new LinkedHashMap<>();
-										urlParams.put("_method", "delete");
-										boolean isSuccess = doPostFormData(deleteUrl, urlParams);
-										JOptionPane.showMessageDialog(null, fileName + (isSuccess ? "删除成功!" : "删除失败!"));
-									} catch (Exception e1) {
-										e1.printStackTrace();
-									}
-								}
+							int opt = JOptionPane.showConfirmDialog(null, "是否要清空本地文件服务器共享列表?", "确认清空", JOptionPane.YES_NO_OPTION);
+							if (opt == JOptionPane.YES_OPTION) {
+								FileServerPreferences.clearFileServers();
+								refreshFileServerTable();
 							}
 						}
 					});
@@ -198,68 +189,31 @@ public class FileServerJPanel extends FileServerJPanelUI {
 							popup.setVisible(false);
 						}
 					});
-
+					JMenuItem clearItem = new JMenuItem("清空");
+					popup.add(clearItem);
+					clearItem.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							fileServerTableModel.setRowCount(0);
+						}
+					});
 					popup.add(new JSeparator());
 					popup.add(calcel);
 					popup.show(me.getComponent(), me.getX(), me.getY());
 				}
 			}
 		});
-
-		refreshUrlBtn.addActionListener(new ActionListener() {
+		
+		serverInfoBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				refreshServerIp();
-
-				String comboText = getComboText(ipCombo);
-				String folderList = comboText + (comboText.endsWith(FOLDER_LIST) ? "" : FOLDER_LIST);
-
-				addItemsToCombo(ipCombo, new String[]{comboText, folderList}, 1);
-
-				Request request = new Request.Builder().addHeader("x-header", "dll")//
-						.header("sort", "_id")//
-						.url(folderList).build();
-				try {
-					Response response = DownloadUtil.get().newCall(request);
-					if (!response.isSuccessful()) {
-						JOptionPane.showMessageDialog(null, response.message());
-						return;
-					}
-					String body = response.body().string();
-					fileServerTableModel.setRowCount(0);
-					Map<String, JsonObject> toMap = new Gson().fromJson(body, new TypeToken<Map<String, JsonObject>>() {
-					}.getType());
-					Iterator<Entry<String, JsonObject>> iter = toMap.entrySet().iterator();
-					while (iter.hasNext()) {
-						Entry<String, JsonObject> entry = iter.next();
-						JsonObject element = entry.getValue();
-						JsonObject jsonObject = element.get("nameValuePairs").getAsJsonObject();
-						final String id = jsonObject.get(FILESERVER_MD5).getAsString();
-						final String title = jsonObject.get(FILESERVER_NAME).getAsString();
-						final String url = jsonObject.get(FILESERVER_PATH).getAsString();
-						final String size = jsonObject.get(FILESERVER_SIZE).getAsString();
-						final int fileList = jsonObject.get(FILESERVER_FILELIST).getAsInt();
-						fileServerTableModel.insertRow(0, new Object[]{id, title, url, size, "", "", fileList});
-					}
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-
-		startStopBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				HttpUtil.createServer(8888)
-						// 设置默认根目录
-						.setRoot("./")//
-						.addAction("/restTest", (request, response) -> response.write("{\"id\": 1, \"msg\": \"OK\"}", ContentType.JSON.toString()))
-						.start();
+				String fileUrl = getInputHostUrl();
+				QRCodeDialog dialog = new QRCodeDialog(frame, fileUrl, "扫码打开", fileUrl);
+				dialog.setVisible(true);
 			}
 		});
 	}
 
 	protected void createPopupMenu() {
-		// 创建右键菜单
 		JPopupMenu popupMenu = new JPopupMenu();
 		JMenuItem copyItem = new JMenuItem("复制");
 		popupMenu.add(copyItem);
@@ -293,165 +247,68 @@ public class FileServerJPanel extends FileServerJPanelUI {
 				}
 			}
 		});
-		JMenuItem refreshItem = new JMenuItem("刷新网址");
-		popupMenu.add(refreshItem);
-		refreshItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dispatchMessage(PROP_LANPORT_SCAN, FileServerJPanel.class.getSimpleName(), null);
-			}
-		});
 		ipCombo.setComponentPopupMenu(popupMenu);
 	}
 
-	protected boolean doBackFiles(int page) throws IOException, SQLException {
-		ipCombo.setSelectedItem(String.valueOf(ipCombo.getSelectedItem()).replace("：", ":"));
-		String backupListUrl = String.format("%s/dll/export/list", getComboText(ipCombo));
-		Request request = new Request.Builder().addHeader("x-header", "dll")//
-				.header("page", String.valueOf(page))//
-				.header("size", String.valueOf(100))//
-				.header("sort", "_id")//
-				.url(backupListUrl).build();
-		Response response = DownloadUtil.get().newCall(request);
-		if (!response.isSuccessful()) {
-			throw new UnsupportedOperationException("文件下载失败:" + response.message());
+	protected String getInputHostUrl(JComboBox<String> urlCombo) {
+		try {
+			String newItem = String.valueOf(urlCombo.getEditor().getItem());
+			return "http://" + String.format("%s:%s", newItem, portTxt.getText().trim());
+		} catch (Exception ex) {
+			return null;
 		}
-		String body = response.body().string();
-		JsonArray jsonArray = new Gson().fromJson(body, JsonArray.class);
-
-		Map<String, String> whereMap = new HashMap<String, String>();
-		for (int i = 0; i < jsonArray.size(); i++) {
-			JsonObject element = jsonArray.get(i).getAsJsonObject();
-			System.out.println("开始执行:" + element);
-			final String id = element.get("_id").getAsString();
-			final String title = element.get("title").getAsString();
-			final String url = element.get("url").getAsString();
-			final long length = element.get("foldersize").getAsLong();
-
-			whereMap.put(BackupTask.KEY_ID, id);
-
-			// List<Map<String, Object>> resList =
-			// database.dbQuery(backupTask.getTableName(), whereMap);
-			// if (resList != null && resList.size() > 0) {
-			// backupTableModel.insertRow(0, new Object[] { id, title, url,
-			// FileUtils.getFileSize(length), "文件已存在！" });
-			//// continue;
-			// }
-			fileServerTableModel.insertRow(0, new Object[]{id, title, url, FileUtils.getFileSize(length), "0%"});
-
-			fileServerTable.scrollRectToVisible(fileServerTable.getCellRect(0, 0, true));
-			fileServerTable.setRowSelectionInterval(0, 0);
-			fileServerTable.setSelectionBackground(Color.LIGHT_GRAY);// 选中行设置背景色
-			SwingUtilities.invokeLater(() -> fileServerTable.repaint());
-
-			final int row = 0;
-			int statusCol = fileServerTable.getColumnModel().getColumnIndex(KEY_STATUS);
-			int pathCol = fileServerTable.getColumnModel().getColumnIndex(KEY_FILEPATH);
-			final String getUrl = String.format("%s/dll/export/%s", getComboText(ipCombo), id);
-
-			DownloadUtil.get().download(getUrl, id, "backup", new OnDownloadListener() {
-				@Override
-				public boolean isFileExists(File srcFile) {
-					return srcFile.exists() && srcFile.length() > 0;
-				}
-
-				@Override
-				public void onDownloadSuccess(File file) {
-					try {
-						fileServerTableModel.setValueAt("100%", row, statusCol);
-						fileServerTableModel.setValueAt(file.getCanonicalFile(), row, pathCol);
-						// backupTask.setId(id);
-						// backupTask.setTitle(title);
-						// backupTask.setUrl(url);
-						// backupTask.setLength(String.valueOf(length));
-						// database.dbInsert(backupTask);
-					} catch (Exception ex) {
-						LogHandler.error(ex);
-						ex.printStackTrace();
-					}
-				}
-
-				@Override
-				public void onDownloading(int progress) {
-					fileServerTableModel.setValueAt(progress + "%", row, statusCol);
-				}
-
-				@Override
-				public void onDownloadFailed(Exception e) {
-					fileServerTableModel.setValueAt("0%", row, statusCol);
-					fileServerTableModel.setValueAt("下载失败" + e.getMessage(), row, pathCol);
-				}
-
-				@Override
-				public void onFileExists(File file) {
-					fileServerTableModel.setValueAt("文件已存在:", row, statusCol);
-					fileServerTableModel.setValueAt(file.getPath(), row, pathCol);
-				}
-			});
-
-			if (fileServerTableModel.getDataVector().size() > 5000) {
-				fileServerTableModel.setRowCount(0);
-			}
-			// frame.setTitle(String.format("%s (已处理: %s项)", TITLE,
-			// counter.incrementAndGet()));
-			dispatchMessage(PROP_SET_WINDOW_TITLE, String.format("%s (已处理: %s项)", TITLE, counter.incrementAndGet()), null);
-		}
-		return jsonArray.size() > 0;
 	}
 
 	protected String getInputHostUrl() {
 		return getInputHostUrl(ipCombo);
 	}
 
-	public void refreshServerIp() {
-		String newItem = String.valueOf(ipCombo.getEditor().getItem());
-		if (!newItem.startsWith("http://"))
-			newItem = "http://" + newItem;
-		if (!newItem.contains(":61666") && !newItem.contains(":61667"))
-			newItem = newItem + ":61666";
-
-		Set<String> itemSet = new HashSet<String>();
-		DefaultComboBoxModel<String> d = (DefaultComboBoxModel<String>) ipCombo.getModel();
-		d.removeAllElements();
-		try {
-			itemSet.add(String.valueOf(newItem));
-			URL url = new URL(newItem);
-			String newUrl = "http://" + String.format("%s:%s", url.getHost(), url.getPort());
-			itemSet.add(newUrl);
-			// itemSet.add(String.valueOf(newUrl + FOLDER_LIST));
-		} catch (MalformedURLException e1) {
-			e1.printStackTrace();
+	private void refreshFileServerTable() {
+		fileServerTableModel.setRowCount(0);
+		List<Mr_FileServer> fileServers = FileServerPreferences.queryUploadFiles();
+		for (int i = 0; i < fileServers.size(); i++) {
+			Mr_FileServer fileServer = fileServers.get(i);
+			final String path = fileServer.getLocation();
+			if (!new File(path).exists())
+				continue;
+			// KEY_ID, KEY_FILENAME, KEY_FILEPATH, KEY_LENGTH, KEY_URL, "个 数"
+			final int index = fileServers.size() - i;
+			final String id = fileServer.getFileMD5();
+			final String title = fileServer.getTitle();
+			final String url = String.format("http://%s:%s/files/%s", getComboText(ipCombo), portTxt.getText(), id);
+			final String size = FileUtils.formatFileSize(fileServer.getFolderSize());
+			final int fileList = 0;
+			fileServerTableModel.insertRow(0, new Object[]{index, title, path, size, url, fileList});
 		}
-		addItemsToCombo(ipCombo, itemSet.toArray(new String[0]), 0);
 	}
 
-	public boolean doPostFormData(String urlStr, LinkedHashMap<String, String> urlParams) throws Exception {
-		FormBody.Builder builder = new FormBody.Builder();
-		Iterator<Entry<String, String>> iter = urlParams.entrySet().iterator();
-		while (iter.hasNext()) {
-			Entry<String, String> entry = iter.next();
-			builder.add(entry.getKey(), entry.getValue());
-		}
-		FormBody formBody = builder.build();
-		Request request = new Request.Builder().url(urlStr)//
-				.post(formBody)//
-				.addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")//
-				.build();
-
-		OkHttpClient client = new OkHttpClient();
-
-		Response response = client.newCall(request).execute();
-		return response.isSuccessful();
-	}
-
-	private void doDownloadFolder(final String fileUrl, final File toFile) {
+	// 获取本机非回环、非虚拟网卡的 IP 地址
+	private static String getHostIP() {
 		try {
-			System.out.println(String.format("开始下载文件%s到%s", fileUrl, toFile));
-			EventDispatcher.dispatchMessage(PROP_DOWNLOAD_FOLDER,
-					CsvUtil.stringArrayToCsv(new String[]{fileUrl, toFile.getCanonicalPath(), getInputHostUrl()}), null);
-		} catch (IOException ex) {
-			LogHandler.debug("下载文件夹失败:" + ex.getMessage());
+			Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
+			while (allNetInterfaces.hasMoreElements()) {
+				NetworkInterface netInterface = allNetInterfaces.nextElement();
+
+				// 跳过虚拟网卡和未启用的网卡
+				if (netInterface.isLoopback() || netInterface.isVirtual() || !netInterface.isUp())
+					continue;
+
+				Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
+				while (addresses.hasMoreElements()) {
+					InetAddress addr = addresses.nextElement();
+					if (addr instanceof java.net.Inet4Address) { // 优先获取 IPv4
+						String ip = addr.getHostAddress();
+						// 排除 docker 或其他内网保留地址（根据需要调整）
+						if (ip.startsWith("192.168") || ip.startsWith("10.") || ip.startsWith("172.")) {
+							return ip;
+						}
+					}
+				}
+			}
+		} catch (SocketException e) {
+			e.printStackTrace();
 		}
+		return "127.0.0.1"; // 默认回退
 	}
 
 	Set<String> itemSet = new HashSet<String>();
@@ -464,5 +321,20 @@ public class FileServerJPanel extends FileServerJPanelUI {
 			addItemsToCombo(ipCombo, itemSet.toArray(new String[0]), 0);
 		}
 		super.propertyChange(event);
+	}
+
+	private Mr_FileServer newFileServer(File srcFile) throws IOException {
+		Mr_FileServer fileServer = new Mr_FileServer();
+		fileServer.setTitle(srcFile.getName());
+		fileServer.setLocation(srcFile.getPath());
+		// fileServer.setFileUri(stream);
+		fileServer.setWebSrc("本机");
+		fileServer.setContentType(Files.probeContentType(srcFile.toPath()));
+		fileServer.setFolderSize(srcFile.length());
+		fileServer.setFileMD5(MD5Utils.encryptFileFast(srcFile));
+		fileServer.setUpdateTime(DateUtils.getCurrentTime());
+		fileServer.setReqType(0);
+		fileServer.setState(0);
+		return fileServer;
 	}
 }

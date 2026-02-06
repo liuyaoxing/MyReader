@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.DefaultComboBoxModel;
@@ -81,6 +82,7 @@ public abstract class MyReaderPanel extends JPanel implements IConstants, Proper
 	}
 
 	public void addItemsToCombo(JComboBox<String> urlCombo, String[] items, int index) {
+		items = Arrays.stream(items).distinct().toArray(String[]::new);
 		DefaultComboBoxModel<String> d = (DefaultComboBoxModel<String>) urlCombo.getModel();
 		d.removeAllElements();
 		for (String item : items) {
@@ -150,8 +152,23 @@ public abstract class MyReaderPanel extends JPanel implements IConstants, Proper
 		}
 	}
 
+	public int parseInt(String value, int defVal) {
+		try {
+			return Integer.valueOf(value);
+		} catch (Exception e) {
+		}
+		return defVal;
+	}
+
 	public void dispatchMessage(String propName, Object newValue, Object oldValue) {
 		EventDispatcher.dispatchMessage(propName, newValue, oldValue);
+	}
+
+	public String getTableValueAt(JTable table, int row, String columnName) {
+		int columnIndex = table.getColumnModel().getColumnIndex(columnName);
+		if (columnIndex == -1)
+			return "";
+		return (String) table.getModel().getValueAt(row, columnIndex);
 	}
 
 	@Override

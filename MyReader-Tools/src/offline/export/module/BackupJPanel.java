@@ -91,7 +91,6 @@ public class BackupJPanel extends BackupJPanelUI {
 			public void popupMenuCanceled(PopupMenuEvent e) {
 			}
 		});
-
 		backupTable.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
 				if (SwingUtilities.isRightMouseButton(me)) {
@@ -250,6 +249,12 @@ public class BackupJPanel extends BackupJPanelUI {
 				backupTableModel.setRowCount(0);
 				counter.set(0);
 				doStartBackup(backupBtn);
+			}
+		});
+		refreshUrlBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				refreshServerIp();
 			}
 		});
 	}
