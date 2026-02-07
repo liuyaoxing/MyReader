@@ -24,7 +24,7 @@ public class FileServerJPanelUI extends MyReaderPanel {
 
 	protected JComboBox<String> ipCombo;
 
-	protected JButton startStopBtn, serverInfoBtn, removeSelectedBtn;
+	protected JButton startStopBtn, serverQRCodeBtn;
 
 	protected JButton addFileBtn, addFolderBtn, clearBtn;
 
@@ -53,9 +53,9 @@ public class FileServerJPanelUI extends MyReaderPanel {
 		ipCombo = new JComboBox<String>();
 		// urlCombo.setFont(new Font("宋体", Font.PLAIN, 16));
 		ipCombo.setEditable(true);
-		ipCombo.setPreferredSize(new Dimension(180, ipCombo.getPreferredSize().height));
-		ipCombo.setMinimumSize(new Dimension(180, ipCombo.getPreferredSize().height));
-		ipCombo.setMaximumSize(new Dimension(180, ipCombo.getPreferredSize().height));
+		ipCombo.setPreferredSize(new Dimension(200, ipCombo.getPreferredSize().height));
+		ipCombo.setMinimumSize(new Dimension(200, ipCombo.getPreferredSize().height));
+		ipCombo.setMaximumSize(new Dimension(200, ipCombo.getPreferredSize().height));
 		ipCombo.setToolTipText("读乐乐服务IP");
 		firstPanel_1.add(ipCombo);
 
@@ -63,9 +63,9 @@ public class FileServerJPanelUI extends MyReaderPanel {
 		firstPanel_1.add(lblNewLabel2);
 
 		portTxt = new JTextField();
-		portTxt.setPreferredSize(new Dimension(66, portTxt.getPreferredSize().height));
-		portTxt.setMinimumSize(new Dimension(66, portTxt.getPreferredSize().height));
-		portTxt.setMaximumSize(new Dimension(66, portTxt.getPreferredSize().height));
+		portTxt.setPreferredSize(new Dimension(77, portTxt.getPreferredSize().height));
+		portTxt.setMinimumSize(new Dimension(77, portTxt.getPreferredSize().height));
+		portTxt.setMaximumSize(new Dimension(77, portTxt.getPreferredSize().height));
 		portTxt.setText("61666");
 		firstPanel_1.add(portTxt);
 
@@ -81,17 +81,13 @@ public class FileServerJPanelUI extends MyReaderPanel {
 		addFolderBtn.setHorizontalAlignment(SwingConstants.RIGHT);
 		firstPanel_1.add(addFolderBtn);
 
-		removeSelectedBtn = new JButton("移除选中");
-		removeSelectedBtn.setHorizontalAlignment(SwingConstants.RIGHT);
-		firstPanel_1.add(removeSelectedBtn);
-
-		clearBtn = new JButton("清空");
+		clearBtn = new JButton("清空共享");
 		clearBtn.setHorizontalAlignment(SwingConstants.RIGHT);
 		firstPanel_1.add(clearBtn);
 
-		serverInfoBtn = new JButton("连接详情");
-		serverInfoBtn.setHorizontalAlignment(SwingConstants.RIGHT);
-		firstPanel_1.add(serverInfoBtn);
+		serverQRCodeBtn = new JButton("连接二维码");
+		serverQRCodeBtn.setHorizontalAlignment(SwingConstants.RIGHT);
+		firstPanel_1.add(serverQRCodeBtn);
 
 		// 创建水平方向胶水，填充水平剩余空间
 		Component hGlue = Box.createHorizontalGlue();

@@ -36,6 +36,17 @@ public class FileServerPreferences {
 		prefs.flush();
 	}
 
+	public static void saveFileServerList(List<Mr_FileServer> fileServerList) throws Exception {
+		List<Map<String, String>> listMap = new ArrayList<>(fileServerList.size());
+		for (Mr_FileServer fileServer : fileServerList) {
+			listMap.add(fileServer.getAttributeMap());
+		}
+		Preferences prefs = Preferences.userRoot().node(PREFS_NODE);
+		String json = new Gson().toJson(listMap);
+		prefs.put(KEY_FILESERVER, json);
+		prefs.flush();
+	}
+
 	public static List<Mr_FileServer> queryUploadFiles() {
 		Preferences prefs = Preferences.userRoot().node(PREFS_NODE);
 		String fileServerJson = prefs.get(KEY_FILESERVER, "");
@@ -57,6 +68,17 @@ public class FileServerPreferences {
 		List<Mr_FileServer> result = listMap.stream().filter(map -> whereMap.entrySet().stream()//
 				.allMatch(e -> Objects.equals(e.getValue(), map.get(e.getKey())))).collect(Collectors.toList());
 		return result;
+	}
+
+	public static boolean deleteUploadFiles(Map<String, String> whereMap) throws Exception {
+		List<Mr_FileServer> listMap = queryUploadFiles();
+		List<Mr_FileServer> result = listMap.stream().filter(map -> whereMap.entrySet().stream()//
+				.allMatch(e -> Objects.equals(e.getValue(), map.get(e.getKey())))).collect(Collectors.toList());
+		if (listMap.removeAll(result)) {
+			saveFileServerList(listMap);
+			return true;
+		}
+		return false;
 	}
 
 	public static Mr_FileServer queryUploadFile(String md5) {

@@ -17,8 +17,10 @@ import java.net.SocketException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -126,6 +128,7 @@ public class FileServerJPanel extends FileServerJPanelUI {
 							LogHandler.error(ex);
 						}
 					}
+					refreshFileServerTable();
 				} else {
 					System.out.println("未选择任何文件或已取消。");
 				}
@@ -164,10 +167,17 @@ public class FileServerJPanel extends FileServerJPanelUI {
 					popup.add(removeItem);
 					removeItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							int opt = JOptionPane.showConfirmDialog(null, "是否要清空本地文件服务器共享列表?", "确认清空", JOptionPane.YES_NO_OPTION);
-							if (opt == JOptionPane.YES_OPTION) {
-								FileServerPreferences.clearFileServers();
-								refreshFileServerTable();
+							int row = fileServerTable.rowAtPoint(me.getPoint());
+							String filePath = getTableValueAt(fileServerTable, row, KEY_FILEPATH);
+							try {
+								Map<String, String> whereMap = new HashMap<>();
+								whereMap.put(Mr_FileServer.FILE_LOCATION, filePath);
+								if (FileServerPreferences.deleteUploadFiles(whereMap)) {
+									pushInfo("删除成功", "移除成功!");
+									refreshFileServerTable();
+								}
+							} catch (Exception ex) {
+								LogHandler.error(ex);
 							}
 						}
 					});
@@ -189,13 +199,6 @@ public class FileServerJPanel extends FileServerJPanelUI {
 							popup.setVisible(false);
 						}
 					});
-					JMenuItem clearItem = new JMenuItem("清空");
-					popup.add(clearItem);
-					clearItem.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							fileServerTableModel.setRowCount(0);
-						}
-					});
 					popup.add(new JSeparator());
 					popup.add(calcel);
 					popup.show(me.getComponent(), me.getX(), me.getY());
@@ -203,12 +206,23 @@ public class FileServerJPanel extends FileServerJPanelUI {
 			}
 		});
 
-		serverInfoBtn.addActionListener(new ActionListener() {
+		serverQRCodeBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String fileUrl = getInputHostUrl();
 				QRCodeDialog dialog = new QRCodeDialog(frame, fileUrl, "扫码打开", fileUrl);
 				dialog.setVisible(true);
+			}
+		});
+
+		clearBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int opt = JOptionPane.showConfirmDialog(null, "是否要清空本地文件服务器共享列表?", "确认清空", JOptionPane.YES_NO_OPTION);
+				if (opt == JOptionPane.YES_OPTION) {
+					FileServerPreferences.clearFileServers();
+					refreshFileServerTable();
+				}
 			}
 		});
 	}
@@ -265,20 +279,25 @@ public class FileServerJPanel extends FileServerJPanelUI {
 
 	private void refreshFileServerTable() {
 		fileServerTableModel.setRowCount(0);
-		List<Mr_FileServer> fileServers = FileServerPreferences.queryUploadFiles();
-		for (int i = 0; i < fileServers.size(); i++) {
-			Mr_FileServer fileServer = fileServers.get(i);
-			final String path = fileServer.getLocation();
-			if (!new File(path).exists())
-				continue;
-			// KEY_ID, KEY_FILENAME, KEY_FILEPATH, KEY_LENGTH, KEY_URL, "个 数"
-			final int index = fileServers.size() - i;
-			final String id = fileServer.getFileMD5();
-			final String title = fileServer.getTitle();
-			final String url = String.format("http://%s:%s/files/%s", getComboText(ipCombo), portTxt.getText(), id);
-			final String size = FileUtils.formatFileSize(fileServer.getFolderSize());
-			final int fileList = 0;
-			fileServerTableModel.insertRow(0, new Object[]{index, title, path, size, url, fileList});
+		try {
+			List<Mr_FileServer> fileServers = FileServerPreferences.queryUploadFiles();
+			for (int i = 0; i < fileServers.size(); i++) {
+				Mr_FileServer fileServer = fileServers.get(i);
+				final String path = fileServer.getLocation();
+				if (!new File(path).exists())
+					continue;
+				// KEY_ID, KEY_FILENAME, KEY_FILEPATH, KEY_LENGTH, KEY_URL, "个
+				// 数"
+				final int index = fileServers.size() - i;
+				final String id = fileServer.getFileMD5();
+				final String title = fileServer.getTitle();
+				final String url = String.format("http://%s:%s/files/%s", getComboText(ipCombo), portTxt.getText(), id);
+				final String size = FileUtils.formatFileSize(fileServer.getFolderSize());
+				final int fileList = 0;
+				fileServerTableModel.insertRow(0, new Object[]{index, title, path, size, url, fileList});
+			}
+		} catch (Exception ex) {
+			LogHandler.error(ex);
 		}
 	}
 

@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTree;
@@ -158,6 +159,14 @@ public abstract class MyReaderPanel extends JPanel implements IConstants, Proper
 		} catch (Exception e) {
 		}
 		return defVal;
+	}
+
+	public void pushInfo(String title, String message) {
+		JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public void pushError(String title, String message) {
+		JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
 	}
 
 	public void dispatchMessage(String propName, Object newValue, Object oldValue) {
