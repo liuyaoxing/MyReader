@@ -16,15 +16,15 @@ public class Version_Apk {
 	private boolean forceUpdate;
 
 	public static void main(String[] args) {
-		File srcFile = new File("E:\\DeveloperWorks\\Android\\MyReader.v36\\app\\release\\MyReader-release-3.31.v202601161200.apk");
+		File srcFile = new File("E:\\DeveloperWorks\\Android\\MyReader.v36\\app\\release\\MyReader-release-3.31.v202602091200.apk");
 		Version_Apk version = new Version_Apk();
 		version.setTitle("读乐乐v3.31");
 		version.setFileName(srcFile.getName());
-		version.setChangeLog("01、下载网页支持时支持视频下载；\r\n02、启用硬件加速优化续航");
-		version.setUrl("https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202601161200.apk");
+		version.setChangeLog("01、增加二维码生成功能,完全离线本地生成；\r\n02、下载网页支持时支持视频下载；\r\n02、启用硬件加速优化续航");
+		version.setUrl("https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202602091200.apk");
 		version.setFileSize(srcFile.length());
 		version.setVcode(77);
-		version.setVersion(202601161200L);
+		version.setVersion(202602091200L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();

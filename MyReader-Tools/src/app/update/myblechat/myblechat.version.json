@@ -1,10 +1,10 @@
 {
-	"title": "读乐乐v3.31",
-	"fileName": "MyReader-release-3.31.v202511201700.apk",
-	"url": "https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202511201700.apk",
-	"changelog": "01、修复图片墙体验问题，播放视频长按加速；\n02、优化使用体验；",
-	"vcode": 77,
-	"version": 202511201700,
+	"title": "左右手v3.22",
+	"fileName": "MyBleChat-release-3.22.v202602091200.apk",
+	"url": "https://github.com/liuyaoxing/MyBLEChat/releases/download/v3.22/MyBleChat-release-3.22.v202602091200.apk",
+	"changelog": "01、增加二维码生成功能,完全离线本地生成；\r\n01、优化码云传的用户体验\r\n02、修复了一些体验的问题",
+	"vcode": 30,
+	"version": 202602091200,
 	"fileSize": 0,
 	"forceUpdate": true
 }

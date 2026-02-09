@@ -10,7 +10,6 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry excluding="main/resources/" kind="src" path="src"/>
-	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="lib" path="libs/gson-2.2.4.jar"/>
 	<classpathentry kind="lib" path="libs/okio-1.17.5.jar"/>
