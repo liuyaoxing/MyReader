@@ -24,7 +24,7 @@ public class FileServerJPanelUI extends MyReaderPanel {
 
 	protected JComboBox<String> ipCombo;
 
-	protected JButton startStopBtn, serverQRCodeBtn;
+	protected JButton startStopBtn, serverQRCodeBtn, genQRCodeBtn;
 
 	protected JButton addFileBtn, addFolderBtn, clearBtn;
 
@@ -88,6 +88,10 @@ public class FileServerJPanelUI extends MyReaderPanel {
 		serverQRCodeBtn = new JButton("连接二维码");
 		serverQRCodeBtn.setHorizontalAlignment(SwingConstants.RIGHT);
 		firstPanel_1.add(serverQRCodeBtn);
+		
+		genQRCodeBtn = new JButton("生成二维码");
+		genQRCodeBtn.setHorizontalAlignment(SwingConstants.RIGHT);
+		firstPanel_1.add(genQRCodeBtn);
 
 		// 创建水平方向胶水，填充水平剩余空间
 		Component hGlue = Box.createHorizontalGlue();

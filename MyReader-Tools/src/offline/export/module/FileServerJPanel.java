@@ -214,6 +214,15 @@ public class FileServerJPanel extends FileServerJPanelUI {
 				dialog.setVisible(true);
 			}
 		});
+		
+		genQRCodeBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String input = JOptionPane.showInputDialog(null, "请输入内容：");
+				QRCodeDialog dialog = new QRCodeDialog(frame, input, "扫码打开", input);
+				dialog.setVisible(true);
+			}
+		});
 
 		clearBtn.addActionListener(new ActionListener() {
 			@Override
