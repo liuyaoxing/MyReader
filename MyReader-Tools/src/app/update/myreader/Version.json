@@ -1,10 +1,10 @@
 {
 	"title": "读乐乐v3.31",
-	"fileName": "MyReader-release-3.31.v202602091200.apk",
-	"url": "https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202602091200.apk",
-	"changelog": "01、增加二维码生成功能,完全离线本地生成；\r\n02、下载网页支持时支持视频下载；\r\n02、启用硬件加速优化续航",
+	"fileName": "MyReader-release-3.31.MyReader-release-3.31.v202605081500.apk",
+	"url": "https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202605081500.apk",
+	"changelog": "00、修复浏览器无法拦截垃圾网址,增加网页白名单；\r\n01、支持指定网址使用新窗口打开；\r\n02、增加二维码生成功能,完全离线本地生成；\r\n03、下载网页支持时支持视频下载；\r\n04、启用硬件加速优化续航",
 	"vcode": 77,
-	"version": 202602091200,
+	"version": 202605081500,
 	"fileSize": 0,
 	"forceUpdate": true
 }

@@ -1,10 +1,10 @@
 {
-	"title": "左右手v3.22",
-	"fileName": "MyBleChat-release-3.22.v202602091200.apk",
-	"url": "https://github.com/liuyaoxing/MyBLEChat/releases/download/v3.22/MyBleChat-release-3.22.v202602091200.apk",
-	"changelog": "01、增加二维码生成功能,完全离线本地生成；\r\n01、优化码云传的用户体验\r\n02、修复了一些体验的问题",
-	"vcode": 30,
-	"version": 202602091200,
+	"title": "读乐乐v3.31",
+	"fileName": "MyReader-release-3.31.MyReader-release-3.31.v202604061500.apk",
+	"url": "https://github.com/liuyaoxing/MyReader/releases/download/v3.31/MyReader-release-3.31.v202604061500.apk",
+	"changelog": "00、增加文件服务添加文件显示隐藏文件和文件大小统计；\r\n01、支持指定网址使用新窗口打开；\r\n02、增加二维码生成功能,完全离线本地生成；\r\n03、下载网页支持时支持视频下载；\r\n04、启用硬件加速优化续航",
+	"vcode": 77,
+	"version": 202604061500,
 	"fileSize": 0,
 	"forceUpdate": true
 }

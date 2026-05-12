@@ -38,6 +38,7 @@ import com.liuyx.common.db.dao.Mr_FileServer;
 import com.sun.net.httpserver.HttpServer;
 
 import offline.export.db.BackupTask;
+import offline.export.dialog.DialogHelper;
 import offline.export.dialog.QRCodeDialog;
 import offline.export.log.LogHandler;
 import offline.export.module.httpserver.FileServerPreferences;
@@ -214,11 +215,13 @@ public class FileServerJPanel extends FileServerJPanelUI {
 				dialog.setVisible(true);
 			}
 		});
-		
+
 		genQRCodeBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String input = JOptionPane.showInputDialog(null, "请输入内容：");
+				String input = DialogHelper.showMultiInputDialog(frame, "请输入二维码内容");
+				if (input == null)
+					return;
 				QRCodeDialog dialog = new QRCodeDialog(frame, input, "扫码打开", input);
 				dialog.setVisible(true);
 			}

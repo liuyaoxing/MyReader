@@ -86,15 +86,15 @@ public class Version_Apk {
 	}
 
 	public static void main(String[] args) {
-		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyBleChatv33\\app\\release\\MyBleChat-release-3.22.v202602091200.apk");
+		File srcFile = new File("D:\\Developer\\DeveloperWorks\\Android\\MyBleChatv33\\app\\release\\MyBleChat-release-3.22.v202603181200.apk");
 		Version_Apk version = new Version_Apk();
 		version.setTitle("左右手v3.22");
 		version.setFileName(srcFile.getName());
-		version.setChangeLog("01、增加二维码生成功能,完全离线本地生成；\r\n01、优化码云传的用户体验\r\n02、修复了一些体验的问题");
-		version.setUrl("https://github.com/liuyaoxing/MyBLEChat/releases/download/v3.22/MyBleChat-release-3.22.v202602091200.apk");
+		version.setChangeLog("00、修复扫一扫识别的二维码内容无法复制;\r\n01、增加二维码生成功能,完全离线本地生成；\r\n01、优化码云传的用户体验\r\n02、修复了一些体验的问题");
+		version.setUrl("https://github.com/liuyaoxing/MyBLEChat/releases/download/v3.22/MyBleChat-release-3.22.v202603181200.apk");
 		version.setFileSize(srcFile.length());
 		version.setVcode(30);
-		version.setVersion(202602091200L);
+		version.setVersion(202604061500L);
 		version.setForceUpdate(true);
 
 		Gson gson = new Gson();

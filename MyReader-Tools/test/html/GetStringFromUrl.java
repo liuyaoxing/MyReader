@@ -1,5 +1,6 @@
 package html;
 
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import org.jsoup.Connection;
@@ -15,7 +16,7 @@ public class GetStringFromUrl {
 		// System.out.println(getStringFromUrl("https://cl.xgbrnb.org/htm_mob/2501/7/6663802.html"));
 
 		System.out.println(getStringFromUrl(
-				"https://mbd.baidu.com/newspage/data/landingsuper?id=1791474120816221227&third=baijiahao&baijiahao_id=1791474120816221227&wfr=&c_source=duedge&c_score=0.999100&p_tk=7631rRq9H4L%2B8qP0AQg%2FLJ%2BH1xbCL2XJupZjLHFgdPFuFgTaYsofNypU4qRxLbzZbnXBVjWsaBekq5g%2BeEaCiLHk6p%2BF%2BnwFbZrm1ecF%2FYI%2Bc3Cj%2Frecqq7%2BaNnB%2FXUrQLnZ%2FrqwuMw0%2BBJ85Af4phJNFk7566OcjxPr5h5BgOzKnNk%3D&p_timestamp=1739341545&p_sign=42ccfa1525294c5a1476f19d1e21e631&p_signature=2fd4dbe059e672b7ea20b0f348243511&__pc2ps_ab=7631rRq9H4L%2B8qP0AQg%2FLJ%2BH1xbCL2XJupZjLHFgdPFuFgTaYsofNypU4qRxLbzZbnXBVjWsaBekq5g%2BeEaCiLHk6p%2BF%2BnwFbZrm1ecF%2FYI%2Bc3Cj%2Frecqq7%2BaNnB%2FXUrQLnZ%2FrqwuMw0%2BBJ85Af4phJNFk7566OcjxPr5h5BgOzKnNk%3D|1739341545|2fd4dbe059e672b7ea20b0f348243511|42ccfa1525294c5a1476f19d1e21e631"));
+				"https://fuliba2023.net/s.php?u=https://tvax1.sinaimg.cn/large/006BNqYCly1ibz62sakb4j31340pganr.jpg"));
 		// System.out.println(getStringFromUrl(
 		// "https://baijiahao.baidu.com/s?id=1820677285038563021&wfr=spider&for=pc&searchword=%E7%8E%8B%E5%B0%94%E5%BE%B7%E7%BB%8F%E5%85%B8%E5%8F%A5%E5%AD%90"));
 
@@ -62,6 +63,10 @@ public class GetStringFromUrl {
 		if (url == null || url.length() == 0)
 			return "";
 
+		URL urli = new URL(url);
+		System.out.println(urli.getHost());
+		
+		
 		OkHttpClient client = new OkHttpClient.Builder()//
 				.connectTimeout(10, TimeUnit.SECONDS)//
 				.readTimeout(10, TimeUnit.SECONDS)//
