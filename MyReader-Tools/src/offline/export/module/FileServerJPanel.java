@@ -220,7 +220,7 @@ public class FileServerJPanel extends FileServerJPanelUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String input = DialogHelper.showMultiInputDialog(frame, "请输入二维码内容");
-				if (input == null)
+				if (input == null || input.isEmpty())
 					return;
 				QRCodeDialog dialog = new QRCodeDialog(frame, input, "扫码打开", input);
 				dialog.setVisible(true);
