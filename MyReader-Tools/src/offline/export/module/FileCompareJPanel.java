@@ -7,6 +7,8 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.Enumeration;
@@ -31,6 +33,9 @@ import javax.swing.tree.TreePath;
 import offline.export.dialog.DeleteFileConfirmDialog;
 import offline.export.module.compare.CompareTreeNode;
 import offline.export.module.compare.FileTreeCellRenderer;
+import offline.export.utils.DialogUtils;
+import offline.export.utils.EventDispatcher;
+import offline.export.utils.FileCompareUtils;
 import offline.export.utils.FileUtils;
 import offline.export.utils.PathUtils;
 
@@ -407,39 +412,31 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 	}
 
 	private void deleteAllEqualFiles() {
-		if (!(leftModel.getRoot() instanceof CompareTreeNode))
+		Path sourcePath = Paths.get(getComboText(leftCombo));
+		Path targetPath = Paths.get(getComboText(rightCombo));
+		if (!Files.exists(sourcePath)) {
+			DialogUtils.showWarningDialog(null, "左侧文件不存在:" + sourcePath, "左侧文件不存在!");
 			return;
-		CompareTreeNode root = (CompareTreeNode) leftModel.getRoot();
-		Set<File> toDeletedFiles = new HashSet<>();
-		removeAllSubNodes(root, toDeletedFiles);
-		boolean confirmed = DeleteFileConfirmDialog.showConfirmDialog(null, toDeletedFiles);
-		if (confirmed) {
-			toDeletedFiles.forEach(f -> {
-				if (f != null && f.isFile()) {
-					if (!f.delete())
-						System.err.println("Delete failed: " + f.getAbsolutePath());
 				}
-			});
-		} else {
-			System.out.println("用户取消删除");
+		if (!Files.exists(targetPath)) {
+			DialogUtils.showWarningDialog(null, "右侧文件不存在:" + targetPath, "右侧文件不存在!");
+			return;
 		}
+		String message = String.format("确认删除两个文件夹: \n%s\n%s\n中内容相同的文件?", sourcePath, targetPath);
+		if (JOptionPane.showConfirmDialog(null, message) == JOptionPane.OK_OPTION) {
+			try {
+				EventDispatcher.dispatchMessage(PROP_GLASSPANE_START, null, null);
+				try {
+					FileCompareUtils.removeDuplicateFilesRecursively(sourcePath, targetPath, md5CompBtn.isSelected());
+				} finally {
+					EventDispatcher.dispatchMessage(PROP_GLASSPANE_STOP, null, null);
 	}
-
-	private void removeAllSubNodes(DefaultMutableTreeNode parent, Set<File> toDeletedFiles) {
-		for (Enumeration<? extends TreeNode> e = parent.children(); e.hasMoreElements();) {
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
-			if (!(node instanceof CompareTreeNode))
-				continue;
-			CompareTreeNode treeNode = (CompareTreeNode) node;
-			if (treeNode.getFile().isDirectory()) {
-				removeAllSubNodes(treeNode, toDeletedFiles);
-			} else {
-				if (treeNode.getStatus() == CompareTreeNode.Status.MATCHED) {
-					File rightFile = mapFile(treeNode.getFile(), new File(getComboText(leftCombo)), new File(getComboText(rightCombo)));
-					System.out.println("删除左侧文件:" + treeNode.getFile() + ", 删除右侧文件:" + rightFile);
-					toDeletedFiles.add(treeNode.getFile());
-					toDeletedFiles.add(rightFile);
+				if (JOptionPane.showConfirmDialog(null, "文件清理完成, 是否刷新文件夹") == JOptionPane.OK_OPTION) {
+					performCompare();
 				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				DialogUtils.showErrorDialog(null, "文件删除错误: " + ex.getMessage(), "删除失败!");
 			}
 		}
 	}
@@ -461,7 +458,12 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 		new SwingWorker<Void, Void>() {
 			@Override
 			protected Void doInBackground() throws Exception {
+				EventDispatcher.dispatchMessage(PROP_GLASSPANE_START, null, null);
+				try {
 				performCompare0(); // 耗时操作放后台
+				} finally {
+					EventDispatcher.dispatchMessage(PROP_GLASSPANE_STOP, null, null);
+				}
 				return null;
 			}
 
