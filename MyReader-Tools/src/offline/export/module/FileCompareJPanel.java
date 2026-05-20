@@ -412,13 +412,15 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 	}
 
 	private void deleteAllEqualFiles() {
-		Path sourcePath = Paths.get(getComboText(leftCombo));
-		Path targetPath = Paths.get(getComboText(rightCombo));
-		if (!Files.exists(sourcePath)) {
+		String sourcePathStr = getComboText(leftCombo);
+		String targetPathStr = getComboText(rightCombo);
+		Path sourcePath = Paths.get(sourcePathStr);
+		Path targetPath = Paths.get(targetPathStr);
+		if (StringUtils.isEmpty(sourcePathStr) || !Files.exists(sourcePath)) {
 			DialogUtils.showWarningDialog(null, "左侧文件不存在:" + sourcePath, "左侧文件不存在!");
 			return;
-				}
-		if (!Files.exists(targetPath)) {
+		}
+		if ((StringUtils.isEmpty(targetPathStr) || !Files.exists(targetPath)) {
 			DialogUtils.showWarningDialog(null, "右侧文件不存在:" + targetPath, "右侧文件不存在!");
 			return;
 		}
