@@ -2,6 +2,8 @@ package offline.export.module;
 
 import java.awt.Desktop;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -36,8 +38,10 @@ import offline.export.module.compare.FileTreeCellRenderer;
 import offline.export.utils.DialogUtils;
 import offline.export.utils.EventDispatcher;
 import offline.export.utils.FileCompareUtils;
+import offline.export.utils.FileDiffUtil;
 import offline.export.utils.FileUtils;
 import offline.export.utils.PathUtils;
+import offline.export.utils.StringUtils;
 
 /**
  * 文件夹比较面板
@@ -65,8 +69,40 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 	}
 
 	private void createPopupMenu() {
+		{ //
+			// 创建右键菜单
+			JPopupMenu popupMenu = new JPopupMenu();
+			JMenuItem copyItem = new JMenuItem("复制");
+			popupMenu.add(copyItem);
+			copyItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String selectedItem = (String) rightCombo.getSelectedItem();
+					if (selectedItem != null) {
+						setSysClipboardText(selectedItem);
+					}
+				}
+			});
+			JMenuItem winMergeMenuItem = new JMenuItem("WinMerge打开");
+			popupMenu.add(winMergeMenuItem);
+			winMergeMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						FileDiffUtil.openWinMerge(new File(getComboText(leftCombo)), new File(getComboText(rightCombo)));
+					} catch (Exception ex) {
+						JOptionPane.showMessageDialog(FileCompareJPanel.this, "比对文件失败:" + ex.getMessage());
+					}
+				}
+			});
+			rightCombo.setComponentPopupMenu(popupMenu);
+		}
 		{
 			leftPopupMenu = new JPopupMenu("操作");
+			
+			JMenuItem winMergeItem = new JMenuItem("WinMerge打开");
+			winMergeItem.addActionListener(e -> openWithWinMerge(leftTree));
+			leftPopupMenu.add(winMergeItem);
 
 			JMenuItem ignoreItem = new JMenuItem("忽略文件");
 			ignoreItem.addActionListener(e -> ignoreSelectedNode(leftTree));
@@ -104,13 +140,21 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 			JMenuItem showInRightItem = new JMenuItem("显示在右侧");
 			showInRightItem.addActionListener(e -> showInOtherTree(leftTree, rightTree));
 			leftPopupMenu.add(showInRightItem);
+			
+			JMenuItem deleteEmptyFolderRightItem = new JMenuItem("删除空文件夹");
+			deleteEmptyFolderRightItem.addActionListener(e -> deleteEmtpyFolder(leftTree));
+			leftPopupMenu.add(deleteEmptyFolderRightItem);
 		}
 
 		{
 			rightPopupMenu = new JPopupMenu("操作");
 
+			JMenuItem winMergeItem = new JMenuItem("WinMerge打开");
+			winMergeItem.addActionListener(e -> openWithWinMerge(rightTree));
+			rightPopupMenu.add(winMergeItem);
+			
 			JMenuItem ignoreItem = new JMenuItem("忽略文件");
-			ignoreItem.addActionListener(e -> ignoreSelectedNode(leftTree));
+			ignoreItem.addActionListener(e -> ignoreSelectedNode(rightTree));
 			rightPopupMenu.add(ignoreItem);
 
 			JMenuItem copyToItem = new JMenuItem("复制到左侧");
@@ -145,6 +189,10 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 			JMenuItem showInRightItem = new JMenuItem("显示在左侧");
 			showInRightItem.addActionListener(e -> showInOtherTree(rightTree, leftTree));
 			rightPopupMenu.add(showInRightItem);
+			
+			JMenuItem deleteEmptyFolderRightItem = new JMenuItem("删除空文件夹");
+			deleteEmptyFolderRightItem.addActionListener(e -> deleteEmtpyFolder(rightTree));
+			rightPopupMenu.add(deleteEmptyFolderRightItem);
 		}
 	}
 
@@ -164,6 +212,13 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 			collapseAll(leftTree);
 			collapseAll(rightTree);
 		});
+		winMergeUBtn.addActionListener(e -> {
+			try {
+				FileDiffUtil.openWinMerge(new File(getComboText(leftCombo)), new File(getComboText(rightCombo)));
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(this, "比对文件失败:" + ex.getMessage());
+			}
+		});
 
 		// 添加鼠标监听器，处理右键点击
 		leftTree.addMouseListener(new MouseAdapter() {
@@ -175,6 +230,8 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 						leftTree.setSelectionPath(path);
 						leftPopupMenu.show(leftTree, e.getX(), e.getY());
 					}
+				} else if (e.getClickCount() == 2) {
+					openWithWinMerge((JTree) e.getComponent());
 				}
 			}
 		});
@@ -221,6 +278,8 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 						rightTree.setSelectionPath(path);
 						rightPopupMenu.show(rightTree, e.getX(), e.getY());
 					}
+				} else if (e.getClickCount() == 2) {
+					openWithWinMerge((JTree) e.getComponent());
 				}
 			}
 		});
@@ -420,7 +479,7 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 			DialogUtils.showWarningDialog(null, "左侧文件不存在:" + sourcePath, "左侧文件不存在!");
 			return;
 		}
-		if ((StringUtils.isEmpty(targetPathStr) || !Files.exists(targetPath)) {
+		if (StringUtils.isEmpty(targetPathStr) || !Files.exists(targetPath)) {
 			DialogUtils.showWarningDialog(null, "右侧文件不存在:" + targetPath, "右侧文件不存在!");
 			return;
 		}
@@ -432,7 +491,7 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 					FileCompareUtils.removeDuplicateFilesRecursively(sourcePath, targetPath, md5CompBtn.isSelected());
 				} finally {
 					EventDispatcher.dispatchMessage(PROP_GLASSPANE_STOP, null, null);
-	}
+				}
 				if (JOptionPane.showConfirmDialog(null, "文件清理完成, 是否刷新文件夹") == JOptionPane.OK_OPTION) {
 					performCompare();
 				}
@@ -661,6 +720,20 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 		return fileSet;
 	}
 
+	private void openWithWinMerge(JTree srcTree) {
+		File selectedFile = getSelectedFile(srcTree);
+		File targetFile = null;
+		if (srcTree == this.leftTree)
+			targetFile = mapFile(selectedFile, getComboText(leftCombo), getComboText(rightCombo));
+		else
+			targetFile = mapFile(selectedFile, getComboText(rightCombo), getComboText(leftCombo));
+		try {
+			FileDiffUtil.openWinMerge(selectedFile, targetFile);
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(this, "比对文件失败:" + ex.getMessage());
+		}
+	}
+	
 	private void ignoreSelectedNode(JTree tree) {
 		ignoreFiles.add(getSelectedFile(tree));
 	}
@@ -749,6 +822,17 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 			JOptionPane.showMessageDialog(this, "查看文件失败:" + ex.getMessage());
 		}
 	}
+	
+	private void deleteEmtpyFolder(JTree tree) {
+		try {
+			File selectedFile = getSelectedFile(tree);
+			FileUtils.deleteEmptyDirectories(selectedFile);
+			JOptionPane.showMessageDialog(this, "已删除空文件夹: " + selectedFile);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			JOptionPane.showMessageDialog(this, "删除空文件夹失败:" + ex.getMessage());
+		}
+	}
 
 	private void showInOtherTree(JTree tree1, JTree tree2) {
 		File selectedFile = getSelectedFile(tree1);
@@ -785,6 +869,7 @@ public class FileCompareJPanel extends FileCompareJPanelUI {
 		}
 	}
 
+   
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		String propertyName = event.getPropertyName();

@@ -872,4 +872,29 @@ public class FileUtils {
 		}
 		return new FileInputStream(file);
 	}
+	
+	 /**
+     * 递归删除指定目录下的所有空文件夹
+     * 注意：不会删除非空文件夹，只会清理因删除文件或文件夹后形成的“空壳”目录
+     *
+     * @param directory 根目录路径
+     */
+    public static void deleteEmptyDirectories(File directory) {
+        if (directory == null || !directory.exists() || !directory.isDirectory())
+            return;
+
+        File[] children = directory.listFiles();
+        if (children == null || children.length == 0) 
+            return;
+
+        for (File child : children) {
+            if (child.isDirectory()) {
+                deleteEmptyDirectories(child);
+                if (child.listFiles() == null || child.listFiles().length == 0) {
+                    child.delete();
+                }
+            }
+        }
+    }
+    
 }
