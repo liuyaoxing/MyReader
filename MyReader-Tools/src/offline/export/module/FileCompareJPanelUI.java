@@ -43,7 +43,7 @@ public class FileCompareJPanelUI extends MyReaderPanel {
 	protected JButton rightBtn;
 	protected JCheckBox md5CompBtn, sizeDateCompBtn;
 	protected JCheckBox showEqualsBtn, showAddedBtn, showModifiedBtn, synActionBtn;
-	protected JButton deleteEqualBtn, expandAllBtn, collapseAllBtn;
+	protected JButton deleteEqualBtn, expandAllBtn, collapseAllBtn, winMergeUBtn;
 	protected JButton refreshBtn;
 	protected JSplitPane splitPane;
 
@@ -122,7 +122,7 @@ public class FileCompareJPanelUI extends MyReaderPanel {
 		gbc_rightBtn.gridy = 0;
 		panel1.add(rightBtn, gbc_rightBtn);
 
-		refreshBtn = new JButton("刷新");
+		refreshBtn = new JButton("比较");
 		GridBagConstraints gbc_refreshBtn = new GridBagConstraints();
 		gbc_refreshBtn.gridx = 6;
 		gbc_refreshBtn.gridy = 0;
@@ -216,6 +216,17 @@ public class FileCompareJPanelUI extends MyReaderPanel {
 			collapseAllBtn.setFocusable(false); // 可选
 			collapseAllBtn.setIcon(new ImageIcon(getClass().getResource("/icons/expand.png")));
 			btnPanel.add(collapseAllBtn);
+			
+			btnPanel.add(Box.createHorizontalStrut(10));
+			
+			winMergeUBtn = new JButton("WinMerge打开");
+			winMergeUBtn.setBorder(BorderFactory.createEmptyBorder());
+			winMergeUBtn.setOpaque(false);
+			winMergeUBtn.setContentAreaFilled(false);
+			winMergeUBtn.setFocusPainted(false);
+			winMergeUBtn.setFocusable(false); // 可选
+			winMergeUBtn.setIcon(new ImageIcon(getClass().getResource("/icons/WinMergeLogoSmall.png")));
+			btnPanel.add(winMergeUBtn);
 		}
 
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);

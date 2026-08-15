@@ -62,6 +62,10 @@ public class ViewerFrame extends JFrame {
 	public static final String WINDOW_SHAKE = "窗口抖动";
 
 	public static final String MENU_SET_ALWAYS_ONTOP = "窗口置顶";
+	
+	public static final String MENU_KEEP_SLEEP = "正常锁屏";
+	
+	public static final String MENU_ANTI_SLEEP = "禁止锁屏";
 
 	public static final String MENU_PREVIOUS = "上一个";
 
@@ -355,7 +359,7 @@ public class ViewerFrame extends JFrame {
 		// 菜单文字数组，以下面的menuItemArr一一对应
 		String[] menuArr = {MENUBAR_FILE, MENUBAR_TOOLS};
 		// 菜单项文字数组
-		String[][] menuItemArr = {{MENU_OPENFILE, "-", MENU_SET_ALWAYS_ONTOP, WINDOW_SHAKE, "-", MENU_EXIT}, //
+		String[][] menuItemArr = {{MENU_OPENFILE, "-", MENU_SET_ALWAYS_ONTOP, WINDOW_SHAKE, MENU_ANTI_SLEEP, "-", MENU_EXIT}, //
 				{MENU_ZOOM_IN, MENU_ZOOM_OUT, MENU_ZOOM_FIX, "-", MENU_PREVIOUS, MENU_NEXT, "-", MENU_PLAY1_0S, MENU_PLAY0_8S, MENU_PLAY0_5S,
 						MENU_PLAYCUSTOMS, MENU_PLAY_PAUSE, MENU_PLAY_STOP}};
 		// 遍历menuArr与menuItemArr去创建菜单
