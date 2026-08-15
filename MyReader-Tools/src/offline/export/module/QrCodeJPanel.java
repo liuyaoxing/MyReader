@@ -33,7 +33,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
+import offline.export.log.LogHandler;
 import offline.export.pictureViewer.ViewerFrame;
+import offline.export.utils.AntiSleepRobot;
 import offline.export.utils.Base64FileUtil;
 import offline.export.utils.ComparatorFactory;
 import offline.export.utils.EventDispatcher;
@@ -107,9 +109,13 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 		qrCodeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Point location = qrCodeButton.getLocationOnScreen();
-					popupMenu.setLocation(location.x, location.y + qrCodeButton.getSize().height);
-					popupMenu.setVisible(true);
+					if(popupMenu.isVisible()) {
+						popupMenu.setVisible(false);
+					} else {
+						Point location = qrCodeButton.getLocationOnScreen();
+						popupMenu.setLocation(location.x, location.y + qrCodeButton.getSize().height);
+						popupMenu.setVisible(true);
+					}
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
@@ -140,83 +146,86 @@ public class QrCodeJPanel extends QrCodeJPanelUI {
 	}
 
 	private void initMenus() {
-		popupMenu = new JPopupMenu();
-		JMenuItem qrCodeTransferMenuItem = new JMenuItem("码云传");
-		qrCodeTransferMenuItem.addActionListener(new ActionListener() {
+		ActionListener actionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					popupMenu.setVisible(false);
-					// FileDialog fd = new FileDialog(frame);
-					FileDialog fd = new FileDialog(frame);
-					// fd.setMultipleMode(false);
-					fd.setTitle("请选择文件");
-					fd.setVisible(true);
-
-					File getFile = new File(fd.getDirectory(), fd.getFile());
+				popupMenu.setVisible(false);
+				if (MENU_CLEAR.equals(e.getActionCommand())) {
 					qrCodeTableModel.setRowCount(0);
-					parseFile2QrCodes(getFile);
+				} else if (MENU_ANTI_SLEEP.equals(e.getActionCommand())) {
+					AntiSleepRobot.switchAntiSleep();
+				} else if (MENU_OPEN_FOLDER.equals(e.getActionCommand())) {
+					try {
+						JFileChooser fileChooser = new JFileChooser();
+						fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+						fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+							File choosedFolder = fileChooser.getSelectedFile();
+							EventDispatcher.dispatchMessage(PROP_GLASSPANE_START, null, null);
+							File[] qrCodeFiles = refreshFileItems(choosedFolder.getCanonicalPath());
+							if (viewerFrame == null) {
+								viewerFrame = new ViewerFrame();
+								viewerFrame.setLocationRelativeTo(null);
+							}
+							EventDispatcher.dispatchMessage(PROP_GLASSPANE_STOP, null, null);
+							viewerFrame.setVisible(true);
+							viewerFrame.openFile(qrCodeFiles, qrCodeFiles[0]);
+						}
+					} catch (Exception ex) {
+						LogHandler.error(ex);
+					}
+				} else if(MENU_PHOTO_VIEWER.equals(e.getActionCommand())) {
+					try {
+						popupMenu.setVisible(false);
+						frame.setExtendedState(Frame.ICONIFIED);
+						ViewerFrame viewerFrame = new ViewerFrame();
+						viewerFrame.setLocationRelativeTo(null);
+						File openFile = viewerFrame.openFile();
+						if (openFile != null) {
+							qrCodeTableModel.setRowCount(0);
+							refreshFileItems(openFile.getParent());
+						}
+					} catch (Exception ex) {
+						LogHandler.error(ex);
+					}
+				} else if(MENU_QRCODE_TRANSFER.equals(e.getActionCommand())) {
+					try {
+						popupMenu.setVisible(false);
+						// FileDialog fd = new FileDialog(frame);
+						FileDialog fd = new FileDialog(frame);
+						// fd.setMultipleMode(false);
+						fd.setTitle("请选择文件");
+						fd.setVisible(true);
 
-				} catch (Exception ex) {
-					ex.printStackTrace();
+						File getFile = new File(fd.getDirectory(), fd.getFile());
+						qrCodeTableModel.setRowCount(0);
+						parseFile2QrCodes(getFile);
+					} catch (Exception ex) {
+						LogHandler.error(ex);
+					}
 				}
 			}
-		});
+		};
+		
+		popupMenu = new JPopupMenu();
+		JMenuItem qrCodeTransferMenuItem = new JMenuItem(MENU_QRCODE_TRANSFER);
+		qrCodeTransferMenuItem.addActionListener(actionListener);
 		popupMenu.add(qrCodeTransferMenuItem);
 
-		JMenuItem photoViewerMenuItem = new JMenuItem("图片浏览器");
-		photoViewerMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					popupMenu.setVisible(false);
-					frame.setExtendedState(Frame.ICONIFIED);
-					ViewerFrame viewerFrame = new ViewerFrame();
-					viewerFrame.setLocationRelativeTo(null);
-					File openFile = viewerFrame.openFile();
-					if (openFile != null) {
-						qrCodeTableModel.setRowCount(0);
-						refreshFileItems(openFile.getParent());
-					}
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-		});
+		JMenuItem photoViewerMenuItem = new JMenuItem(MENU_PHOTO_VIEWER);
+		photoViewerMenuItem.addActionListener(actionListener);
 		popupMenu.add(photoViewerMenuItem);
 
-		JMenuItem openFolderMenuItem = new JMenuItem("打开文件夹");
-		openFolderMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					popupMenu.setVisible(false);
-					JFileChooser fileChooser = new JFileChooser();
-					fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-					if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-						File choosedFolder = fileChooser.getSelectedFile();
-						EventDispatcher.dispatchMessage(PROP_GLASSPANE_START, null, null);
-						File[] qrCodeFiles = refreshFileItems(choosedFolder.getCanonicalPath());
-						if (viewerFrame == null) {
-							viewerFrame = new ViewerFrame();
-							viewerFrame.setLocationRelativeTo(null);
-						}
-						EventDispatcher.dispatchMessage(PROP_GLASSPANE_STOP, null, null);
-						viewerFrame.setVisible(true);
-						viewerFrame.openFile(qrCodeFiles, qrCodeFiles[0]);
-					}
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-		});
+		JMenuItem openFolderMenuItem = new JMenuItem(MENU_OPEN_FOLDER);
+		openFolderMenuItem.addActionListener(actionListener);
 		popupMenu.add(openFolderMenuItem);
 
-		JMenuItem cleanMenuItem = new JMenuItem("清空");
-		cleanMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				qrCodeTableModel.setRowCount(0);
-				popupMenu.setVisible(false);
-			}
-		});
+		JMenuItem antiSleepMenuItem = new JMenuItem(MENU_ANTI_SLEEP);
+		antiSleepMenuItem.addActionListener(actionListener);
+		popupMenu.add(antiSleepMenuItem);
+		
+		JMenuItem cleanMenuItem = new JMenuItem(MENU_CLEAR);
+		cleanMenuItem.addActionListener(actionListener);
+
 		popupMenu.add(cleanMenuItem);
 
 		addPopupMenu(qrCodeButton, popupMenu);

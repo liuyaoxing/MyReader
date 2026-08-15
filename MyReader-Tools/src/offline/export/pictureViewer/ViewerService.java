@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import offline.export.utils.AntiSleepRobot;
 import offline.export.utils.ComparatorFactory;
 
 public class ViewerService {
@@ -42,6 +43,9 @@ public class ViewerService {
 
 	/** 是否窗口抖動 */
 	protected boolean windowShake = false;
+	
+	/** 禁止锁屏 */
+	protected boolean antiSleep = false;
 
 	/** 自动播放间隔时间 */
 	protected double playTimerPeriod = 0;
@@ -145,6 +149,9 @@ public class ViewerService {
 		if (cmd.equals(ViewerFrame.MENU_SET_ALWAYS_ONTOP)) {
 			frame.setAlwaysOnTop(!frame.isAlwaysOnTop());
 		}
+		if (cmd.equals(ViewerFrame.MENU_ANTI_SLEEP)) {
+			AntiSleepRobot.switchAntiSleep();
+		}
 		if (cmd.equals(ViewerFrame.WINDOW_SHAKE)) {
 			windowShake = !windowShake;
 		}
@@ -201,6 +208,7 @@ public class ViewerService {
 				timer = null;
 			}
 			refreshTitle(frame);
+			AntiSleepRobot.stopPreventingSleep();
 		}
 
 		// 退出
@@ -308,5 +316,6 @@ public class ViewerService {
 					doNext(frame);
 			}
 		}, 2000, (long) (period * 1000));
+		AntiSleepRobot.startPreventingSleep();
 	}
 }

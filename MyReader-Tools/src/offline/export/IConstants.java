@@ -58,4 +58,16 @@ public interface IConstants {
 	public static final String PROP_DOWNLOAD_FOLDER = "PROP_DOWNLOAD_FOLDER";
 
 	public static final String PROP_SET_WINDOW_TITLE = "PROP_SET_WINDOW_TITLE";
+	
+	public static final String PROP_ANTI_SLEEP = "PROP_ANTI_SLEEP";
+	
+	public static final String MENU_CLEAR = "清空";
+	
+	public static final String MENU_ANTI_SLEEP = "禁止休眠";
+	
+	public static final String MENU_OPEN_FOLDER = "打开文件夹";
+	
+	public static final String MENU_PHOTO_VIEWER = "图片浏览器";
+	
+	public static final String MENU_QRCODE_TRANSFER = "码云传";
 }

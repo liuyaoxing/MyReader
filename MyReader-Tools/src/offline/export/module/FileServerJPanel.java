@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +27,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.imageio.ImageIO;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -43,9 +45,11 @@ import offline.export.dialog.QRCodeDialog;
 import offline.export.log.LogHandler;
 import offline.export.module.httpserver.FileServerPreferences;
 import offline.export.module.httpserver.WebServerHandler;
+import offline.export.pictureViewer.ViewerFrame;
 import offline.export.utils.DateUtils;
 import offline.export.utils.FileUtils;
 import offline.export.utils.MD5Utils;
+import offline.export.utils.QRCodeUtil;
 
 /**
  * 手机备份面板
@@ -208,11 +212,27 @@ public class FileServerJPanel extends FileServerJPanelUI {
 		});
 
 		serverQRCodeBtn.addActionListener(new ActionListener() {
+			private ViewerFrame viewerFrame;
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String fileUrl = getInputHostUrl();
-				QRCodeDialog dialog = new QRCodeDialog(frame, fileUrl, "扫码打开", fileUrl);
-				dialog.setVisible(true);
+				try {
+					BufferedImage qrImage = QRCodeUtil.createQRCode(fileUrl, 256, 256);
+					File tempFile = File.createTempFile("连接二维码_", ".png");
+					tempFile.deleteOnExit();
+					ImageIO.write(qrImage, "png", tempFile);
+
+					if (viewerFrame == null) {
+						viewerFrame = new ViewerFrame();
+						viewerFrame.setLocationRelativeTo(null);
+					}
+					viewerFrame.setFile(tempFile);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					QRCodeDialog dialog = new QRCodeDialog(frame, fileUrl, "扫码打开", fileUrl);
+					dialog.setVisible(true);
+				}
 			}
 		});
 
