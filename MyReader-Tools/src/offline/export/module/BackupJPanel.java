@@ -254,7 +254,7 @@ public class BackupJPanel extends BackupJPanelUI {
 		refreshUrlBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				refreshServerIp();
+				dispatchMessage(PROP_LANPORT_SCAN, BackupJPanel.class.getSimpleName(), null);
 			}
 		});
 	}
